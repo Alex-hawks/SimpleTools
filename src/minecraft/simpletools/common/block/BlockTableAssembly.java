@@ -2,13 +2,15 @@ package simpletools.common.block;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import simpletools.common.SimpleTools;
 import universalelectricity.prefab.BlockMachine;
+import universalelectricity.prefab.implement.ISneakUseWrench;
 import universalelectricity.prefab.tile.TileEntityAdvanced;
 
-public class BlockTableAssembly extends BlockMachine
+public class BlockTableAssembly extends BlockMachine implements ISneakUseWrench
 {
 
 	public BlockTableAssembly(int par1)
@@ -50,5 +52,55 @@ public class BlockTableAssembly extends BlockMachine
 
 		((TileEntityAdvanced) par1World.getBlockTileEntity(x, y, z)).initiate();
 		par1World.notifyBlocksOfNeighborChange(x, y, z, this.blockID);
+	}
+	
+	@Override
+	public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side, float hitX, float hitY, float hitZ)
+	{
+		int metadata = par1World.getBlockMetadata(x, y, z);
+
+		int change = 0;
+
+		// Re-orient the block
+		switch (metadata)
+		{
+			case 0:
+				change = 3;
+				break;
+			case 3:
+				change = 1;
+				break;
+			case 1:
+				change = 2;
+				break;
+			case 2:
+				change = 0;
+				break;
+		}
+
+		par1World.setBlockMetadata(x, y, z, change);
+
+		((TileEntityAdvanced) par1World.getBlockTileEntity(x, y, z)).initiate();
+
+		return true;
+	}
+	
+	@Override
+	public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side, float hitX, float hitY, float hitZ)
+	{
+		if (!par1World.isRemote)
+		{
+			par5EntityPlayer.openGui(SimpleTools.instance, 0, par1World, x, y, z);
+			return true;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean onSneakUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side, float hitX, float hitY, float hitZ)
+	{
+		this.dropBlockAsItem(par1World, x, y, z, par1World.getBlockMetadata(x, y, z), 0);
+        par1World.setBlockWithNotify(x, y, z, 0);
+        return true;
 	}
 }

@@ -14,6 +14,7 @@ import universalelectricity.prefab.network.PacketManager;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
+import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -27,6 +28,9 @@ public class SimpleTools
 {
 	private static final int FIRST_BLOCK_ID = 4040;
 	private static final int FIRST_ITEM_ID = 16000;
+	
+	@Instance("UE-SimpleTools")
+	public static SimpleTools instance;
 	
 	public static final String[] SUPPORTED_LANGUAGES = { "en_US" };
 	
