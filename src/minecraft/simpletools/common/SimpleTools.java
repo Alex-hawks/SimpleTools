@@ -61,8 +61,6 @@ public class SimpleTools
 	public static Item attachmentToolPlasma;
 	public static Item attachmentMWeaponMotor;
 	public static Item attachmentMWeaponPlasma;
-	public static Item attachmentRWeaponMotor;
-	public static Item attachmentRWeaponPlasma;
 	
 	private static void configLoad(Configuration config)
 	{
@@ -80,10 +78,8 @@ public class SimpleTools
 		
 		attachmentToolMotor		= new ItemAttachmentToolMotor(config.getItem("Motor_Tool_Attachment", FIRST_ITEM_ID + 4).getInt(), "MotorTool");
 //5		attachmentToolPlasma	=
-//6		attachmentMWeaponMotor	=
-//7		attachmentMWeaponPlasma =
-//8		attachmentRWeaponMotor	=
-//9		attachmentRWeaponPlasma	=
+//6		attachmentWeaponMotor	=
+//7		attachmentWeaponPlasma =
 		
 		config.save();
 	}

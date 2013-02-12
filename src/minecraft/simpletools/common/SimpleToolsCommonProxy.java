@@ -5,6 +5,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.network.IGuiHandler;
+import simpletools.common.containers.ContainerTableAssembly;
 import simpletools.common.tileentities.TileEntityTableAssembly;
 
 public class SimpleToolsCommonProxy implements IGuiHandler
