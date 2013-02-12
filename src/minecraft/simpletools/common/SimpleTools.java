@@ -79,7 +79,7 @@ public class SimpleTools
 		attachmentToolMotor		= new ItemAttachmentToolMotor(config.getItem("Motor_Tool_Attachment", FIRST_ITEM_ID + 4).getInt(), "MotorTool");
 //5		attachmentToolPlasma	=
 //6		attachmentWeaponMotor	=
-//7		attachmentWeaponPlasma =
+//7		attachmentWeaponPlasma	=
 		
 		config.save();
 	}
