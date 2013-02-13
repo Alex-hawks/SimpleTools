@@ -27,4 +27,16 @@ public interface ICore
 	 * @return The Unique Identifier of the core. POSITIVE VALUES ONLY!
 	 */
 	public byte getCoreUID(ItemStack i);
+	
+	/**
+	 * @param i The ItemStack, to provide the metadata to the method.
+	 * @return What the core is powered by. f.e. "electric", "fuel", "plasma"
+	 */
+	public String getCoreFinerType(ItemStack i);
+	
+	/**
+	 * @param i The ItemStack, to provide the metadata to the method.
+	 * @return true if the core uses electricity, false if it uses something else
+	 */
+	public boolean requiresElectricity(ItemStack i);
 }

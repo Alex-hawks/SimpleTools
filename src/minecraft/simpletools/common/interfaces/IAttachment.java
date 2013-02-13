@@ -36,4 +36,14 @@ public interface IAttachment
 	 * @return The Unique Identifier of the attachment. POSITIVE VALUES UNDER 1000 ONLY!
 	 */
 	public short getAttachmentUID(ItemStack i);
+	
+	/**
+	 * @param i The ItemStack, to provide the metadata to the method.
+	 * @return the attachment's tier
+	 * 		0:	Stone
+	 * 		1:	Iron
+	 * 		2:	Diamond
+	 * 		3:	(3, ignored, 12.0F, 4, ignored)
+	 */
+	public int getAttachmentTier(ItemStack i);
 }

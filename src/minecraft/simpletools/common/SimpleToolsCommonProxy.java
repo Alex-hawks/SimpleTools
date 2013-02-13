@@ -25,6 +25,8 @@ public class SimpleToolsCommonProxy implements IGuiHandler
 			{
 				case 0: return new ContainerTableAssembly(player.inventory, (TileEntityTableAssembly)tileEntity);
 			}
+		}
+		return null;
 	}
 
 	@Override

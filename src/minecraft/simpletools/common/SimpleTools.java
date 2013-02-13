@@ -4,6 +4,7 @@ import java.io.File;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraftforge.common.Configuration;
 import simpletools.common.block.BlockTableAssembly;
 import simpletools.common.items.ItemAssembledTool;
@@ -17,21 +18,31 @@ import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.PostInit;
 import cpw.mods.fml.common.Mod.PreInit;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 
-@Mod(modid = "UE-SimpleTools", name = "Simple Tools", dependencies = "after:BasicComponents")
+@Mod(modid = SimpleTools.modID, name = SimpleTools.modName, dependencies = "after:BasicComponents")
 @NetworkMod(clientSideRequired = true, channels = "SimplePowerTools", connectionHandler = ConnectionHandler.class, packetHandler = PacketManager.class)
 public class SimpleTools 
 {
+	protected static final String modID = "UE-SimpleTools";
+	protected static final String modName = "Simple Tools";
+	
+	
 	private static final int FIRST_BLOCK_ID = 4040;
 	private static final int FIRST_ITEM_ID = 16000;
 	
 	@Instance("UE-SimpleTools")
 	public static SimpleTools instance;
 	
+/*	@SidedProxy(clientSide = "simpletools.client.SimpleToolsClientProxy", serverSide = "simpletools.common.SimpleToolsCommonProxy")
+	SimpleToolsCommonProxy proxy;
+*/	
 	public static final String[] SUPPORTED_LANGUAGES = { "en_US" };
 	
 	public static final int MAJOR_VERSION = 0;
@@ -44,9 +55,9 @@ public class SimpleTools
 	public static final Configuration CONFIG = new Configuration(CONFIG_FILE);
 	
 	public static final String RESOURCE_PATH = "/simpletools/";
-	public static final String LANGUAGE_PATH = RESOURCE_PATH + "language";
-	public static final String TEXTURE_PATH = RESOURCE_PATH + "textures";
-	public static final String BLOCK_TEXTURES = TEXTURE_PATH + "/block.png";
+	public static final String LANGUAGE_PATH = RESOURCE_PATH + "language/";
+	public static final String TEXTURE_PATH = RESOURCE_PATH + "textures/";
+	public static final String BLOCK_TEXTURES = TEXTURE_PATH + "block.png";
 	public static final String ITEM_TEXTURES = TEXTURE_PATH + "items.png";
 	
 	public static Block tableAssembly;
@@ -72,7 +83,7 @@ public class SimpleTools
 		
 		assembledTool			= new ItemAssembledTool(config.getItem("Tool", FIRST_ITEM_ID).getInt(), "AssembledTool");
 		
-		coreMotor 				= new ItemCoreMotor(config.getItem("Motor_Core", FIRST_ITEM_ID + 1).getInt(), "CoreMotor");
+		coreMotor 				= new ItemCoreMotor(config.getItem("Electric_Motor_Core", FIRST_ITEM_ID + 1).getInt(), "CoreElectric");
 //2		corePlasma				=
 //3		coreEngine				=
 		
@@ -88,12 +99,14 @@ public class SimpleTools
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		configLoad(CONFIG);
+		GameRegistry.registerBlock(tableAssembly, ItemBlock.class, "tableAssembly", this.modID);
 	}
 	
 	@Init
 	public void init(FMLInitializationEvent event)
 	{
-		
+		for (String lang : SUPPORTED_LANGUAGES)
+			LanguageRegistry.instance().loadLocalization(LANGUAGE_PATH + lang + ".properties", lang, false);
 	}
 	
 	@PostInit
