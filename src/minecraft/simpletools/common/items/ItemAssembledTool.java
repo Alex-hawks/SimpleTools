@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 import simpletools.common.interfaces.IAttachment;
 import simpletools.common.interfaces.ICore;
@@ -20,7 +21,7 @@ import universalelectricity.prefab.ItemElectric;
 
 public class ItemAssembledTool extends ItemTool implements IItemElectric
 {
-	
+
 	public ItemAssembledTool(int itemID, String name)
 	{
 		super(itemID, 0, EnumToolMaterial.EMERALD, new Block[0]);
@@ -40,7 +41,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				NBTTagCompound info = var2.stackTagCompound;
+				NBTTagCompound info = var2.stackTagCompound.getCompoundTag("simpleTools");
 				return info.getDouble("maxEnergy");
 			}
 		} catch (Exception e) {}
@@ -55,7 +56,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				NBTTagCompound info = var2.stackTagCompound;
+				NBTTagCompound info = var2.stackTagCompound.getCompoundTag("simpleTools");
 				return ((IItemElectric)Item.itemsList[info.getIntArray("battery")[0]]).getVoltage(data);
 			}
 		} catch (Exception e) {}
@@ -69,7 +70,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				int[] core = var2.stackTagCompound.getIntArray("core");
+				int[] core = var2.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 				return ((ICore)Item.itemsList[core[0]]).getMaxAltFuel(new ItemStack(core[0], 1, core[1]));
 			}
 		} catch (Exception e) {}
@@ -83,17 +84,17 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				int[] core = var2.stackTagCompound.getIntArray("core");
+				int[] core = var2.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 				if (((ICore)Item.itemsList[core[0]]).getCoreFinerType(new ItemStack(core[0], 1, core[1])) == "plasma")
 				{
-					return var2.stackTagCompound.getDouble("plasma");
+					return var2.stackTagCompound.getCompoundTag("simpleTools").getDouble("plasma");
 				}
 				else return 0;
 			}
 		} catch (Exception e) {}
 		return 0;
 	}
-	
+
 	public void setStoredPlasma(double plasma, Object... data)
 	{
 		try
@@ -101,10 +102,10 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				int[] core = var2.stackTagCompound.getIntArray("core");
+				int[] core = var2.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 				if (((ICore)Item.itemsList[core[0]]).getCoreFinerType(new ItemStack(core[0], 1, core[1])) == "plasma")
 				{
-					var2.stackTagCompound.setDouble("plasma", plasma);
+					var2.stackTagCompound.getCompoundTag("simpleTools").setDouble("plasma", plasma);
 				}
 			}
 		} catch (Exception e) {}
@@ -117,7 +118,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				int[] core = var2.stackTagCompound.getIntArray("core");
+				int[] core = var2.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 				return ((ICore)Item.itemsList[core[0]]).getMaxAltFuel(new ItemStack(core[0], 1, core[1]));
 			}
 		} catch (Exception e) {}
@@ -131,17 +132,17 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				int[] core = var2.stackTagCompound.getIntArray("core");
+				int[] core = var2.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 				if (((ICore)Item.itemsList[core[0]]).getCoreFinerType(new ItemStack(core[0], 1, core[1])) == "fuel")
 				{
-					return var2.stackTagCompound.getDouble("fuelStored");
+					return var2.stackTagCompound.getCompoundTag("simpleTools").getDouble("fuelStored");
 				}
 				else return 0;
 			}
 		} catch (Exception e) {}
 		return 0;
 	}
-	
+
 	public void setStoredFuel(double fuel, Object... data)
 	{
 		try
@@ -149,10 +150,10 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				int[] core = var2.stackTagCompound.getIntArray("core");
+				int[] core = var2.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 				if (((ICore)Item.itemsList[core[0]]).getCoreFinerType(new ItemStack(core[0], 1, core[1])) == "fuel")
 				{
-					var2.stackTagCompound.setDouble("fuel", fuel);
+					var2.stackTagCompound.getCompoundTag("simpleTools").setDouble("fuel", fuel);
 				}
 			}
 		} catch (Exception e) {}
@@ -182,8 +183,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 					int meta = coreMeta + attachMeta;
 					returnStack = new ItemStack(this, 1, meta);
 
-					returnStack.setTagCompound(new NBTTagCompound());
-					NBTTagCompound info = returnStack.stackTagCompound;
+					NBTTagCompound info = new NBTTagCompound("simpleTools");
 					//	all ItemStacks are stored as new int[] {itemID, item metadata}
 					//	stackSize is not needed, as it is always one
 
@@ -206,6 +206,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 						info.setIntArray("fuelTank", new int[] {storage.itemID, storage.getItemDamage()});
 						info.setDouble("fuelStored", 0);
 					}
+					returnStack.setTagInfo(info.getName(), info);
 				}
 			}
 		}
@@ -220,10 +221,10 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				int[] core = var2.stackTagCompound.getIntArray("core");
+				int[] core = var2.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 				if (((ICore)Item.itemsList[core[0]]).requiresElectricity(new ItemStack(core[0], 1, core[1])))
 				{
-					return var2.stackTagCompound.getDouble("electricity");
+					return var2.stackTagCompound.getCompoundTag("simpleTools").getDouble("electricity");
 				}
 				else return 0;
 			}
@@ -239,10 +240,10 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				int[] core = var2.stackTagCompound.getIntArray("core");
+				int[] core = var2.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 				if (((ICore)Item.itemsList[core[0]]).requiresElectricity(new ItemStack(core[0], 1, core[1])))
 				{
-					var2.stackTagCompound.setDouble("electricity", joules);
+					var2.stackTagCompound.getCompoundTag("simpleTools").setDouble("electricity", joules);
 				}
 			}
 		} catch (Exception e) {}
@@ -253,7 +254,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 	{
 		try
 		{
-			int[] core = itemStack.stackTagCompound.getIntArray("core");
+			int[] core = itemStack.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 			if (((ICore)Item.itemsList[core[0]]).requiresElectricity(new ItemStack(core[0], 1, core[1])))
 			{
 				double rejectedElectricity = Math.max((this.getJoules(itemStack) + ElectricInfo.getJoules(amps, voltage, 1)) - this.getMaxJoules(itemStack), 0);
@@ -270,7 +271,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 	@Override
 	public double onUse(double joulesNeeded, ItemStack itemStack)
 	{
-		int[] core = itemStack.stackTagCompound.getIntArray("core");
+		int[] core = itemStack.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 		if (((ICore)Item.itemsList[core[0]]).requiresElectricity(new ItemStack(core[0], 1, core[1])))
 		{
 			double electricityToUse = Math.min(this.getJoules(itemStack), joulesNeeded);
@@ -283,11 +284,11 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 	@Override
 	public boolean canReceiveElectricity()
 	{
-/*
-		int[] core = itemStack.stackTagCompound.getIntArray("core");
+		/*
+		int[] core = itemStack.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 		if (((ICore)Item.itemsList[core[0]]).requiresElectricity(new ItemStack(core[0], 1, core[1])))
 			return ((ICore)core.getItem()).getCoreFinerType(this.core) == "electric";
-*/
+		 */
 		return false;
 	}
 
@@ -307,27 +308,28 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 	public void addInformation(ItemStack itemStack, EntityPlayer player, List currentTips, boolean advancedToolTips)
 	{
 		ItemStack core = null, attachment = null, battery = null, fuelTank = null;
-		try 
+		try
 		{
-			NBTTagCompound info = itemStack.stackTagCompound;
+			NBTTagCompound info = itemStack.getTagCompound().getCompoundTag("simpleTools");
 			int[] coreIntArray = info.getIntArray("core");
 			core = new ItemStack(coreIntArray[0], 1, coreIntArray[1]);
 			int[] attachmentIntArray = info.getIntArray("attachment");
 			attachment = new ItemStack(attachmentIntArray[0], 1, attachmentIntArray[1]);
 			int[] batteryIntArray = info.getIntArray("battery");
 			battery = new ItemStack(batteryIntArray[0], 1, batteryIntArray[1]);
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			try 
 			{
-				NBTTagCompound info = itemStack.stackTagCompound;
+				NBTTagCompound info = itemStack.getTagCompound().getCompoundTag("simpleTools");
 				int[] coreIntArray = info.getIntArray("core");
 				core = new ItemStack(coreIntArray[0], 1, coreIntArray[1]);
 				int[] attachmentIntArray = info.getIntArray("attachment");
 				attachment = new ItemStack(attachmentIntArray[0], 1, attachmentIntArray[1]);
 				int[] fuelTankIntArray = info.getIntArray("fuelTank");
 				fuelTank = new ItemStack(fuelTankIntArray[0], 1, fuelTankIntArray[1]);
-			} catch (Exception e2) {}
+			} catch (Exception e2) {e.printStackTrace();}
 		}
 
 
@@ -352,9 +354,9 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 		{
 			currentTips.add("Creative Mode Tool");
 		}
-		
 
-		if (advancedToolTips)
+
+		//		if (advancedToolTips)
 		{
 			if (core != null)
 				currentTips.add("Core Module: " + core.getDisplayName());
@@ -370,7 +372,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 		ItemStack core = null, attachment = null, battery = null, fuelTank = null;
 		try 
 		{
-			NBTTagCompound info = i.stackTagCompound;
+			NBTTagCompound info = i.stackTagCompound.getCompoundTag("simpleTools");
 			int[] coreIntArray = info.getIntArray("core");
 			core = new ItemStack(coreIntArray[0], 1, coreIntArray[1]);
 			int[] attachmentIntArray = info.getIntArray("attachment");
@@ -381,7 +383,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 		{
 			try 
 			{
-				NBTTagCompound info = i.stackTagCompound;
+				NBTTagCompound info = i.stackTagCompound.getCompoundTag("simpleTools");
 				int[] coreIntArray = info.getIntArray("core");
 				core = new ItemStack(coreIntArray[0], 1, coreIntArray[1]);
 				int[] attachmentIntArray = info.getIntArray("attachment");
@@ -423,7 +425,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 		try
 		{
 			ItemStack core = null;
-			int[] coreIntArray = i.stackTagCompound.getIntArray("core");
+			int[] coreIntArray = i.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 			core = new ItemStack(coreIntArray[0], 1, coreIntArray[1]);
 			return ((ICore)core.getItem()).getPrimaryEnergyPerOperation(i);
 		} catch (Exception e)
@@ -437,7 +439,7 @@ public class ItemAssembledTool extends ItemTool implements IItemElectric
 		try
 		{
 			ItemStack core = null;
-			int[] coreIntArray = i.stackTagCompound.getIntArray("core");
+			int[] coreIntArray = i.stackTagCompound.getCompoundTag("simpleTools").getIntArray("core");
 			core = new ItemStack(coreIntArray[0], 1, coreIntArray[1]);
 			if (((ICore)core.getItem()).usesAltFuel(i))
 				return ((ICore)core.getItem()).getSecondaryEnergyPerOperation(i);
