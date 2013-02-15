@@ -23,16 +23,17 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 @Mod(modid = SimpleTools.modID, name = SimpleTools.modName, dependencies = "after:BasicComponents")
-@NetworkMod(clientSideRequired = true, channels = "SimplePowerTools", connectionHandler = ConnectionHandler.class, packetHandler = PacketManager.class)
+@NetworkMod(clientSideRequired = true, channels = SimpleTools.CHANNEL, connectionHandler = ConnectionHandler.class, packetHandler = PacketManager.class)
 public class SimpleTools 
 {
 	protected static final String modID = "UE-SimpleTools";
 	protected static final String modName = "Simple Tools";
-	
+	public static final String CHANNEL = "SimplePowerTools";
 	
 	private static final int FIRST_BLOCK_ID = 4040;
 	private static final int FIRST_ITEM_ID = 16000;
@@ -40,9 +41,9 @@ public class SimpleTools
 	@Instance("UE-SimpleTools")
 	public static SimpleTools instance;
 	
-/*	@SidedProxy(clientSide = "simpletools.client.SimpleToolsClientProxy", serverSide = "simpletools.common.SimpleToolsCommonProxy")
-	SimpleToolsCommonProxy proxy;
-*/	
+	@SidedProxy(clientSide = "simpletools.client.SimpleToolsClientProxy", serverSide = "simpletools.common.SimpleToolsCommonProxy")
+	public static SimpleToolsCommonProxy proxy;
+	
 	public static final String[] SUPPORTED_LANGUAGES = { "en_US" };
 	
 	public static final int MAJOR_VERSION = 0;
@@ -100,6 +101,7 @@ public class SimpleTools
 	{
 		configLoad(CONFIG);
 		GameRegistry.registerBlock(tableAssembly, ItemBlock.class, "tableAssembly", this.modID);
+		NetworkRegistry.instance().registerGuiHandler(this, this.proxy);
 	}
 	
 	@Init

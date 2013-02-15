@@ -2,6 +2,7 @@ package simpletools.common.containers;
 
 import simpletools.common.misc.SlotAttachment;
 import simpletools.common.misc.SlotCore;
+import simpletools.common.misc.SlotOutput;
 import simpletools.common.misc.SlotSTStorage;
 import simpletools.common.tileentities.TileEntityTableAssembly;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,13 +12,17 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerTableAssembly extends Container implements IInventory
+public class ContainerTableAssembly extends Container
 {
+	private TileEntityTableAssembly tileEntity;
+
 	public ContainerTableAssembly(InventoryPlayer inventory, TileEntityTableAssembly tileEntity)
 	{
-		this.addSlotToContainer(new SlotAttachment(tileEntity, 0, 11, 16));
-		this.addSlotToContainer(new SlotCore(tileEntity, 1, 11, 32));
-		this.addSlotToContainer(new SlotSTStorage(tileEntity, 2, 11, 56));
+		this.tileEntity = tileEntity;
+		this.addSlotToContainer(new SlotCore(tileEntity, 1, 39, 36));
+		this.addSlotToContainer(new SlotAttachment(tileEntity, 0, 16, 22, tileEntity.getStackInSlot(1)));
+		this.addSlotToContainer(new SlotSTStorage(tileEntity, 2, 16, 50, tileEntity.getStackInSlot(1)));
+		this.addSlotToContainer(new SlotOutput(tileEntity, 3, 120, 36));
 		int var3;
 
 		for (var3 = 0; var3 < 3; ++var3)
@@ -39,83 +44,13 @@ public class ContainerTableAssembly extends Container implements IInventory
 	@Override
 	public boolean canInteractWith(EntityPlayer var1)
 	{
-		return false;
+		return tileEntity.isUseableByPlayer(var1);
 	}
 
 	@Override
-	public int getSizeInventory()
+	public void onCraftGuiClosed(EntityPlayer entityplayer)
 	{
-		return 4;
+		super.onCraftGuiClosed(entityplayer);
+		tileEntity.closeChest();
 	}
-
-	@Override
-	public ItemStack getStackInSlot(int var1)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ItemStack decrStackSize(int var1, int var2)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ItemStack getStackInSlotOnClosing(int var1)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setInventorySlotContents(int var1, ItemStack var2)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getInvName()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getInventoryStackLimit()
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void onInventoryChanged()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isUseableByPlayer(EntityPlayer var1)
-	{
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void openChest()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void closeChest()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-	
 }

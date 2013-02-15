@@ -1,6 +1,10 @@
 package simpletools.common.tileentities;
 
+import java.util.Locale;
+
 import com.google.common.io.ByteArrayDataInput;
+
+import cpw.mods.fml.common.network.PacketDispatcher;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -8,12 +12,15 @@ import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ISidedInventory;
+import simpletools.common.SimpleTools;
 import simpletools.common.interfaces.IAttachment;
 import simpletools.common.interfaces.ICore;
+import simpletools.common.items.ItemAssembledTool;
 import universalelectricity.core.implement.IItemElectric;
 import universalelectricity.core.implement.IJouleStorage;
 import universalelectricity.prefab.implement.IRedstoneProvider;
 import universalelectricity.prefab.network.IPacketReceiver;
+import universalelectricity.prefab.network.PacketManager;
 import universalelectricity.prefab.tile.TileEntityAdvanced;
 
 public class TileEntityTableAssembly extends TileEntityAdvanced implements IRedstoneProvider, IPacketReceiver, ISidedInventory
@@ -28,10 +35,10 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int var1)
+	public ItemStack getStackInSlot(int i)
 	{
-		if (var1 < this.getSizeInventory())
-			return this.inventory[var1];
+		if (i < this.getSizeInventory())
+			return this.inventory[i];
 		else return null;
 	}
 
@@ -67,7 +74,7 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 	@Override
 	public String getInvName()
 	{
-		return "TileEntityAssemblyTable";
+		return "Assembly Table";
 	}
 
 	@Override
@@ -81,7 +88,7 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 	{
 		return true;
 	}
-	
+
 	@Override
 	public void openChest()
 	{
@@ -118,7 +125,23 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 	@Override
 	public void handlePacketData(INetworkManager network, int packetType, Packet250CustomPayload packet, EntityPlayer player, ByteArrayDataInput dataStream)
 	{
-		
+		if (this.worldObj.isRemote)
+		{
+			try
+			{}
+			catch (Exception e)
+			{}
+		}
+		else
+		{
+			try
+			{
+				if (dataStream.readInt() == 0)
+					doProcess(); 
+			}
+			catch (Exception e)
+			{}
+		}
 	}
 
 	@Override
@@ -133,27 +156,46 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 		return this.canProcess();
 	}
 
-	private boolean canProcess()
+	public boolean canProcess()
 	{
 		ItemStack slot0 = this.inventory[0];
 		ItemStack slot1 = this.inventory[1];
 		ItemStack slot2 = this.inventory[2];
-		
-		if (slot0.getItem() instanceof IAttachment && slot1.getItem() instanceof ICore)
+
+		if (slot0 != null && slot1 != null)
 		{
-			IAttachment attachTemp = (IAttachment)slot0.getItem();
-			ICore coreTemp = (ICore)slot1.getItem();
-			
-			if (attachTemp.getToolAttachmentType(slot0) == coreTemp.getCoreType(slot1) && attachTemp.getMinimumTier(slot0) <= coreTemp.getCoreTier(slot1))
+			if (slot0.getItem() instanceof IAttachment && slot1.getItem() instanceof ICore)
 			{
-				if (coreTemp.requiresElectricity(slot1) && slot2.getItem() instanceof IItemElectric && ((IItemElectric)slot2.getItem()).canProduceElectricity() )
+				IAttachment attachTemp = (IAttachment)slot0.getItem();
+				ICore coreTemp = (ICore)slot1.getItem();
+
+				if (attachTemp.getToolAttachmentType(slot0) == coreTemp.getCoreType(slot1) && attachTemp.getMinimumTier(slot0) <= coreTemp.getCoreTier(slot1))
 				{
-					return true;
+					if (coreTemp.requiresElectricity(slot1) && slot2.getItem() instanceof IItemElectric && ((IItemElectric)slot2.getItem()).canProduceElectricity() )
+					{
+						return true;
+					}
+					// TODO add support for fuel
+
 				}
-				// TODO add support for fuel
-				
 			}
+			return false;
 		}
 		return false;
+	}
+
+	public void doProcess()
+	{
+		if (this.canProcess())
+		{
+			this.inventory[3] = ((ItemAssembledTool)(new ItemStack(SimpleTools.assembledTool).getItem())).onCreate(this.inventory[0], this.inventory[1], this.inventory[2]);
+			this.inventory[0] = null;
+			this.inventory[1] = null;
+			this.inventory[2] = null;
+		}
+		if (this.worldObj.isRemote)
+		{
+			PacketDispatcher.sendPacketToServer(PacketManager.getPacket(SimpleTools.CHANNEL, this, 0));
+		}
 	}
 }

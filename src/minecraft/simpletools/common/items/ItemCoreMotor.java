@@ -67,4 +67,35 @@ public class ItemCoreMotor extends Item implements ICore
 	{
 		return true;
 	}
+
+	@Override
+	public boolean usesAltFuel(ItemStack i)
+	{
+		return false;
+	}
+
+	@Override
+	public double getMaxAltFuel(ItemStack i)
+	{
+		return 0;
+	}
+
+	@Override
+	public double getPrimaryEnergyPerOperation(ItemStack i)
+	{
+		switch(i.getItemDamage())
+		{
+			case 0:	return 500;
+			case 1:	return 400;
+			case 2:	return 300;
+			case 3:	return 200;
+		}
+		return 500;
+	}
+
+	@Override
+	public double getSecondaryEnergyPerOperation(ItemStack i)
+	{
+		return 0;
+	}
 }

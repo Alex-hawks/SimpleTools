@@ -3,9 +3,11 @@ package simpletools.common.block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import simpletools.common.SimpleTools;
+import simpletools.common.tileentities.TileEntityTableAssembly;
 import universalelectricity.prefab.BlockMachine;
 import universalelectricity.prefab.implement.ISneakUseWrench;
 import universalelectricity.prefab.tile.TileEntityAdvanced;
@@ -102,5 +104,11 @@ public class BlockTableAssembly extends BlockMachine implements ISneakUseWrench
 		this.dropBlockAsItem(par1World, x, y, z, par1World.getBlockMetadata(x, y, z), 0);
         par1World.setBlockWithNotify(x, y, z, 0);
         return true;
+	}
+	
+	@Override
+	public TileEntity createNewTileEntity(World var1)
+	{
+		return new TileEntityTableAssembly();
 	}
 }
