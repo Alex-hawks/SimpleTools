@@ -8,14 +8,16 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ISidedInventory;
 import simpletools.common.SimpleTools;
+import simpletools.common.interfaces.IAssembledTool;
 import simpletools.common.interfaces.IAttachment;
 import simpletools.common.interfaces.ICore;
-import simpletools.common.items.ItemAssembledTool;
 import universalelectricity.core.implement.IItemElectric;
 import universalelectricity.core.implement.IJouleStorage;
 import universalelectricity.prefab.implement.IRedstoneProvider;
@@ -171,7 +173,11 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 
 				if (attachTemp.getToolAttachmentType(slot0) == coreTemp.getCoreType(slot1) && attachTemp.getMinimumTier(slot0) <= coreTemp.getCoreTier(slot1))
 				{
-					if (coreTemp.requiresElectricity(slot1) && slot2.getItem() instanceof IItemElectric && ((IItemElectric)slot2.getItem()).canProduceElectricity() )
+					if (coreTemp.getCoreFinerType(slot1).equals("electric") && slot2.getItem() instanceof IItemElectric && ((IItemElectric)slot2.getItem()).canProduceElectricity() )
+					{
+						return true;
+					}
+					else if (coreTemp.getCoreFinerType(slot1).equals("plasma") && slot2.getItem() instanceof IItemElectric && ((IItemElectric)slot2.getItem()).canProduceElectricity() )
 					{
 						return true;
 					}
@@ -188,7 +194,8 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 	{
 		if (this.canProcess())
 		{
-			this.inventory[3] = ((ItemAssembledTool)(new ItemStack(SimpleTools.assembledTool).getItem())).onCreate(this.inventory[0], this.inventory[1], this.inventory[2]);
+			IAssembledTool result = (IAssembledTool) ((ICore)this.inventory[1].getItem()).getAssmebledToolItem(this.inventory[1]);
+			this.inventory[3] = result.onCreate(this.inventory[0], this.inventory[1], this.inventory[2]);
 			this.inventory[0] = null;
 			this.inventory[1] = null;
 			this.inventory[2] = null;
@@ -197,5 +204,24 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 		{
 			PacketDispatcher.sendPacketToServer(PacketManager.getPacket(SimpleTools.CHANNEL, this, 0));
 		}
+	}
+	
+	@Override
+	public void writeToNBT(NBTTagCompound par1NBTTagCompound)
+	{
+		super.writeToNBT(par1NBTTagCompound);
+		NBTTagList nbtList = new NBTTagList();
+		
+		for (int i = 0; i < this.inventory.length; i++)
+		{
+			if (this.inventory[i] != null)
+			{
+				NBTTagCompound nbt = new NBTTagCompound();
+				nbt.setByte("Slot", (byte) i);
+				this.inventory[i].writeToNBT(nbt);
+				nbtList.appendTag(nbt);
+			}
+		}
+		par1NBTTagCompound.setTag("Items", nbtList);
 	}
 }

@@ -1,5 +1,6 @@
 package simpletools.common.interfaces;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -37,33 +38,7 @@ public interface ICore
 	
 	/**
 	 * @param i	The ItemStack, to provide the metadata to the method.
-	 * @return	true if the core uses electricity, false if it uses something else
+	 * @return	The Item that is given when the tool is assembled
 	 */
-	public boolean requiresElectricity(ItemStack i);
-	
-	/**
-	 * @param i	The ItemStack, to provide the metadata to the method.
-	 * @return	true if the core requires an secondary fuel, such as plasma 
-	 */
-	public boolean usesAltFuel(ItemStack i);
-
-	/**
-	 * @param i	The ItemStack, to provide the metadata to the method.
-	 * @return	The Maximum storage of an alternative fuel, such as plasma in a plasma core, 
-	 * 			or lubricant in an engine
-	 */
-	public double getMaxAltFuel(ItemStack i);
-
-	/**
-	 * @param i	The ItemStack, to provide the metadata to the method.
-	 * @return	The energy (fuel, electricity, etc) required to do 1 action
-	 */
-	public double getPrimaryEnergyPerOperation(ItemStack i);
-
-	/**
-	 * 			Not called if usesAltFuel() is false
-	 * @param i	The ItemStack, to provide the metadata to the method.
-	 * @return	The amount of secondary fuel used. 
-	 */
-	public double getSecondaryEnergyPerOperation(ItemStack i);
+	public Item getAssmebledToolItem(ItemStack i);
 }

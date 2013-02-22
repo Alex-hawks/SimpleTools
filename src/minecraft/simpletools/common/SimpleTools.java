@@ -7,7 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.common.Configuration;
 import simpletools.common.block.BlockTableAssembly;
-import simpletools.common.items.ItemAssembledTool;
+import simpletools.common.items.ItemAssembledToolElectric;
 import simpletools.common.items.ItemAttachmentToolMotor;
 import simpletools.common.items.ItemCoreMotor;
 import universalelectricity.prefab.network.ConnectionHandler;
@@ -36,7 +36,9 @@ public class SimpleTools
 	public static final String CHANNEL = "SimplePowerTools";
 	
 	private static final int FIRST_BLOCK_ID = 4040;
-	private static final int FIRST_ITEM_ID = 16000;
+	private static final int FIRST_TOOL_ID = 16000;
+	private static final int FIRST_CORE_ID = 16010;
+	private static final int FIRST_ATTACH_ID = 16020;
 	
 	@Instance("UE-SimpleTools")
 	public static SimpleTools instance;
@@ -65,10 +67,12 @@ public class SimpleTools
 	public static Block tableRefuel;
 	public static Block tablePlasma;
 
-	public static Item assembledTool;
-	public static Item coreMotor;
+	public static Item assembledToolElectric;
+	public static Item assembledToolPlasma;
+	public static Item assembledToolFuel;
+	public static Item coreMechElectric;
 	public static Item corePlasma;
-	public static Item coreEngine;
+	public static Item coreMechFuel;
 	public static Item attachmentToolMotor;
 	public static Item attachmentToolPlasma;
 	public static Item attachmentMWeaponMotor;
@@ -82,16 +86,18 @@ public class SimpleTools
 //1		tableRefuel				= 
 //2		tablePlasma				=
 		
-		assembledTool			= new ItemAssembledTool(config.getItem("Tool", FIRST_ITEM_ID).getInt(), "AssembledTool");
+		assembledToolElectric	= new ItemAssembledToolElectric(config.getItem("Tool", FIRST_TOOL_ID).getInt(), "AssembledTool");
+//1		assembledToolPlasma		=
+//2		assembledToolFuel
 		
-		coreMotor 				= new ItemCoreMotor(config.getItem("Electric_Motor_Core", FIRST_ITEM_ID + 1).getInt(), "CoreElectric");
-//2		corePlasma				=
-//3		coreEngine				=
+		coreMechElectric 		= new ItemCoreMotor(config.getItem("Electric_Motor_Core", FIRST_CORE_ID + 1).getInt(), "CoreElectric");
+//1		corePlasma				=
+//2		coreMechFuel			=
 		
-		attachmentToolMotor		= new ItemAttachmentToolMotor(config.getItem("Motor_Tool_Attachment", FIRST_ITEM_ID + 4).getInt(), "MotorTool");
-//5		attachmentToolPlasma	=
-//6		attachmentWeaponMotor	=
-//7		attachmentWeaponPlasma	=
+		attachmentToolMotor		= new ItemAttachmentToolMotor(config.getItem("Motor_Tool_Attachment", FIRST_ATTACH_ID + 4).getInt(), "MotorTool");
+//1		attachmentToolPlasma	=
+//2		attachmentWeaponMotor	=
+//3		attachmentWeaponPlasma	=
 		
 		config.save();
 	}
@@ -107,8 +113,8 @@ public class SimpleTools
 	@Init
 	public void init(FMLInitializationEvent event)
 	{
-		for (String lang : SUPPORTED_LANGUAGES)
-			LanguageRegistry.instance().loadLocalization(LANGUAGE_PATH + lang + ".properties", lang, false);
+		for (int i = 0; i < SUPPORTED_LANGUAGES.length; i++)
+			LanguageRegistry.instance().loadLocalization(LANGUAGE_PATH + SUPPORTED_LANGUAGES[i] + ".properties", SUPPORTED_LANGUAGES[i], false);
 	}
 	
 	@PostInit

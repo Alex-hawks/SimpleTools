@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import simpletools.common.SimpleTools;
 import simpletools.common.interfaces.ICore;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 
@@ -63,39 +64,8 @@ public class ItemCoreMotor extends Item implements ICore
 	}
 
 	@Override
-	public boolean requiresElectricity(ItemStack i)
+	public Item getAssmebledToolItem(ItemStack i) 
 	{
-		return true;
-	}
-
-	@Override
-	public boolean usesAltFuel(ItemStack i)
-	{
-		return false;
-	}
-
-	@Override
-	public double getMaxAltFuel(ItemStack i)
-	{
-		return 0;
-	}
-
-	@Override
-	public double getPrimaryEnergyPerOperation(ItemStack i)
-	{
-		switch(i.getItemDamage())
-		{
-			case 0:	return 500;
-			case 1:	return 400;
-			case 2:	return 300;
-			case 3:	return 200;
-		}
-		return 500;
-	}
-
-	@Override
-	public double getSecondaryEnergyPerOperation(ItemStack i)
-	{
-		return 0;
+		return SimpleTools.assembledToolElectric;
 	}
 }

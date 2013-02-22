@@ -13,6 +13,11 @@ public interface IAttachment
 	 * 			2: shovel
 	 * 			3: sword
 	 * 			4: shears
+	 * 			5: 
+	 * 			6: 
+	 * 			7: 
+	 * 			8: 
+	 * 			9: 
 	 */
 	public int getToolType(ItemStack i);
 	
