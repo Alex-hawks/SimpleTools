@@ -113,6 +113,7 @@ public class SimpleTools
 	@Init
 	public void init(FMLInitializationEvent event)
 	{
+		proxy.init();
 		for (int i = 0; i < SUPPORTED_LANGUAGES.length; i++)
 			LanguageRegistry.instance().loadLocalization(LANGUAGE_PATH + SUPPORTED_LANGUAGES[i] + ".properties", SUPPORTED_LANGUAGES[i], false);
 	}

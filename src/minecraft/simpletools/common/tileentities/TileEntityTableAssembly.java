@@ -108,13 +108,13 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 	{
 		switch (side.ordinal())
 		{
-			case 0:		return 0;
-			case 1:		return 2;
-			case 2:		
-			case 3:		
-			case 4:		
-			case 5:		
-			default:	return 1;
+		case 0:		return 0;
+		case 1:		return 2;
+		case 2:		
+		case 3:		
+		case 4:		
+		case 5:		
+		default:	return 1;
 		}
 	}
 
@@ -205,13 +205,13 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 			PacketDispatcher.sendPacketToServer(PacketManager.getPacket(SimpleTools.CHANNEL, this, 0));
 		}
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound par1NBTTagCompound)
 	{
 		super.writeToNBT(par1NBTTagCompound);
 		NBTTagList nbtList = new NBTTagList();
-		
+
 		for (int i = 0; i < this.inventory.length; i++)
 		{
 			if (this.inventory[i] != null)
@@ -224,4 +224,24 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 		}
 		par1NBTTagCompound.setTag("Items", nbtList);
 	}
+
+
+	@Override
+	public void readFromNBT(NBTTagCompound par1NBTTagCompound)
+	{
+		super.readFromNBT(par1NBTTagCompound);
+
+		NBTTagList var2 = par1NBTTagCompound.getTagList("Items");
+		this.inventory = new ItemStack[this.getSizeInventory()];
+
+		for (int var3 = 0; var3 < var2.tagCount(); var3++)
+		{
+			NBTTagCompound var4 = (NBTTagCompound) var2.tagAt(var3);
+			byte var5 = var4.getByte("Slot");
+
+			if (var5 >= 0 && var5 < this.inventory.length)
+				this.inventory[var5] = ItemStack.loadItemStackFromNBT(var4);
+		}
+	}
+
 }
