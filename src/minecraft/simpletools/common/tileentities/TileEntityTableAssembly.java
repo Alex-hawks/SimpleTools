@@ -123,6 +123,19 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 	{
 		return 1;
 	}
+	
+	@Override
+	public boolean canUpdate()
+	{
+		return true;
+	}
+	
+	@Override
+	public void updateEntity()
+	{
+		if (this.canProcess())
+			this.doProcess();
+	}
 
 	@Override
 	public void handlePacketData(INetworkManager network, int packetType, Packet250CustomPayload packet, EntityPlayer player, ByteArrayDataInput dataStream)
@@ -164,7 +177,7 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 		ItemStack slot1 = this.inventory[1];
 		ItemStack slot2 = this.inventory[2];
 
-		if (slot0 != null && slot1 != null)
+		if (slot0 != null && slot1 != null && slot2 != null)
 		{
 			if (slot0.getItem() instanceof IAttachment && slot1.getItem() instanceof ICore)
 			{

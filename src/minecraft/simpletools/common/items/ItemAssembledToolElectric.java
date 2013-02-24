@@ -24,7 +24,7 @@ import universalelectricity.prefab.ItemElectric;
 public class ItemAssembledToolElectric extends ItemTool implements IItemElectric, IAssembledTool
 {
 	private final double joulesPerUse = 2000; //in Joules
-	
+
 	public ItemAssembledToolElectric(int itemID, String name)
 	{
 		super(itemID, 0, EnumToolMaterial.EMERALD, new Block[0]);
@@ -44,9 +44,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				NBTBase info = var2.stackTagCompound.getTagList("SimpleTools").tagAt(3);
-				if (info instanceof NBTTagDouble)
-					return ((NBTTagDouble)info).data;
+				return var2.stackTagCompound.getCompoundTag("SimpleTools").getDouble("maxEnergy");
 			}
 		} catch (Exception e) {}
 		return 0;
@@ -60,13 +58,10 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				NBTBase info = var2.stackTagCompound.getTagList("SimpleTools").tagAt(1);
-				if (info instanceof NBTTagCompound)
-				{
-					ItemStack batteryStack = ItemStack.loadItemStackFromNBT((NBTTagCompound) info);
-					if (batteryStack.getItem() instanceof IItemElectric)
-						return ((IItemElectric) batteryStack.getItem()).getVoltage(batteryStack);
-				}
+				NBTTagCompound info = var2.stackTagCompound.getCompoundTag("SimpleTools");
+				ItemStack batteryStack = ItemStack.loadItemStackFromNBT((NBTTagCompound) info);
+				if (batteryStack.getItem() instanceof IItemElectric)
+					return ((IItemElectric) batteryStack.getItem()).getVoltage(batteryStack);
 			}
 		} catch (Exception e) {}
 		return 0;
@@ -80,9 +75,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				NBTBase info = var2.stackTagCompound.getTagList("SimpleTools").tagAt(2);
-				if (info instanceof NBTTagDouble)
-					return ((NBTTagDouble)info).data;
+				return var2.stackTagCompound.getCompoundTag("SimpleTools").getDouble("electricity");
 			}
 		} catch (Exception e) {}
 		return 0;
@@ -96,9 +89,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 			if (data[0] instanceof ItemStack)
 			{
 				ItemStack var2 = (ItemStack)data[0];
-				NBTBase info = var2.stackTagCompound.getTagList("SimpleTools").tagAt(2);
-				if (info instanceof NBTTagDouble)
-					((NBTTagDouble)info).data = joules;
+				var2.stackTagCompound.getCompoundTag("SimpleTools").setDouble("electricity", joules);
 			}
 		} catch (Exception e) {}
 	}
@@ -160,26 +151,16 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 					int attachMeta = attachmentTemp.getAttachmentUID(attachment);
 					int meta = coreMeta + attachMeta;
 					returnStack = new ItemStack(this, 1, meta);
-					
-					if (!returnStack.hasTagCompound())
-						returnStack.setTagCompound(new NBTTagCompound());
-					if (!returnStack.stackTagCompound.hasKey("SimpleTools"))
-						returnStack.stackTagCompound.setTag("SimpleTools", new NBTTagList("SimpleTools"));
-					
-					NBTTagList info = returnStack.stackTagCompound.getTagList("SimpleTools");
-					
-					//	all ItemStacks are stored as new int[] {itemID, item metadata}
-					//	stackSize is not needed, as it is always one
-					
-					NBTTagCompound attach = attachment.writeToNBT(new NBTTagCompound("attachment"));
-					NBTTagCompound batt = battery.writeToNBT(new NBTTagCompound("battery"));
-					NBTTagDouble joules = new NBTTagDouble("electricity", ((IItemElectric)battery.getItem()).getJoules(battery));
-					NBTTagDouble maxJoules = new NBTTagDouble("maxEnergy", ((IItemElectric)battery.getItem()).getMaxJoules(battery));
-					
-					info.appendTag(attach);
-					info.appendTag(batt);
-					info.appendTag(joules);
-					info.appendTag(maxJoules);
+
+					NBTTagCompound compound = new NBTTagCompound();
+					compound.setCompoundTag("SimpleTools", new NBTTagCompound());
+
+					compound.getCompoundTag("SimpleTools").setDouble("electricity", ((IItemElectric)battery.getItem()).getJoules(battery));
+					compound.getCompoundTag("SimpleTools").setDouble("maxEnergy", ((IItemElectric)battery.getItem()).getMaxJoules(battery));
+					compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
+					compound.getCompoundTag("SimpleTools").setCompoundTag("battery", battery.writeToNBT(new NBTTagCompound()));
+
+					returnStack.setTagCompound(compound);
 				}
 			}
 		}
@@ -198,16 +179,14 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		ItemStack attachment = null, battery = null;
 		try
 		{
-			NBTBase batt = itemStack.getTagCompound().getTagList("SimpleTools").tagAt(1);
-			if (batt instanceof NBTTagCompound)
-				battery = ItemStack.loadItemStackFromNBT((NBTTagCompound) batt);
-			
-			NBTBase attach = itemStack.getTagCompound().getTagList("SimpleTools").tagAt(0);
-			if (attach instanceof NBTTagIntArray)
-				attachment = ItemStack.loadItemStackFromNBT((NBTTagCompound) attach);
+			NBTTagCompound batt = itemStack.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
+			battery = ItemStack.loadItemStackFromNBT((NBTTagCompound) batt);
+
+			NBTBase attach = itemStack.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("attachment");
+			attachment = ItemStack.loadItemStackFromNBT((NBTTagCompound) attach);
 		}
 		catch (Exception e) {}
-		
+
 		currentTips.add("Energy: " + this.getJoules(itemStack) + " / " + this.getMaxJoules(itemStack));
 
 		//if (advancedToolTips)
