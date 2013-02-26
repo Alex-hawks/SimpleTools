@@ -3,6 +3,7 @@ package simpletools.common.items;
 import java.util.List;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import simpletools.common.interfaces.IAttachment;
@@ -17,11 +18,24 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 		this.setItemName(name);
 		this.setMaxStackSize(16);
 	}
-
+	
 	@Override
-	public int getToolType(ItemStack i)
+	public String getToolType(ItemStack i)
 	{
-		return i.getItemDamage() % 10;
+		switch (i.getItemDamage() % 10)
+		{
+		case 0: return "pickaxe";
+		case 1: return "shovel";
+		case 2: return "axe";
+		case 3: return "sword";
+		case 4: return "shears";
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		default: return "";
+		}
 	}
 
 	@Override
@@ -49,32 +63,9 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 	}
 	
 	@Override
-	public String getItemNameIS(ItemStack par1ItemStack)
+	public String getItemNameIS(ItemStack i)
 	{
-		String type;
-		String tier = par1ItemStack.getItemDamage() / 10 + "";
-		switch (par1ItemStack.getItemDamage() % 10)
-		{
-			case 0:		type = "drill";
-						break;
-			case 1:		type = "chainsaw";
-						break;
-			case 2:		type = "shovel";
-						break;
-			case 3:		type = "sword";
-						break;
-			case 4:		type = "shears";
-						break;
-			case 5:
-			case 6:
-			case 7:
-			case 8:
-			case 9:
-			default:	type = "unknown";
-						break;
-		}
-		
-		return this.getItemName() + "." + type + "." + tier;
+		return this.getItemName() + "." + this.getToolType(i) + "." + this.getAttachmentTier(i);
 	}
 
 	@Override
@@ -89,6 +80,37 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 	public boolean isDamageable()
 	{
 		return false;
+	}
+
+	@Override
+	public double getHarvestSpeed(ItemStack i) 
+	{
+		switch (this.getAttachmentTier(i))
+		{
+		case 0:		return 4.0F;
+		case 1:		return 6.0F;
+		case 2:		return 8.0F;
+		case 3:		return 12.0F;
+		default:	return 1.0F;
+		}
+	}
+
+	@Override
+	public int getDamageVsEntity(ItemStack i, Entity entity) 
+	{
+		String type = this.getToolType(i);
+		int toolBonus = 0;
+		if (type.equals("pickaxe"))
+			toolBonus = 2;
+		else if (type.equals("shovel"))
+			toolBonus = 1;
+		else if (type.equals("axe"))
+			toolBonus = 3;
+		else if (type.equals("sword"))
+			toolBonus = 4;
+		else if (type.equals("shears"))
+			toolBonus = -this.getAttachmentTier(i);
+		return this.getAttachmentTier(i) + toolBonus;
 	}
 
 }

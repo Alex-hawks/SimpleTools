@@ -3,14 +3,26 @@ package simpletools.common.items;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.EnchantmentThorns;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumToolMaterial;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.potion.Potion;
+import net.minecraft.stats.AchievementList;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import simpletools.common.SimpleTools;
 import simpletools.common.interfaces.IAssembledTool;
 import simpletools.common.interfaces.IAttachment;
@@ -18,8 +30,8 @@ import simpletools.common.interfaces.ICore;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 import universalelectricity.core.electricity.ElectricInfo;
 import universalelectricity.core.implement.IItemElectric;
-import universalelectricity.core.implement.IVoltage;
-import universalelectricity.prefab.ItemElectric;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemAssembledToolElectric extends ItemTool implements IItemElectric, IAssembledTool
 {
@@ -32,8 +44,9 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		this.setItemName(name);
 		this.setMaxStackSize(1);
 		this.setNoRepair();
-		this.setIconIndex(0);
+		this.setMaxDamage(0);
 		this.setCreativeTab(SimpleToolsCreativeTab.INSTANCE);
+		this.setTextureFile(SimpleTools.ITEM_TEXTURES);
 	}
 
 	@Override
@@ -223,17 +236,26 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	}
 
 	@Override
-	public boolean onBlockDestroyed(ItemStack par1ItemStack, World par2World, int par3, int par4, int par5, int par6, EntityLiving par7EntityLiving)
+	public boolean onBlockDestroyed(ItemStack par1ItemStack, World par2World, int id, int x, int y, int z, EntityLiving par7EntityLiving)
 	{
-		double blockHardness = (double)Block.blocksList[par3].getBlockHardness(par2World, par4, par5, par6);
-		if (blockHardness != 0D)
+		double blockHardness = (double)Block.blocksList[id].getBlockHardness(par2World, x, y, z);
+		if (blockHardness != 0D && this.canBreakBlock(par1ItemStack, par2World, id, x, y, z, par7EntityLiving))
 		{
+			int fortune = this.getEnchantmentLvl(Enchantment.fortune, par1ItemStack);
+
+			if(this.getEnchantmentLvl(Enchantment.silkTouch, par1ItemStack) >= 0)
+			{
+				this.dropBlockAsItem_do(par2World, x, y, z, new ItemStack(Block.blocksList[id], 1, par2World.getBlockMetadata(x, y, z)));
+			}
+			else
+			{
+				Block.blocksList[id].dropBlockAsItem(par2World, x, y, z, par2World.getBlockMetadata(x, y, z), fortune);
+			}
 			return this.onItemUse(par1ItemStack);
 		}
-
 		return true;
 	}
-
+	
 	@Override
 	public ItemStack getCore(ItemStack assembledTool) 
 	{
@@ -241,4 +263,123 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		return new ItemStack(SimpleTools.coreMechElectric, 1, tier);
 	}
 
+	@Override
+	public ItemStack getStorage(ItemStack assembledTool) 
+	{
+		ItemStack battery = null;
+		try
+		{
+			NBTTagCompound batt = assembledTool.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
+			battery = ItemStack.loadItemStackFromNBT((NBTTagCompound) batt);
+			((IItemElectric)battery.getItem()).setJoules(this.getJoules(assembledTool), battery);
+		}
+		catch(Throwable e) {}
+		return battery;
+	}
+
+	@Override
+	public ItemStack getAttachment(ItemStack assembledTool) 
+	{
+		ItemStack attachment = null;
+		try
+		{
+			NBTBase attach = assembledTool.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("attachment");
+			attachment = ItemStack.loadItemStackFromNBT((NBTTagCompound) attach);
+			if (!assembledTool.getEnchantmentTagList().equals(null))
+			{
+				attachment.setTagCompound(new NBTTagCompound());
+				attachment.getTagCompound().setTag(assembledTool.getEnchantmentTagList().getName(), assembledTool.getEnchantmentTagList());
+			}
+		}
+		catch(Throwable e) {}
+		return attachment;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean requiresMultipleRenderPasses()
+	{
+		return false;
+	}
+
+	@Override
+	public int getIconIndex(ItemStack assembledTool, int pass)
+	{
+		//	pass: 0 is attachment, 1 is core
+		if (pass == 0)
+		{
+			try
+			{
+				int attachMeta = ((IAssembledTool)assembledTool.getItem()).getAttachment(assembledTool).getItemDamage();
+				return ((IAssembledTool)assembledTool.getItem()).getAttachment(assembledTool).getItem().getIconFromDamage(attachMeta);
+			}
+			catch (Throwable e) {}
+		}
+		else if (pass == 1)
+		{
+			try
+			{
+				int coreMeta = ((IAssembledTool)assembledTool.getItem()).getAttachment(assembledTool).getItemDamage();
+				return ((IAssembledTool)assembledTool.getItem()).getCore(assembledTool).getItem().getIconFromDamage(coreMeta);
+			}
+			catch (Throwable e) {}
+		}
+		return 0;
+	}
+
+	private boolean canBreakBlock(ItemStack par1ItemStack, World par2World, int par3, int par4, int par5, int par6, EntityLiving par7EntityLiving) 
+	{
+		Block block = Block.blocksList[par3];
+		int metadata = par2World.getBlockMetadata(par4, par5, par6);
+		ItemStack attachment = this.getAttachment(par1ItemStack);
+		String toolClass = ((IAttachment)attachment.getItem()).getToolType(attachment);
+		int toolLevel = ((IAttachment)attachment.getItem()).getAttachmentTier(attachment);
+		int blockLevel = MinecraftForge.getBlockHarvestLevel(block, metadata, toolClass);
+		return toolLevel >= blockLevel;
+	}
+
+	/**
+	 * @param enchant The enchantment to check for.
+	 * @param assembledTool The ItemStack to check on. 
+	 * @return The level of the enchantment. -1 if the enchantment is not on the given tool
+	 */
+	public int getEnchantmentLvl(Enchantment enchant, ItemStack assembledTool)
+	{
+		int level = -1;
+		if (assembledTool.getEnchantmentTagList() != null)
+		{
+			for (int i = 0; i < assembledTool.getEnchantmentTagList().tagCount(); i++)
+			{
+				if (assembledTool.getEnchantmentTagList().tagAt(i) instanceof NBTTagCompound)
+				{
+					if (((NBTTagCompound)assembledTool.getEnchantmentTagList().tagAt(i)).getShort("id") == enchant.effectId)
+						level = ((NBTTagCompound)assembledTool.getEnchantmentTagList().tagAt(i)).getShort("lvl");
+				}
+			}
+		}
+		return level;
+	}
+
+	protected void dropBlockAsItem_do(World par1World, int par2, int par3, int par4, ItemStack par5ItemStack)
+	{
+		if (!par1World.isRemote && par1World.getGameRules().getGameRuleBooleanValue("doTileDrops"))
+		{
+			float var6 = 0.7F;
+			double var7 = (double)(par1World.rand.nextFloat() * var6) + (double)(1.0F - var6) * 0.5D;
+			double var9 = (double)(par1World.rand.nextFloat() * var6) + (double)(1.0F - var6) * 0.5D;
+			double var11 = (double)(par1World.rand.nextFloat() * var6) + (double)(1.0F - var6) * 0.5D;
+			EntityItem var13 = new EntityItem(par1World, (double)par2 + var7, (double)par3 + var9, (double)par4 + var11, par5ItemStack);
+			var13.delayBeforeCanPickup = 10;
+			par1World.spawnEntityInWorld(var13);
+		}
+	}
+	
+	@Override
+    public boolean hitEntity(ItemStack par1ItemStack, EntityLiving par2EntityLiving, EntityLiving par3EntityLiving)
+    {
+        if (this.onItemUse(par1ItemStack))
+        	return true;
+        else
+        	return false;
+    }
 }

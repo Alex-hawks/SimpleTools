@@ -1,32 +1,40 @@
 package simpletools.common.containers;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
+import simpletools.common.interfaces.IAssembledTool;
+import simpletools.common.interfaces.IAttachment;
 import simpletools.common.interfaces.ICore;
-import simpletools.common.misc.SlotAttachment;
-import simpletools.common.misc.SlotCore;
 import simpletools.common.misc.SlotOutput;
 import simpletools.common.misc.SlotSTStorage;
 import simpletools.common.tileentities.TileEntityTableAssembly;
 import universalelectricity.core.implement.IItemElectric;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
+import universalelectricity.prefab.SlotSpecific;
 
 public class ContainerTableAssembly extends Container
 {
 	private TileEntityTableAssembly tileEntity;
+	private Class[] validStorage = { IItemElectric.class };
 
 	public ContainerTableAssembly(InventoryPlayer inventory, TileEntityTableAssembly tileEntity)
 	{
 		this.tileEntity = tileEntity;
-		this.addSlotToContainer(new SlotCore(tileEntity, 1, 39, 36)); 
-		this.addSlotToContainer(new SlotAttachment(tileEntity, 0, 16, 22, tileEntity.getStackInSlot(1)));
-		this.addSlotToContainer(new SlotSTStorage(tileEntity, 2, 16, 50, tileEntity.getStackInSlot(1)));
-		this.addSlotToContainer(new Slot(tileEntity, 3, 120, 36));
+		//	The Slot for the Core of the Assembled Tool
+		this.addSlotToContainer(new SlotSpecific(tileEntity, 1, 39, 36, ICore.class));
+		//	The Slot for the Attachment of the Assembled Tool
+		this.addSlotToContainer(new SlotSpecific(tileEntity, 0, 16, 22, IAttachment.class));
+		//	The Slot for the Primary Storage of the Assembled Tool. A different class is used to perform some validity checks
+		this.addSlotToContainer(new SlotSTStorage(tileEntity, 2, 16, 50));
+		//	The Slot for the resulting Assembled Tool
+		this.addSlotToContainer(new SlotOutput(tileEntity, 3, 120, 22));
+		//	The Slot for the ItemStack that will be Disassembled
+		this.addSlotToContainer(new SlotSpecific(tileEntity, 4, 120, 50, IAssembledTool.class));
+		
 		int var3;
-
+		
 		for (var3 = 0; var3 < 3; ++var3)
 		{
 			for (int var4 = 0; var4 < 9; ++var4)

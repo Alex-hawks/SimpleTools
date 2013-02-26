@@ -92,7 +92,7 @@ public class BlockTableAssembly extends BlockMachine implements ISneakUseWrench
 	{
 		if (!par1World.isRemote)
 		{
-			par5EntityPlayer.openGui(SimpleTools.instance, 0, par1World, x, y, z);
+			par5EntityPlayer.openGui(SimpleTools.INSTANCE, 0, par1World, x, y, z);
 			return true;
 		}
 		return true;

@@ -22,4 +22,18 @@ public interface IAssembledTool
 	 * @return	The ItemStack of the associated core. stackSize of 1, MUST BE CORRECT TIER!
 	 */
 	public ItemStack getCore(ItemStack assembledTool);
+	
+	/**
+	 * @param assembledTool The assembled tool for which the storage is wanted
+	 * @return	The ItemStack of the Storage (eg. Battery). MUST be created storing 
+	 * 			the amount of primary energy that was stored in the assembled tool
+	 */
+	public ItemStack getStorage(ItemStack assembledTool);
+	
+	/**
+	 * @param assembledTool The assembled tool for which the storage is wanted
+	 * @return	The ItemStack of the associated core. stackSize of 1, MUST BE CORRECT TIER AND TYPE!
+	 * 			Also, the attachment store the enchantments...
+	 */
+	public ItemStack getAttachment(ItemStack assembledTool);
 }

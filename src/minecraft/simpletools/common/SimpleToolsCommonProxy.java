@@ -3,10 +3,10 @@ package simpletools.common;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.network.IGuiHandler;
 import simpletools.common.containers.ContainerTableAssembly;
 import simpletools.common.tileentities.TileEntityTableAssembly;
+import cpw.mods.fml.common.network.IGuiHandler;
+import cpw.mods.fml.common.registry.GameRegistry;
 
 public class SimpleToolsCommonProxy implements IGuiHandler
 {

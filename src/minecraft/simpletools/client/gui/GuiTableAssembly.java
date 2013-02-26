@@ -1,19 +1,17 @@
 package simpletools.client.gui;
 
-import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.common.network.PacketDispatcher;
-import cpw.mods.fml.relauncher.SideOnly;
-import cpw.mods.fml.relauncher.Side;
-import simpletools.common.SimpleTools;
-import simpletools.common.containers.ContainerTableAssembly;
-import simpletools.common.tileentities.TileEntityTableAssembly;
-import universalelectricity.prefab.network.PacketManager;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
+
+import simpletools.common.SimpleTools;
+import simpletools.common.containers.ContainerTableAssembly;
+import simpletools.common.tileentities.TileEntityTableAssembly;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiTableAssembly extends GuiContainer
@@ -62,7 +60,7 @@ public class GuiTableAssembly extends GuiContainer
 		switch (button.id)
 		{
 			case 0:
-				this.tileEntity.doProcess();
+				this.tileEntity.dissassemble();
 				break;
 			default:
 		}
