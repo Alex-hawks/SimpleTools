@@ -2,6 +2,9 @@ package simpletools.common.items;
 
 import java.util.List;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
@@ -95,7 +98,6 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 		}
 	}
 
-	@Override
 	public int getDamageVsEntity(ItemStack i, Entity entity) 
 	{
 		String type = this.getToolType(i);
@@ -109,8 +111,28 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 		else if (type.equals("sword"))
 			toolBonus = 4;
 		else if (type.equals("shears"))
-			toolBonus = -this.getAttachmentTier(i);
-		return this.getAttachmentTier(i) + toolBonus;
+			toolBonus = -(this.getAttachmentTier(i) + 1); // shears will hit for 0
+		return this.getAttachmentTier(i) + toolBonus + 1;
 	}
 
+	@Override
+	public BiMap<Entity, Integer> getDamageVsEntities(ItemStack i)
+	{
+		BiMap<Entity, Integer> toReturn = HashBiMap.create();
+		
+		String type = this.getToolType(i);
+		int toolBonus = 0;
+		if (type.equals("pickaxe"))
+			toolBonus = 2;
+		else if (type.equals("shovel"))
+			toolBonus = 1;
+		else if (type.equals("axe"))
+			toolBonus = 3;
+		else if (type.equals("sword"))
+			toolBonus = 4;
+		else if (type.equals("shears"))
+			toolBonus = -(this.getAttachmentTier(i) + 1); // shears will hit for 0
+		toReturn.put(null, this.getAttachmentTier(i) + toolBonus + 1);
+		return toReturn;
+	}
 }
