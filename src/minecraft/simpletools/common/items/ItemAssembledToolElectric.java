@@ -49,6 +49,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		this.setMaxStackSize(1);
 		this.setNoRepair();
 		this.setMaxDamage(0);
+		this.toolMaterial = null;
 		this.setCreativeTab(SimpleToolsCreativeTab.INSTANCE);
 		this.setTextureFile(SimpleTools.ITEM_TEXTURES);
 	}
@@ -189,9 +190,17 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	}
 	
 	@Override
-	public float getStrVsBlock(ItemStack itemStack, Block block)
-	{
-		return 1f;
+	public float getStrVsBlock(ItemStack itemStack, Block block, int meta)
+	{	
+		ItemStack attachment = this.getAttachment(itemStack);
+		String toolClass = ((IAttachment)attachment.getItem()).getToolType(attachment);
+		int toolLevel = ((IAttachment)attachment.getItem()).getAttachmentTier(attachment);
+		int blockLevel = MinecraftForge.getBlockHarvestLevel(block, meta, toolClass);
+		
+		if (toolLevel >= blockLevel)
+			return (float) ((IAttachment)attachment.getItem()).getHarvestSpeed(attachment);
+		else
+			return 1f;
 		
 	}
 	
@@ -308,7 +317,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	@SideOnly(Side.CLIENT)
 	public boolean requiresMultipleRenderPasses()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -333,7 +342,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 			}
 			catch (Throwable e) {}
 		}
-		return 0;
+		return 255;
 	}
 	
 	private boolean canBreakBlock(ItemStack par1ItemStack, World par2World, int par3, int par4, int par5, int par6, EntityLiving par7EntityLiving) 

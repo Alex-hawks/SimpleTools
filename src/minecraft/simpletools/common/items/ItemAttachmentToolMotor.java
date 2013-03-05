@@ -9,6 +9,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import simpletools.common.SimpleTools;
 import simpletools.common.interfaces.IAttachment;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 
@@ -20,6 +21,8 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 		this.setCreativeTab(SimpleToolsCreativeTab.INSTANCE);
 		this.setItemName(name);
 		this.setMaxStackSize(16);
+		this.setIconIndex(32);
+		this.setTextureFile(SimpleTools.ITEM_TEXTURES);
 	}
 	
 	@Override
@@ -94,7 +97,8 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 		case 1:		return 6.0F;
 		case 2:		return 8.0F;
 		case 3:		return 12.0F;
-		default:	return 1.0F;
+		default:	System.out.println("Default Strength");
+					return 1.0F;
 		}
 	}
 
@@ -135,4 +139,10 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 		toReturn.put(null, this.getAttachmentTier(i) + toolBonus + 1);
 		return toReturn;
 	}
+	
+	@Override
+    public int getIconFromDamage(int meta)
+    {
+        return this.iconIndex + meta;
+    }
 }

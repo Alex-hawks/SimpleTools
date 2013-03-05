@@ -33,7 +33,6 @@ public class GuiTableAssembly extends GuiContainer
 		int var1 = (this.width - this.xSize) / 2;
 		int var2 = (this.height - this.ySize) / 2;
 		this.controlList.clear();
-		this.controlList.add(new GuiButton(0, var1 + 60, var2 + 54, 50, 20, "Assemble"));
 	}
 
 	@Override
@@ -54,16 +53,4 @@ public class GuiTableAssembly extends GuiContainer
 		containerHeight = (this.height - this.ySize) / 2;
 		this.drawTexturedModalRect(containerWidth, containerHeight, 0, 0, this.xSize, this.ySize);
 	}
-	
-	public void actionPerformed(GuiButton button)
-	{
-		switch (button.id)
-		{
-			case 0:
-				this.tileEntity.dissassemble();
-				break;
-			default:
-		}
-	}
-
 }

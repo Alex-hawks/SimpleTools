@@ -18,6 +18,7 @@ public class ItemCoreMotor extends Item implements ICore
 		this.setCreativeTab(SimpleToolsCreativeTab.INSTANCE);
 		this.setItemName(name);
 		this.setMaxStackSize(16);
+		this.setIconIndex(0);
 	}
 
 	@Override
@@ -68,4 +69,10 @@ public class ItemCoreMotor extends Item implements ICore
 	{
 		return SimpleTools.assembledToolElectric;
 	}
+	
+	@Override
+    public int getIconFromDamage(int meta)
+    {
+        return this.iconIndex + meta;
+    }
 }
