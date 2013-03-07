@@ -32,8 +32,8 @@ public interface IAssembledTool
 	
 	/**
 	 * @param assembledTool The assembled tool for which the storage is wanted
-	 * @return	The ItemStack of the associated core. stackSize of 1, MUST BE CORRECT TIER AND TYPE!
-	 * 			Also, the attachment store the enchantments...
+	 * @return	The ItemStack of the attachment on the tool. stackSize of 1, MUST BE CORRECT TIER AND TYPE!
+	 * 			Also, the attachment stores the enchantments...
 	 */
 	public ItemStack getAttachment(ItemStack assembledTool);
 }

@@ -19,6 +19,7 @@ public class ItemCoreMotor extends Item implements ICore
 		this.setItemName(name);
 		this.setMaxStackSize(16);
 		this.setIconIndex(0);
+		this.setTextureFile(SimpleTools.ITEM_TEXTURES);
 	}
 
 	@Override
@@ -36,7 +37,7 @@ public class ItemCoreMotor extends Item implements ICore
 	@Override
 	public byte getCoreUID(ItemStack i)
 	{
-		return 0;
+		return (byte) i.getItemDamage();
 	}
 
 	@Override

@@ -1,7 +1,9 @@
 package simpletools.common.items;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -27,6 +29,7 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.MinecraftForge;
 import simpletools.common.SimpleTools;
 import simpletools.common.interfaces.IAssembledTool;
@@ -314,7 +317,6 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
 	public boolean requiresMultipleRenderPasses()
 	{
 		return true;
@@ -323,13 +325,14 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	@Override
 	public int getIconIndex(ItemStack assembledTool, int pass)
 	{
-		//	pass: 0 is attachment, 1 is core
+		//	pass: 0 is core, 1 is attachment
+		int toReturn = 255;
 		if (pass == 0)
 		{
 			try
 			{
-				int attachMeta = ((IAssembledTool)assembledTool.getItem()).getAttachment(assembledTool).getItemDamage();
-				return ((IAssembledTool)assembledTool.getItem()).getAttachment(assembledTool).getItem().getIconFromDamage(attachMeta);
+				int coreMeta = ((IAssembledTool)assembledTool.getItem()).getCore(assembledTool).getItemDamage();
+				toReturn = ((IAssembledTool)assembledTool.getItem()).getCore(assembledTool).getItem().getIconFromDamage(coreMeta);
 			}
 			catch (Throwable e) {}
 		}
@@ -337,12 +340,12 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		{
 			try
 			{
-				int coreMeta = ((IAssembledTool)assembledTool.getItem()).getAttachment(assembledTool).getItemDamage();
-				return ((IAssembledTool)assembledTool.getItem()).getCore(assembledTool).getItem().getIconFromDamage(coreMeta);
+				int attachMeta = ((IAssembledTool)assembledTool.getItem()).getAttachment(assembledTool).getItemDamage();
+				toReturn = ((IAssembledTool)assembledTool.getItem()).getAttachment(assembledTool).getItem().getIconFromDamage(attachMeta);
 			}
 			catch (Throwable e) {}
 		}
-		return 255;
+		return toReturn;
 	}
 	
 	private boolean canBreakBlock(ItemStack par1ItemStack, World par2World, int par3, int par4, int par5, int par6, EntityLiving par7EntityLiving) 
@@ -412,4 +415,34 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		else
 			return false;
 	}
+	
+    @Override
+    public boolean itemInteractionForEntity(ItemStack itemstack, EntityLiving entity)
+    {
+        if (entity.worldObj.isRemote)
+        {
+            return false;
+        }
+        if (entity instanceof IShearable && ((IAttachment)this.getAttachment(itemstack).getItem()).getToolType(this.getAttachment(itemstack)).toLowerCase().equals("shears"))
+        {
+            IShearable target = (IShearable)entity;
+            if (target.isShearable(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ) && this.onItemUse(itemstack))
+            {
+                ArrayList<ItemStack> drops = target.onSheared(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ,
+                        EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
+
+                Random rand = new Random();
+                for(ItemStack stack : drops)
+                {
+                    EntityItem ent = entity.entityDropItem(stack, 1.0F);
+                    ent.motionY += rand.nextFloat() * 0.05F;
+                    ent.motionX += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
+                    ent.motionZ += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -154,7 +154,7 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 			this.finishAssemble();
 			this.assembling = false;
 		}
-		else if((this.inventory[0] == null || this.inventory[0] == null || this.inventory[0] == null) && this.inventory[3] != null)
+		else if((this.inventory[0] == null || this.inventory[1] == null || this.inventory[2] == null) && this.inventory[3] != null)
 		{
 			this.cancelAssemble();
 			this.assembling = false;

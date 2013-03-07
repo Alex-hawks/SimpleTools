@@ -22,7 +22,7 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 
 public class SimpleToolsEventHandler
-{
+{	
 /*	@ForgeSubscribe
 	public void someEntityEvent(EntityEvent event)
 	{
@@ -53,7 +53,7 @@ public class SimpleToolsEventHandler
 	public void playerAttack(AttackEntityEvent event)
 	{
 		ItemStack usedIS = event.entityPlayer.inventory.getCurrentItem();
-		if (usedIS.getItem() instanceof IAssembledTool)
+		if (usedIS != null && usedIS.getItem() instanceof IAssembledTool && event.target instanceof EntityLiving)
 		{
 			event.setCanceled(true);
 			Entity target = event.target;

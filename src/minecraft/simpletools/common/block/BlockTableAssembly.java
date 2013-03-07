@@ -20,6 +20,7 @@ public class BlockTableAssembly extends BlockMachine implements ISneakUseWrench
 		super(par1, Material.iron);
 		this.setRequiresSelfNotify();
 		this.blockHardness = -1;
+		this.setBlockName("tableAssembly");
 	}
 	
 	@Override
