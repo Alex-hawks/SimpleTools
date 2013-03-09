@@ -426,7 +426,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
         if (entity instanceof IShearable && ((IAttachment)this.getAttachment(itemstack).getItem()).getToolType(this.getAttachment(itemstack)).toLowerCase().equals("shears"))
         {
             IShearable target = (IShearable)entity;
-            if (target.isShearable(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ) && this.onItemUse(itemstack))
+            if (target.isShearable(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ))
             {
                 ArrayList<ItemStack> drops = target.onSheared(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ,
                         EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
@@ -439,6 +439,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
                     ent.motionX += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
                     ent.motionZ += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
                 }
+                return this.onItemUse(itemstack);
             }
             return true;
         }

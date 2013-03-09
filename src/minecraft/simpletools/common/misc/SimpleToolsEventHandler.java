@@ -75,7 +75,7 @@ public class SimpleToolsEventHandler
 	public void playerBreakingBlock(BreakSpeed event)
 	{
 		ItemStack usedIS = event.entityPlayer.inventory.getCurrentItem();
-		if (usedIS.getItem() instanceof IAssembledTool)
+		if (usedIS != null && usedIS.getItem() instanceof IAssembledTool)
 		{
 			event.newSpeed = usedIS.getItem().getStrVsBlock(usedIS, event.block, event.metadata);
 		}
