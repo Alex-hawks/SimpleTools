@@ -5,8 +5,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ImageBufferDownload;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.StringUtils;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.relauncher.Side;
@@ -16,7 +16,33 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class STTickHandler implements ITickHandler
 {
 	private static final Minecraft mc = Minecraft.getMinecraft();
+	/**
+	 * Don't add to this, use {@link STTickHandler#registerUEDeveloper}
+	 */
 	public static List<String> ueDevelopers = new ArrayList();
+	
+	/**
+	 * Don't add to this, use {@link STTickHandler#registerUEAssistant}
+	 */
+	public static List<String> ueAssistants = new ArrayList();
+	
+	public static final STTickHandler INSTANCE = new STTickHandler();
+	private static final String developerCloakURL = "https://raw.github.com/Alex-hawks/SimpleTools/master/misc/UE-Dev-Cape.png";
+	private static final String assistantCloakURL = "https://raw.github.com/Alex-hawks/SimpleTools/master/misc/UE-Assistant-Cape.png";
+	
+	private STTickHandler()
+	{
+		//	Major Coders
+		this.registerUEDeveloper("Alex_hawks");		//	Alex_hawks
+		this.registerUEDeveloper("Mattredsox");		//	Mattredsox
+		this.registerUEDeveloper("calclavia");		//	Calclavia
+		this.registerUEDeveloper("briman0094");		//	Briman
+		this.registerUEDeveloper("TrainerGuy22");	//	TheMike
+		this.registerUEDeveloper("liquidyyy64");
+		
+		//	Major Texture Artists
+		this.registerUEDeveloper("Tifflor");		//	Comply
+	}
 	
 	@Override
 	public void tickStart(EnumSet<TickType> type, Object... tickData) 
@@ -30,17 +56,20 @@ public class STTickHandler implements ITickHandler
 			for (EntityPlayer player : players) 
 			{
 				String oldCloak = player.cloakUrl;
-				String groupUrl = oldCloak;
 				
-				if (ueDevelopers.contains(player.username.toLowerCase()))
+				if (player.cloakUrl.startsWith("http://skins.minecraft.net/MinecraftCloaks/")) 
 				{
-					if (player.cloakUrl.startsWith("http://skins.minecraft.net/MinecraftCloaks/")) 
+					if (ueDevelopers.contains(StringUtils.stripControlCodes(player.username).toLowerCase()))
 					{
-						player.cloakUrl = "";
-						
-						if (player.cloakUrl != oldCloak) 
-							mc.renderEngine.obtainImageData(player.cloakUrl, new ImageBufferDownload());
+						player.cloakUrl = developerCloakURL;
 					}
+					else if (ueAssistants.contains(StringUtils.stripControlCodes(player.username).toLowerCase()))
+					{
+						player.cloakUrl = assistantCloakURL;
+					}
+
+					if (!oldCloak.equals(player.cloakUrl))
+						mc.renderEngine.obtainImageData(player.cloakUrl, new SimpleToolsCloakDownload());
 				}
 			}
 		}
@@ -64,9 +93,26 @@ public class STTickHandler implements ITickHandler
 		return "SimpleToolsClientTickHandler";
 	}
 	
+	/**
+	 * 			All Coders are developers, but not all developers are coders...
+	 * </br>	This cape goes to anyone who has had a significant positive impact on the UE mod collection
+	 * @param userName The UserName of the person. Plain text, and lower case...
+	 */
 	public static void registerUEDeveloper(String userName)
 	{
 		if (!userName.equals(null))
-			ueDevelopers.add(userName);
+			ueDevelopers.add(userName.toLowerCase());
+	}
+	
+	/**
+	 * 			This cape goes to anyone who has had a small positive impact, and no negative impacts, on the UE Mod Collection
+	 * </br>	This includes most donators. In the case of the donator, the donation receiver determines whether or not the
+	 * </br>	contribution was significant enough for this.
+	 * @param userName The UserName of the person. Plain text, and lower case...
+	 */
+	public static void registerUEAssistant(String userName)
+	{
+		if (!userName.equals(null))
+			ueAssistants.add(userName.toLowerCase());
 	}
 }

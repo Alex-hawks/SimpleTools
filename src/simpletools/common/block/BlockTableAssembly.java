@@ -1,11 +1,7 @@
 package simpletools.common.block;
 
-import java.util.HashMap;
-import java.util.List;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -17,7 +13,6 @@ import net.minecraftforge.common.ForgeDirection;
 import simpletools.common.SimpleTools;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 import simpletools.common.tileentities.TileEntityTableAssembly;
-import universalelectricity.components.common.BasicComponents;
 import universalelectricity.prefab.block.BlockAdvanced;
 import universalelectricity.prefab.tile.TileEntityAdvanced;
 import cpw.mods.fml.relauncher.Side;

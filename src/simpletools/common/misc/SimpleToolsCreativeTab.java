@@ -3,10 +3,6 @@ package simpletools.common.misc;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
-import simpletools.common.SimpleTools;
-import simpletools.common.items.ItemAssembledToolElectric;
-import universalelectricity.components.common.BasicComponents;
-import universalelectricity.core.item.ElectricItemHelper;
 
 public class SimpleToolsCreativeTab extends CreativeTabs
 {

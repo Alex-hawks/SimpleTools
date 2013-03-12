@@ -13,7 +13,6 @@ import net.minecraft.util.Icon;
 import simpletools.common.SimpleTools;
 import simpletools.common.interfaces.IAttachment;
 import simpletools.common.misc.SimpleToolsCreativeTab;
-import universalelectricity.components.common.BasicComponents;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;

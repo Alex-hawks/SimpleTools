@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -17,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
@@ -25,13 +30,15 @@ import simpletools.common.SimpleTools;
 import simpletools.common.interfaces.IAssembledTool;
 import simpletools.common.interfaces.IAttachment;
 import simpletools.common.interfaces.ICore;
-import simpletools.common.misc.SimpleToolsCreativeTab;
+import universalelectricity.core.electricity.ElectricityDisplay;
 import universalelectricity.core.electricity.ElectricityPack;
+import universalelectricity.core.electricity.ElectricityDisplay.ElectricUnit;
 import universalelectricity.core.item.IItemElectric;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -189,6 +196,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	}
 	
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack itemStack, EntityPlayer player, List currentTips, boolean advancedToolTips)
 	{
 		ItemStack attachment = null, battery = null;
@@ -202,9 +210,10 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		}
 		catch (Exception e) {}
 		
-		currentTips.add("Energy: " + this.getJoules(itemStack) + " / " + this.getMaxJoules(itemStack));
+		currentTips.add("Energy: " + ElectricityDisplay.getDisplay(this.getJoules(itemStack), ElectricUnit.JOULES) 
+				+ " / " + ElectricityDisplay.getDisplay(this.getMaxJoules(itemStack), ElectricUnit.JOULES));
 		
-		//if (advancedToolTips)
+		if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.keyCode))
 		{
 			if (this.getCore(itemStack) != null)
 				currentTips.add("Core Module: " + this.getCore(itemStack).getDisplayName());
@@ -213,6 +222,10 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 			if (battery != null)
 				currentTips.add("Batt Module: " + battery.getDisplayName());
 		}
+		else
+		{
+			currentTips.add("Hold Sneak for more information");
+		}	
 	}
 	
 	public boolean onItemUse(ItemStack i)
@@ -240,22 +253,32 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	@Override
 	public boolean onBlockDestroyed(ItemStack par1ItemStack, World par2World, int id, int x, int y, int z, EntityLiving par7EntityLiving)
 	{
-		double blockHardness = (double)Block.blocksList[id].getBlockHardness(par2World, x, y, z);
-		if (blockHardness != 0D && this.canBreakBlock(par1ItemStack, par2World, id, x, y, z, par7EntityLiving))
+		Block block = Block.blocksList[id];
+		double blockHardness = (double)block.getBlockHardness(par2World, x, y, z);
+		if (((IAttachment)this.getAttachment(par1ItemStack).getItem()).getToolType(this.getAttachment(par1ItemStack)).equals("shears"))
+		{
+			if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass) || block.equals(Block.deadBush)
+					|| block.equals(Block.vine) || block.equals(Block.tripWire) || block instanceof IShearable)
+			{
+				return true;
+			}
+		}
+		if (blockHardness != 0D && this.canBreakBlock(par1ItemStack, par2World, id, x, y, z, par7EntityLiving) 
+				&& !(block.canHarvestBlock((EntityPlayer)par7EntityLiving, par2World.getBlockMetadata(x, y, z))))
 		{
 			int fortune = this.getEnchantmentLvl(Enchantment.fortune, par1ItemStack);
 			
-			if(this.getEnchantmentLvl(Enchantment.silkTouch, par1ItemStack) >= 0)
+			if(this.getEnchantmentLvl(Enchantment.silkTouch, par1ItemStack) > 0)
 			{
-				this.dropBlockAsItem_do(par2World, x, y, z, new ItemStack(Block.blocksList[id], 1, par2World.getBlockMetadata(x, y, z)));
+				this.dropBlockAsItem_do(par2World, x, y, z, new ItemStack(block, 1, par2World.getBlockMetadata(x, y, z)));
 			}
 			else
 			{
-				Block.blocksList[id].dropBlockAsItem(par2World, x, y, z, par2World.getBlockMetadata(x, y, z), fortune);
+				block.dropBlockAsItem(par2World, x, y, z, par2World.getBlockMetadata(x, y, z), fortune);
 			}
 			return this.onItemUse(par1ItemStack);
 		}
-		return true;
+		return false;
 	}
 	
 	@Override
@@ -407,7 +430,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		if (entity instanceof IShearable && ((IAttachment)this.getAttachment(itemstack).getItem()).getToolType(this.getAttachment(itemstack)).toLowerCase().equals("shears"))
 		{
 			IShearable target = (IShearable)entity;
-			if (target.isShearable(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ))
+			if (target.isShearable(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ) && this.onItemUse(itemstack))
 			{
 				ArrayList<ItemStack> drops = target.onSheared(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ,
 						EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
@@ -420,15 +443,49 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 					ent.motionX += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
 					ent.motionZ += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
 				}
-				return this.onItemUse(itemstack);
+				return true;
 			}
 			return true;
 		}
 		return false;
 	}
 	
-    @SideOnly(Side.CLIENT)
-    public void func_94581_a(IconRegister par1IconRegister)
-    {
-    }
+	@SideOnly(Side.CLIENT)
+	public void func_94581_a(IconRegister par1IconRegister)
+	{
+	}
+	
+	@Override
+	public boolean onBlockStartBreak(ItemStack itemstack, int x, int y, int z, EntityPlayer player) 
+	{
+		if (player.worldObj.isRemote)
+		{
+			return false;
+		}
+		int id = player.worldObj.getBlockId(x, y, z);
+		if (Block.blocksList[id] instanceof IShearable && ((IAttachment)this.getAttachment(itemstack).getItem()).getToolType(this.getAttachment(itemstack)).toLowerCase().equals("shears"))
+		{
+			IShearable target = (IShearable)Block.blocksList[id];
+			if (target.isShearable(itemstack, player.worldObj, x, y, z) && this.onItemUse(itemstack))
+			{
+				ArrayList<ItemStack> drops = target.onSheared(itemstack, player.worldObj, x, y, z,
+						EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
+				Random rand = new Random();
+				
+				for(ItemStack stack : drops)
+				{
+					float f = 0.7F;
+					double d  = (double)(rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+					double d1 = (double)(rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+					double d2 = (double)(rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+					EntityItem entityitem = new EntityItem(player.worldObj, (double)x + d, (double)y + d1, (double)z + d2, stack);
+					entityitem.delayBeforeCanPickup = 10;
+					player.worldObj.spawnEntityInWorld(entityitem);
+				}
+				
+				player.addStat(StatList.mineBlockStatArray[id], 1);
+			}
+		}
+		return false;
+	}
 }

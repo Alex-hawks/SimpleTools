@@ -19,7 +19,7 @@ import simpletools.common.interfaces.IAssembledTool;
 
 public class SimpleToolsEventHandler
 {	
-	@ForgeSubscribe
+/*	@ForgeSubscribe
 	public void someEntityEvent(EntityEvent event)
 	{
 		if (!(event instanceof CheckSpawn || event instanceof LivingUpdateEvent || event instanceof EnteringChunk || 
@@ -44,7 +44,7 @@ public class SimpleToolsEventHandler
 			}
 		}		
 	}
-	
+*/	
 	@ForgeSubscribe
 	public void playerAttack(AttackEntityEvent event)
 	{

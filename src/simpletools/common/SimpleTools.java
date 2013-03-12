@@ -154,12 +154,13 @@ public class SimpleTools
 			LanguageRegistry.instance().loadLocalization(LANGUAGE_PATH + SUPPORTED_LANGUAGES[i] + ".properties", SUPPORTED_LANGUAGES[i], false);
 		MinecraftForge.EVENT_BUS.register(this.EVENT_HANDLER);
 		Item.itemsList[this.assembledToolElectric.itemID] = this.assembledToolElectric;
+		//Can't do, until I learn how to do a cape that has resolution to fit in with a 64 * 64 texture pack...
+		TickRegistry.registerTickHandler(STTickHandler.INSTANCE, Side.CLIENT);
 	}
 	
 	@PostInit
 	public void postInit(FMLPostInitializationEvent event)
 	{
 		SimpleToolsCreativeTab.INSTANCE.setItemStack(new ItemStack(this.tableAssembly));
-		TickRegistry.registerTickHandler(new STTickHandler(), Side.CLIENT);
 	}
 }
