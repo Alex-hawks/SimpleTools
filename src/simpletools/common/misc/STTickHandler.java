@@ -38,7 +38,9 @@ public class STTickHandler implements ITickHandler
 		this.registerUEDeveloper("calclavia");		//	Calclavia
 		this.registerUEDeveloper("briman0094");		//	Briman
 		this.registerUEDeveloper("TrainerGuy22");	//	TheMike
-		this.registerUEDeveloper("liquidyyy64");
+		this.registerUEDeveloper("liquidyyy64");	//	LiQuiD
+		this.registerUEDeveloper("Darkguardsman");	//	Darkguardsman
+		this.registerUEDeveloper("aidancbrady");	//	aidancbrady
 		
 		//	Major Texture Artists
 		this.registerUEDeveloper("Tifflor");		//	Comply
