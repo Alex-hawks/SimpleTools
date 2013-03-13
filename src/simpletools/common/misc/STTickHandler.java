@@ -44,6 +44,9 @@ public class STTickHandler implements ITickHandler
 		
 		//	Major Texture Artists
 		this.registerUEDeveloper("Tifflor");		//	Comply
+		
+		//	Assistants
+		//this.registerUEAssistant("b1gb0ss");		//	A friend that split up the Simple Tools and EE textures
 	}
 	
 	@Override
@@ -98,7 +101,7 @@ public class STTickHandler implements ITickHandler
 	/**
 	 * 			All Coders are developers, but not all developers are coders...
 	 * </br>	This cape goes to anyone who has had a significant positive impact on the UE mod collection
-	 * @param userName The UserName of the person. Plain text, and lower case...
+	 * @param userName The Screen name of the person. Plain text, and lower case...
 	 */
 	public static void registerUEDeveloper(String userName)
 	{
@@ -107,10 +110,10 @@ public class STTickHandler implements ITickHandler
 	}
 	
 	/**
-	 * 			This cape goes to anyone who has had a small positive impact, and no negative impacts, on the UE Mod Collection
-	 * </br>	This includes most donators. In the case of the donator, the donation receiver determines whether or not the
-	 * </br>	contribution was significant enough for this.
-	 * @param userName The UserName of the person. Plain text, and lower case...
+	 * 		This cape goes to anyone who has had a small positive impact, and no negative impacts, on the UE Mod Collection.
+	 * 		This includes most donators. In the case of the donator, the donation receiver determines whether or not the
+	 * 		contribution was significant enough for this.
+	 * @param userName The Screen name of the person. Plain text, and lower case...
 	 */
 	public static void registerUEAssistant(String userName)
 	{

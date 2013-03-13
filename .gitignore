@@ -1,3 +1,5 @@
+# I don't need any of the "ignore MCP Stuff" lines after I did the Workspace Refactor
+# But others will, and it is less stress to leave them here
 *.bat
 *.sh
 /*/
@@ -5,6 +7,7 @@ LICENSE.txt
 CHANGELOG
 
 *.exe
+*.db
 
 !/src/
 /src/minecraft/*
