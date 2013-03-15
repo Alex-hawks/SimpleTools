@@ -41,9 +41,13 @@ public class STTickHandler implements ITickHandler
 		this.registerUEDeveloper("liquidyyy64");	//	LiQuiD
 		this.registerUEDeveloper("Darkguardsman");	//	Darkguardsman
 		this.registerUEDeveloper("aidancbrady");	//	aidancbrady
+		this.registerUEDeveloper("micdoodle8");		//	micdoodle
 		
 		//	Major Texture Artists
 		this.registerUEDeveloper("Tifflor");		//	Comply
+		
+		//	Donators
+		this.registerUEAssistant("Crimsus");		//	Donated $500.00 to UE. I wanted to give him the developer cape...
 		
 		//	Assistants
 		//this.registerUEAssistant("b1gb0ss");		//	A friend that split up the Simple Tools and EE textures
