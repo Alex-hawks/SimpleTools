@@ -6,13 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
+import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeSubscribe;
-import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.entity.EntityEvent.EnteringChunk;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent.CheckSpawn;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import simpletools.common.interfaces.IAssembledTool;
@@ -73,7 +68,14 @@ public class SimpleToolsEventHandler
 		ItemStack usedIS = event.entityPlayer.inventory.getCurrentItem();
 		if (usedIS != null && usedIS.getItem() instanceof IAssembledTool)
 		{
-			event.newSpeed = usedIS.getItem().getStrVsBlock(usedIS, event.block, event.metadata);
+			IAssembledTool tool = (IAssembledTool) usedIS.getItem();
+			World world = event.entityPlayer.worldObj;
+			int id = event.block.blockID;
+			int meta = event.metadata;
+			if (tool.canBreakBlock(usedIS, world, id, meta, event.entityPlayer) && tool.isEffectiveOnBlock(usedIS, world, id, meta, event.entityPlayer))
+				event.newSpeed = usedIS.getItem().getStrVsBlock(usedIS, event.block, event.metadata);
+			else
+				event.newSpeed = 1.0f;
 		}
 	}
 }

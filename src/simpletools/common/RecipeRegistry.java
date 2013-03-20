@@ -8,9 +8,9 @@ import cpw.mods.fml.common.registry.GameRegistry;
 
 public class RecipeRegistry
 {
-	public void registerRecipes()
+	public static void registerRecipes()
 	{
-		Item attach = SimpleTools.assembledToolElectric;
+		Item attach = SimpleTools.attachmentToolMotor;
 		Item core = SimpleTools.coreMechElectric;
 		
 		//	Drill
@@ -44,7 +44,11 @@ public class RecipeRegistry
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(attach, 1, 34), new Object[] { "!!!", " # ", "!@!", '!', Item.emerald, '@', new ItemStack(attach, 1, 23), '#', "ingotSteel" }));
 		
 		//	Cores
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(core, 1, 0), new Object[] { "!!!", " @ ", "!@!", '!', Block.stone, '@', "ingotSteel" }));
-		
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(core, 1, 0), new Object[] { "!@#", "!!#", " $ ", '!', "ingotSteel", '@', "basicCircuit", '#', "plateCopper", '$', "ingotCopper" }));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(core, 1, 1), new Object[] { "!@#", "!!#", " $ ", '!', "ingotSteel", '@', "advancedCircuit", '#', "plateBronze", '$', "ingotBronze" }));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(core, 1, 2), new Object[] { "!@#", "!!#", " $ ", '!', "ingotSteel", '@', "eliteCircuit", '#', "plateSteel", '$', "ingotSteel" }));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(core, 1, 3), new Object[] { "!@#", "!!#", " $ ", '!', "ingotSteel", '@', "eliteCircuit", '#', Block.blockDiamond, '$', Item.emerald }));		
+
+		GameRegistry.addRecipe(new ShapedOreRecipe(SimpleTools.tableAssembly, new Object[] { "!@!", "#$#", "%%%", '!', "plateCopper", '@', "advancedCircuit", '#', "plateSteel", '$', Block.workbench, '%', "plateTin" }));
 	}
 }

@@ -56,6 +56,7 @@ public class ItemCoreMotor extends Item implements ICore
 	}
 
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void getSubItems(int par1, CreativeTabs par2CreativeTabs, List par3List)
 	{
 		for (int i = 0; i < 4; i++)

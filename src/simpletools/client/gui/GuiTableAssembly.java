@@ -24,14 +24,6 @@ public class GuiTableAssembly extends GuiContainer
 		super(new ContainerTableAssembly(par1InventoryPlayer, tileEntity));
 		this.tileEntity = tileEntity; 
 	}
-	
-	@Override
-	public void initGui()
-	{
-		super.initGui();
-		int var1 = (this.width - this.xSize) / 2;
-		int var2 = (this.height - this.ySize) / 2;
-	}
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int par1, int par2)

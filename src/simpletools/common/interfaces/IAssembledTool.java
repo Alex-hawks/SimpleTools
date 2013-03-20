@@ -1,6 +1,8 @@
 package simpletools.common.interfaces;
 
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 /**
  * @author Alex_hawks
@@ -36,4 +38,24 @@ public interface IAssembledTool
 	 * 			Also, the attachment stores the enchantments...
 	 */
 	public ItemStack getAttachment(ItemStack assembledTool);
+
+	/**
+	 * @param assembledTool The Assembled Tool for which the condition is wanted
+	 * @return weather or not the tool can successfully complete an action
+	 */
+	boolean canDoWork(ItemStack assembledTool);
+
+	/**
+	 * @param assembledTool The Assembled Tool for which the condition is wanted
+	 * @param entity the entity breaking the block, can usually be cast to an EntityPlayer, but make sure to check
+	 * @return true if the block should yield it's drops, and the tool should be effective against it
+	 */
+	public boolean canBreakBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLiving entity);
+
+	/**
+	 * @param assembledTool The Assembled Tool for which the condition is wanted
+	 * @param entity the entity breaking the block, can usually be cast to an EntityPlayer, but make sure to check
+	 * @return true if the block should yield it's drops, and the tool should be effective against it
+	 */
+	public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLiving entity);
 }

@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 public class SimpleToolsCreativeTab extends CreativeTabs
 {
 	public static final SimpleToolsCreativeTab INSTANCE = new SimpleToolsCreativeTab("SimpleTools");
-	private static ItemStack itemStack;
+	private ItemStack itemStack;
 	
 	public SimpleToolsCreativeTab(String label)
 	{
@@ -20,7 +20,7 @@ public class SimpleToolsCreativeTab extends CreativeTabs
 		this.itemStack = icon;
 	}
 	
-	public static void setItemStack(ItemStack newItemStack)
+	public void setItemStack(ItemStack newItemStack)
 	{
 		if (itemStack == null)
 			itemStack = newItemStack;

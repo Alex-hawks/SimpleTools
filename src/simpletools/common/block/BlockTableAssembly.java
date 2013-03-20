@@ -42,7 +42,7 @@ public class BlockTableAssembly extends BlockAdvanced
 			case 0: return this.bottom;
 			case 1: return this.top;
 		}
-		if ((side & 3) == meta || (ForgeDirection.getOrientation(side).getOpposite().ordinal() & 3) == meta)
+		if (side == meta + 2 || ForgeDirection.getOrientation(side).getOpposite().ordinal() == meta + 2)
 			return this.side1;
 		else if ((side & 3) + 1 == meta || (ForgeDirection.getOrientation(side).getOpposite().ordinal() & 3) + 1 == meta)
 			return this.side2;
@@ -64,11 +64,7 @@ public class BlockTableAssembly extends BlockAdvanced
 	@Override
 	public void onBlockPlacedBy(World par1World, int x, int y, int z, EntityLiving par5EntityLiving, ItemStack par6ItemStack)
 	{
-		int metadata = par1World.getBlockMetadata(x, y, z);
-		
 		int angle = MathHelper.floor_double((par5EntityLiving.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		int change = 3;
-		
 		switch (angle)
 		{
 			case 0:
@@ -114,6 +110,7 @@ public class BlockTableAssembly extends BlockAdvanced
 		}
 		
 		par1World.setBlockAndMetadataWithNotify(x, y, z, this.blockID, change, 0);
+		par1World.markBlockForRenderUpdate(x, y, z);
 		
 		((TileEntityAdvanced) par1World.getBlockTileEntity(x, y, z)).initiate();
 		
@@ -134,7 +131,8 @@ public class BlockTableAssembly extends BlockAdvanced
 	@Override
 	public boolean onSneakUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side, float hitX, float hitY, float hitZ)
 	{
-		this.dropBlockAsItem(par1World, x, y, z, par1World.getBlockMetadata(x, y, z), 0);
+		if (!par5EntityPlayer.capabilities.isCreativeMode)
+			this.dropBlockAsItem(par1World, x, y, z, par1World.getBlockMetadata(x, y, z), 0);
 		par1World.setBlockAndMetadataWithNotify(x, y, z, 0, 0, 0);
 		return true;
 	}

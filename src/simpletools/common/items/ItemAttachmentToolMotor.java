@@ -1,7 +1,5 @@
 package simpletools.common.items;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.IconRegister;
@@ -22,7 +20,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemAttachmentToolMotor extends Item implements IAttachment
 {
-	HashMap<String, Icon> icons = new HashMap<String, Icon>();
+	private Icon[] icons = new Icon[40];
 
 	public ItemAttachmentToolMotor(int itemID, String name)
 	{
@@ -82,6 +80,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 	}
 
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void getSubItems(int par1, CreativeTabs par2CreativeTabs, List par3List)
 	{
 		for (int i = 0; i < 4; i++)
@@ -132,14 +131,13 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 	@SideOnly(Side.CLIENT)
 	public void func_94581_a(IconRegister iconRegister)
 	{
-		List<ItemStack> list = new ArrayList<ItemStack>();
-		this.getSubItems(this.itemID, this.getCreativeTab(), list);
-
-		if (list.size() > 0)
+		ItemStack itemStack;
+		for (int i = 0; i < 4; i++)
 		{
-			for (ItemStack itemStack : list)
+			for (int k = 0; k < 5; k++)
 			{
-				this.icons.put(this.getToolType(itemStack) + "." + this.getAttachmentTier(itemStack), iconRegister.func_94245_a(this.getUnlocalizedName(itemStack).replace("item.", SimpleTools.TEXTURE_NAME_PREFIX)));
+				itemStack = new ItemStack(this.itemID, 1, (i * 10) + k);
+				this.icons[(i * 10) + k] = iconRegister.func_94245_a(this.getUnlocalizedName(itemStack).replace("item.", SimpleTools.TEXTURE_NAME_PREFIX));
 			}
 		}
 	}
@@ -148,8 +146,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 	@SideOnly(Side.CLIENT)
 	public Icon getIconFromDamage(int par1)
 	{
-		ItemStack thisIS = new ItemStack(this, 1, par1);
-		return this.icons.get(this.getToolType(thisIS) + "." + this.getAttachmentTier(thisIS));
+		return this.icons[par1];
 	}
 
 }

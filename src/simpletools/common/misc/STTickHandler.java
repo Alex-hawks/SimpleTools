@@ -19,12 +19,12 @@ public class STTickHandler implements ITickHandler
 	/**
 	 * Don't add to this, use {@link STTickHandler#registerUEDeveloper}
 	 */
-	public static List<String> ueDevelopers = new ArrayList();
+	private static List<String> ueDevelopers = new ArrayList<String>();
 	
 	/**
 	 * Don't add to this, use {@link STTickHandler#registerUEAssistant}
 	 */
-	public static List<String> ueAssistants = new ArrayList();
+	private static List<String> ueAssistants = new ArrayList<String>();
 	
 	public static final STTickHandler INSTANCE = new STTickHandler();
 	private static final String developerCloakURL = "https://raw.github.com/Alex-hawks/SimpleTools/master/misc/UE-Dev-Cape.png";
@@ -107,7 +107,7 @@ public class STTickHandler implements ITickHandler
 	 * </br>	This cape goes to anyone who has had a significant positive impact on the UE mod collection
 	 * @param userName The Screen name of the person. Plain text, and lower case...
 	 */
-	public static void registerUEDeveloper(String userName)
+	public void registerUEDeveloper(String userName)
 	{
 		if (!userName.equals(null))
 			ueDevelopers.add(userName.toLowerCase());
@@ -119,7 +119,7 @@ public class STTickHandler implements ITickHandler
 	 * 		contribution was significant enough for this.
 	 * @param userName The Screen name of the person. Plain text, and lower case...
 	 */
-	public static void registerUEAssistant(String userName)
+	public void registerUEAssistant(String userName)
 	{
 		if (!userName.equals(null))
 			ueAssistants.add(userName.toLowerCase());

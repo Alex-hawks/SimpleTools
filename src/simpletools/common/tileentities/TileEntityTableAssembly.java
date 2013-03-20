@@ -21,6 +21,7 @@ import com.google.common.io.ByteArrayDataInput;
 public class TileEntityTableAssembly extends TileEntityAdvanced implements IRedstoneProvider, IPacketReceiver, ISidedInventory
 {
 	private ItemStack[] inventory = new ItemStack[5];
+	@SuppressWarnings("unused")
 	private int playersUsing = 0;
 	private boolean assembling = false;
 	
@@ -255,9 +256,6 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 		if (this.canDissassemble())
 		{
 			ItemStack oldTool = this.inventory[4];
-			ItemStack newAttach;
-			ItemStack newStorage;
-			NBTTagCompound oldTag;
 			if (oldTool.getItem() instanceof IAssembledTool && oldTool.hasTagCompound())
 			{
 				this.inventory[0] = ((IAssembledTool)oldTool.getItem()).getAttachment(oldTool);

@@ -11,13 +11,12 @@ import simpletools.common.interfaces.ICore;
 import simpletools.common.misc.SlotOutput;
 import simpletools.common.misc.SlotSTStorage;
 import simpletools.common.tileentities.TileEntityTableAssembly;
-import universalelectricity.core.item.IItemElectricityStorage;
 import universalelectricity.prefab.SlotSpecific;
 
 public class ContainerTableAssembly extends Container
 {
 	private TileEntityTableAssembly tileEntity;
-	private Class[] validStorage = { IItemElectricityStorage.class };
+//	private Class[] validStorage = { IItemElectricityStorage.class };
 
 	public ContainerTableAssembly(InventoryPlayer inventory, TileEntityTableAssembly tileEntity)
 	{
