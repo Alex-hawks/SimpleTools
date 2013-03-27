@@ -1,13 +1,21 @@
 package simpletools.common.items;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
+import net.minecraftforge.common.IShearable;
 import simpletools.common.SimpleTools;
 import simpletools.common.interfaces.IAttachment;
 import simpletools.common.misc.SimpleToolsCreativeTab;
@@ -21,7 +29,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class ItemAttachmentToolMotor extends Item implements IAttachment
 {
 	private Icon[] icons = new Icon[40];
-
+	
 	public ItemAttachmentToolMotor(int itemID, String name)
 	{
 		super(itemID);
@@ -35,32 +43,32 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 	{
 		switch (i.getItemDamage() % 10)
 		{
-		case 0: return "pickaxe";
-		case 1: return "shovel";
-		case 2: return "axe";
-		case 3: return "sword";
-		case 4: return "shears";
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		default: return "";
+			case 0: return "pickaxe";
+			case 1: return "shovel";
+			case 2: return "axe";
+			case 3: return "sword";
+			case 4: return "shears";
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			default: return "";
 		}
 	}
-
+	
 	@Override
 	public int getToolAttachmentType(ItemStack i)
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public int getMinimumTier(ItemStack i)
 	{
 		return i.getItemDamage() / 10;
 	}
-
+	
 	@Override
 	public short getAttachmentUID(ItemStack i)
 	{
@@ -78,7 +86,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 	{
 		return this.getUnlocalizedName() + "." + this.getToolType(i) + "." + this.getAttachmentTier(i);
 	}
-
+	
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void getSubItems(int par1, CreativeTabs par2CreativeTabs, List par3List)
@@ -93,20 +101,20 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 	{
 		return false;
 	}
-
+	
 	@Override
 	public double getHarvestSpeed(ItemStack i) 
 	{
 		switch (this.getAttachmentTier(i))
 		{
-		case 0:		return 4.0F;
-		case 1:		return 6.0F;
-		case 2:		return 8.0F;
-		case 3:		return 12.0F;
-		default:	return 1.0F;
+			case 0:		return 4.0F;
+			case 1:		return 6.0F;
+			case 2:		return 8.0F;
+			case 3:		return 12.0F;
+			default:	return 1.0F;
 		}
 	}
-
+	
 	@Override
 	public BiMap<Entity, Integer> getDamageVsEntities(ItemStack i)
 	{
@@ -128,8 +136,9 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 		return toReturn;
 	}
 	
+	@Override
 	@SideOnly(Side.CLIENT)
-	public void func_94581_a(IconRegister iconRegister)
+	public void updateIcons(IconRegister iconRegister)
 	{
 		ItemStack itemStack;
 		for (int i = 0; i < 4; i++)
@@ -137,7 +146,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 			for (int k = 0; k < 5; k++)
 			{
 				itemStack = new ItemStack(this.itemID, 1, (i * 10) + k);
-				this.icons[(i * 10) + k] = iconRegister.func_94245_a(this.getUnlocalizedName(itemStack).replace("item.", SimpleTools.TEXTURE_NAME_PREFIX));
+				this.icons[(i * 10) + k] = iconRegister.registerIcon(this.getUnlocalizedName(itemStack).replace("item.", SimpleTools.TEXTURE_NAME_PREFIX));
 			}
 		}
 	}
@@ -148,5 +157,44 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
 	{
 		return this.icons[par1];
 	}
+	
+	@Override
+	public byte onRightClick(ItemStack i, Object target, EntityPlayer player)
+	{
+		if (target instanceof EntityLiving && this.getToolType(i).toLowerCase().equals("shears"))
+		{
+			EntityLiving entity = (EntityLiving) target;
+			if (entity.worldObj.isRemote)
+			{
+				return 0;
+			}
+			if (entity instanceof IShearable)
+			{
+				IShearable interactTarget = (IShearable)entity;
+				if (interactTarget.isShearable(i, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ))
+				{
+					ArrayList<ItemStack> drops = interactTarget.onSheared(i, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ,
+							EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, i));
+					
+					Random rand = new Random();
+					for(ItemStack stack : drops)
+					{
+						EntityItem ent = entity.entityDropItem(stack, 1.0F);
+						ent.motionY += rand.nextFloat() * 0.05F;
+						ent.motionX += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
+						ent.motionZ += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
+					}
+				}
+			}
+		}
+		return 0;
+	}
 
+	@Override
+	public boolean canRightClick(ItemStack i, Object target, EntityPlayer player)
+	{
+		if (target instanceof EntityLiving && this.getToolType(i).toLowerCase().equals("shears"))
+			return ((EntityLiving) target) instanceof IShearable;
+		return false;
+	}
 }

@@ -12,24 +12,24 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import simpletools.common.SimpleTools;
 import simpletools.common.misc.SimpleToolsCreativeTab;
-import simpletools.common.tileentities.TileEntityTableAssembly;
+import simpletools.common.tileentities.TileEntityTablePlasma;
 import universalelectricity.prefab.block.BlockAdvanced;
 import universalelectricity.prefab.tile.TileEntityAdvanced;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockTableAssembly extends BlockAdvanced
+public class BlockTablePlasma extends BlockAdvanced 
 {
 	Icon top;
 	Icon bottom;
 	Icon side1;
 	Icon side2;
 	
-	public BlockTableAssembly(int par1)
+	public BlockTablePlasma(int par1)
 	{
 		super(par1, Material.iron);
 		this.blockHardness = -1;
-		this.setUnlocalizedName("tableAssembly");
+		this.setUnlocalizedName("tablePlasma");
 		this.setCreativeTab(SimpleToolsCreativeTab.INSTANCE);
 	}
 	
@@ -55,10 +55,10 @@ public class BlockTableAssembly extends BlockAdvanced
 	public void registerIcons(IconRegister par1IconRegister)
 	{
 		
-		this.top 	= par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tableAssembleTop");
-		this.bottom = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tableAssembleBottom");
-		this.side1 	= par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tableAssembleSide1");
-		this.side2 	= par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tableAssembleSide2");
+		this.top 	= par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaTop");
+		this.bottom = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaBottom");
+		this.side1 	= par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaSide1");
+		this.side2 	= par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaSide2");
 	}
 	
 	@Override
@@ -84,7 +84,7 @@ public class BlockTableAssembly extends BlockAdvanced
 		((TileEntityAdvanced) par1World.getBlockTileEntity(x, y, z)).initiate();
 		par1World.notifyBlocksOfNeighborChange(x, y, z, this.blockID);
 	}
-	
+
 	@Override
 	public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side, float hitX, float hitY, float hitZ)
 	{
@@ -96,22 +96,16 @@ public class BlockTableAssembly extends BlockAdvanced
 		switch (metadata)
 		{
 			case 0:
+				change = 3;
+				break;
+			case 3:
 				change = 1;
 				break;
 			case 1:
 				change = 2;
 				break;
 			case 2:
-				change = 5;
-				break;
-			case 3:
-				change = 4;
-				break;
-			case 4:
 				change = 0;
-				break;
-			case 5:
-				change = 3;
 				break;
 		}
 		
@@ -128,12 +122,12 @@ public class BlockTableAssembly extends BlockAdvanced
 	{
 		if (!par1World.isRemote)
 		{
-			par5EntityPlayer.openGui(SimpleTools.INSTANCE, 0, par1World, x, y, z);
+			par5EntityPlayer.openGui(SimpleTools.INSTANCE, 1, par1World, x, y, z);
 			return true;
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean onSneakUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side, float hitX, float hitY, float hitZ)
 	{
@@ -146,6 +140,7 @@ public class BlockTableAssembly extends BlockAdvanced
 	@Override
 	public TileEntity createNewTileEntity(World var1)
 	{
-		return new TileEntityTableAssembly();
+		return new TileEntityTablePlasma();
 	}
+
 }

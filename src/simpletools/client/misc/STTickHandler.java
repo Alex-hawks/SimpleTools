@@ -1,4 +1,4 @@
-package simpletools.common.misc;
+package simpletools.client.misc;
 
 import java.util.ArrayList;
 import java.util.EnumSet;

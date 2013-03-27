@@ -6,6 +6,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.ISidedInventory;
 import simpletools.common.interfaces.IAssembledTool;
@@ -84,7 +85,7 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 	@Override
 	public String getInvName()
 	{
-		return "Assembly Table";
+		return StatCollector.translateToLocal("container.tableAssembly");
 	}
 	
 	@Override
@@ -160,6 +161,28 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 		if (this.inventory[4] != null && this.inventory[4].getItem() instanceof IAssembledTool && this.canDissassemble())
 		{
 			this.dissassemble();
+		}
+		
+		if (this.inventory[3] != null && this.inventory[3].getItem() instanceof IAssembledTool && this.assembling)
+		{
+			IAssembledTool tool = (IAssembledTool) this.inventory[3].getItem();
+			ItemStack toolIS = this.inventory[3];
+			
+			if (this.inventory[0] != tool.getAttachment(toolIS))
+			{
+				this.inventory[3] = null;
+				this.startAssemble();
+			}
+			if (this.inventory[1] != tool.getCore(toolIS))
+			{
+				this.inventory[3] = null;
+				this.startAssemble();
+			}
+			if (this.inventory[2] != tool.getStorage(toolIS))
+			{
+				this.inventory[3] = null;
+				this.startAssemble();
+			}
 		}
 	}
 	
@@ -303,18 +326,27 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
 				this.inventory[var5] = ItemStack.loadItemStackFromNBT(var4);
 		}
 	}
-
+	
 	@Override
-	public boolean func_94042_c() 
+	public boolean isInvNameLocalized()
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
-
+	
 	@Override
-	public boolean func_94041_b(int i, ItemStack itemstack) 
+	public boolean isStackValidForSlot(int i, ItemStack itemstack)
 	{
-		// TODO Auto-generated method stub
+		if (i < this.inventory.length && itemstack != null)
+		{
+			switch (i)
+			{
+				case 0:	return itemstack.getItem() instanceof IAttachment;
+				case 1:	return itemstack.getItem() instanceof ICore;
+				case 2:	return itemstack.getItem() instanceof IItemElectric; //	TODO add support for fuel
+				case 3: return false;
+				case 4: return itemstack.getItem() instanceof IAssembledTool;
+			}
+		}
 		return false;
 	}
 }

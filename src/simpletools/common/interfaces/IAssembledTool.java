@@ -58,4 +58,10 @@ public interface IAssembledTool
 	 * @return true if the block should yield it's drops, and the tool should be effective against it
 	 */
 	public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLiving entity);
+	
+	/**
+	 * @param assembledTool the Assembled Tool for which the current storage is wanted
+	 * @return the current storage of the max storage, formatted for a short display
+	 */
+	public String getStoredForDisplay(ItemStack assembledTool);
 }

@@ -13,11 +13,11 @@ import simpletools.common.misc.SimpleToolsCreativeTab;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemCoreMotor extends Item implements ICore
+public class ItemCorePlasma extends Item implements ICore
 {
 	private Icon[] icons = new Icon[4];
 	
-	public ItemCoreMotor(int itemID, String name)
+	public ItemCorePlasma(int itemID, String name)
 	{
 		super(itemID);
 		this.setCreativeTab(SimpleToolsCreativeTab.INSTANCE);
@@ -28,33 +28,39 @@ public class ItemCoreMotor extends Item implements ICore
 	@Override
 	public int getCoreType(ItemStack i)
 	{
-		return 0;
+		return 1;
 	}
-
+	
 	@Override
 	public int getCoreTier(ItemStack i)
 	{
 		return i.getItemDamage();
 	}
-
+	
 	@Override
 	public byte getCoreUID(ItemStack i)
 	{
-		return (byte) i.getItemDamage();
+		return (byte) (i.getItemDamage() + 4);
 	}
-
+	
 	@Override
 	public String getCoreFinerType(ItemStack i)
 	{
-		return "electric";
+		return "plasma";
 	}
-
+	
+	@Override
+	public Item getAssmebledToolItem(ItemStack i)
+	{
+		return SimpleTools.assembledToolPlasma;
+	}
+	
 	@Override
 	public String getUnlocalizedName(ItemStack itemStack)
 	{
 		return this.getUnlocalizedName() + "." + getCoreTier(itemStack);
 	}
-
+	
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void getSubItems(int par1, CreativeTabs par2CreativeTabs, List par3List)
@@ -67,12 +73,6 @@ public class ItemCoreMotor extends Item implements ICore
 	public boolean isDamageable()
 	{
 		return false;
-	}
-
-	@Override
-	public Item getAssmebledToolItem(ItemStack i) 
-	{
-		return SimpleTools.assembledToolElectric;
 	}
 	
 	@Override
@@ -91,5 +91,4 @@ public class ItemCoreMotor extends Item implements ICore
 	{
 		return this.icons[meta];
 	}
-
 }

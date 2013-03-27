@@ -27,6 +27,7 @@ import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.input.Keyboard;
 
 import simpletools.common.SimpleTools;
+import simpletools.common.interfaces.IAssembledElectricTool;
 import simpletools.common.interfaces.IAssembledTool;
 import simpletools.common.interfaces.IAttachment;
 import simpletools.common.interfaces.ICore;
@@ -41,7 +42,7 @@ import com.google.common.collect.HashBiMap;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemAssembledToolElectric extends ItemTool implements IItemElectric, IAssembledTool
+public class ItemAssembledToolElectric extends ItemTool implements IAssembledElectricTool
 {
 	private final double joulesPerUse = 2000; //in Joules
 	
@@ -52,7 +53,6 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		this.setMaxStackSize(1);
 		this.setNoRepair();
 		this.setMaxDamage(0);
-		this.toolMaterial = null;
 		this.setCreativeTab(null);
 	}
 	
@@ -99,9 +99,10 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	{
 		try
 		{
-			double rejectedElectricity = Math.max((this.getJoules(itemStack) + electricityPack.getWatts() - this.getMaxJoules(itemStack)), 0);
-			this.setJoules(this.getJoules(itemStack) + electricityPack.getWatts() - rejectedElectricity, itemStack);
-			return ElectricityPack.getFromWatts(rejectedElectricity, this.getVoltage(itemStack));
+			double rejectedElectricity = Math.max((this.getJoules(itemStack) + electricityPack.getWatts()) - this.getMaxJoules(itemStack), 0);
+			double joulesToStore = electricityPack.getWatts() - rejectedElectricity;
+			this.setJoules(this.getJoules(itemStack) + joulesToStore, itemStack);
+			return ElectricityPack.getFromWatts(joulesToStore, this.getVoltage(itemStack));
 		} catch (Exception e) 
 		{
 			return electricityPack;
@@ -342,6 +343,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	}
 	
 	@Override
+	@SideOnly(Side.CLIENT)
 	public boolean requiresMultipleRenderPasses()
 	{
 		return true;
@@ -444,35 +446,18 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 	@Override
 	public boolean itemInteractionForEntity(ItemStack itemstack, EntityLiving entity)
 	{
-		if (entity.worldObj.isRemote)
+		IAttachment attach = (IAttachment) this.getAttachment(itemstack).getItem();
+		if (attach.canRightClick(this.getAttachment(itemstack), entity, null) && this.canDoWork(itemstack))
 		{
-			return false;
-		}
-		if (entity instanceof IShearable && ((IAttachment)this.getAttachment(itemstack).getItem()).getToolType(this.getAttachment(itemstack)).toLowerCase().equals("shears"))
-		{
-			IShearable target = (IShearable)entity;
-			if (target.isShearable(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ) && this.onItemUse(itemstack))
-			{
-				ArrayList<ItemStack> drops = target.onSheared(itemstack, entity.worldObj, (int)entity.posX, (int)entity.posY, (int)entity.posZ,
-						EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
-				
-				Random rand = new Random();
-				for(ItemStack stack : drops)
-				{
-					EntityItem ent = entity.entityDropItem(stack, 1.0F);
-					ent.motionY += rand.nextFloat() * 0.05F;
-					ent.motionX += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
-					ent.motionZ += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
-				}
-				return true;
-			}
+			attach.onRightClick(this.getAttachment(itemstack), entity, null);
 			return true;
 		}
 		return false;
 	}
-	
+
+	@Override
 	@SideOnly(Side.CLIENT)
-	public void func_94581_a(IconRegister par1IconRegister)
+	public void updateIcons(IconRegister par1IconRegister)
 	{
 	}
 	
@@ -528,4 +513,23 @@ public class ItemAssembledToolElectric extends ItemTool implements IItemElectric
 		int harvestLevel = MinecraftForge.getBlockHarvestLevel(block, metadata, toolClass);
 		return harvestLevel <= attach.getAttachmentTier(this.getAttachment(assembledTool)) + 1 && !(harvestLevel < 0);
 	}
+
+	@Override
+	public String getStoredForDisplay(ItemStack assembledTool)
+	{
+		String currEnergy = ElectricityDisplay.getDisplayShort(this.getJoules(assembledTool), ElectricityDisplay.ElectricUnit.JOULES);
+		String maxEnergy = ElectricityDisplay.getDisplayShort(this.getMaxJoules(assembledTool), ElectricityDisplay.ElectricUnit.JOULES);
+		if (this.getJoules(assembledTool) != Double.POSITIVE_INFINITY)
+			return currEnergy + " of " + maxEnergy;
+		else
+			return "Infinite";
+	}
+	
+	@Override
+	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float HitY, float hitZ)
+	{
+		IAttachment attach = (IAttachment) this.getAttachment(itemstack).getItem();
+		return attach.canRightClick(this.getAttachment(itemstack), new Object[] {world, x, y, z, side, hitX, HitY, hitZ }, player) && this.canDoWork(itemstack);
+	}
+
 }
