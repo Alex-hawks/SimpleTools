@@ -19,24 +19,20 @@ public class ContainerTableAssembly extends Container
     
     // private Class[] validStorage = { IItemElectricityStorage.class };
     
-    public ContainerTableAssembly(InventoryPlayer inventory,
-            TileEntityTableAssembly tileEntity)
+    public ContainerTableAssembly(InventoryPlayer inventory, TileEntityTableAssembly tileEntity)
     {
         this.tileEntity = tileEntity;
         // The Slot for the Core of the Assembled Tool
-        this.addSlotToContainer(new SlotSpecific(tileEntity, 1, 39, 36,
-                ICore.class));
+        this.addSlotToContainer(new SlotSpecific(tileEntity, 1, 39, 36, ICore.class));
         // The Slot for the Attachment of the Assembled Tool
-        this.addSlotToContainer(new SlotSpecific(tileEntity, 0, 16, 22,
-                IAttachment.class));
+        this.addSlotToContainer(new SlotSpecific(tileEntity, 0, 16, 22, IAttachment.class));
         // The Slot for the Primary Storage of the Assembled Tool. A different
         // class is used to perform some validity checks
         this.addSlotToContainer(new SlotSTStorage(tileEntity, 2, 16, 50));
         // The Slot for the resulting Assembled Tool
         this.addSlotToContainer(new SlotOutput(tileEntity, 3, 120, 22));
         // The Slot for the ItemStack that will be Disassembled
-        this.addSlotToContainer(new SlotSpecific(tileEntity, 4, 120, 50,
-                IAssembledTool.class));
+        this.addSlotToContainer(new SlotSpecific(tileEntity, 4, 120, 50, IAssembledTool.class));
         
         int var3;
         
@@ -44,15 +40,13 @@ public class ContainerTableAssembly extends Container
         {
             for (int var4 = 0; var4 < 9; ++var4)
             {
-                this.addSlotToContainer(new Slot(inventory,
-                        var4 + var3 * 9 + 9, 8 + var4 * 18, 84 + var3 * 18));
+                this.addSlotToContainer(new Slot(inventory, var4 + var3 * 9 + 9, 8 + var4 * 18, 84 + var3 * 18));
             }
         }
         
         for (var3 = 0; var3 < 9; ++var3)
         {
-            this.addSlotToContainer(new Slot(inventory, var3, 8 + var3 * 18,
-                    142));
+            this.addSlotToContainer(new Slot(inventory, var3, 8 + var3 * 18, 142));
         }
         
         tileEntity.openChest();

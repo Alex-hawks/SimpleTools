@@ -1,26 +1,8 @@
-# I don't need any of the "ignore MCP Stuff" lines after I did the Workspace Refactor
-# But others will, and it is less stress to leave them here
-*.bat
-*.sh
-/*/
-LICENSE.txt
-CHANGELOG
+# Windows image file caches
+Thumbs.db
 
-*.exe
-*.db
+# Folder config file
+Desktop.ini
 
-!/src/
-/src/minecraft/*
-!/src/minecraft/simpletools/
-!/src/minecraft/dan200/
-!/src/minecraft/universalelectricity/
-!/src/minecraft/ic2/
-!/include.bat
-/src/minecraft/simpletools/language
-/src/minecraft/simpletools/textures
-
-!/resources/
-!/modversion.txt
-!/publish.bat
-!/README.md
-!/misc/
+# Mac crap
+.DS_Store

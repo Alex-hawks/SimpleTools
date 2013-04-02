@@ -28,9 +28,7 @@ public class STRenderTickHandler implements ITickHandler
     public void tickEnd(EnumSet<TickType> type, Object... tickData)
     {
         EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
-        if (player != null
-                && !(Loader.isModLoaded("" /* NEI */) || Minecraft
-                        .getMinecraft().currentScreen != null))
+        if (player != null && !(Loader.isModLoaded("" /* NEI */) || Minecraft.getMinecraft().currentScreen != null))
         {
             int location = 0;
             if (Loader.isModLoaded("mmmPowersuits"))
@@ -43,11 +41,9 @@ public class STRenderTickHandler implements ITickHandler
                         && player.inventory.getStackInSlot(i).getItem() instanceof IAssembledTool)
                 {
                     ItemStack tool = player.inventory.getStackInSlot(i);
-                    String display = ((IAssembledTool) player.inventory
-                            .getStackInSlot(i).getItem())
+                    String display = ((IAssembledTool) player.inventory.getStackInSlot(i).getItem())
                             .getStoredForDisplay(tool);
-                    this.drawString("Slot <>:  ".replaceAll("<>", i + 1 + "")
-                            + display, 1, 1 + 10 * location++);
+                    this.drawString("Slot <>:  ".replaceAll("<>", i + 1 + "") + display, 1, 1 + 10 * location++);
                 }
                 
                 else if (player.inventory.getStackInSlot(i) != null
@@ -55,14 +51,10 @@ public class STRenderTickHandler implements ITickHandler
                 {
                     ItemStack itemStack = player.inventory.getStackInSlot(i);
                     IItemElectric item = (IItemElectric) itemStack.getItem();
-                    String display = ElectricityDisplay.getDisplayShort(
-                            item.getJoules(itemStack), ElectricUnit.JOULES)
+                    String display = ElectricityDisplay.getDisplayShort(item.getJoules(itemStack), ElectricUnit.JOULES)
                             + " / "
-                            + ElectricityDisplay.getDisplayShort(
-                                    item.getJoules(itemStack),
-                                    ElectricUnit.JOULES);
-                    this.drawString("Slot <>:  ".replaceAll("<>", i + 1 + "")
-                            + display, 1, 1 + 10 * location++);
+                            + ElectricityDisplay.getDisplayShort(item.getJoules(itemStack), ElectricUnit.JOULES);
+                    this.drawString("Slot <>:  ".replaceAll("<>", i + 1 + "") + display, 1, 1 + 10 * location++);
                 }
             }
         }
@@ -83,7 +75,6 @@ public class STRenderTickHandler implements ITickHandler
     public void drawString(String toDraw, double x, double y)
     {
         RenderHelper.disableStandardItemLighting();
-        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(toDraw,
-                (int) x, (int) y, 0xFFFFFFFF);
+        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(toDraw, (int) x, (int) y, 0xFFFFFFFF);
     }
 }

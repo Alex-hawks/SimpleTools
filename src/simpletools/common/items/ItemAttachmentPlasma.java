@@ -29,8 +29,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
     public String getUnlocalizedName(ItemStack is)
     {
         if (is.getItemDamage() < this.names.length)
-            return this.getUnlocalizedName() + "."
-                    + this.names[is.getItemDamage()];
+            return this.getUnlocalizedName() + "." + this.names[is.getItemDamage()];
         else
             return this.getUnlocalizedName() + ".unknown";
         
@@ -86,8 +85,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
     }
     
     @Override
-    public boolean canRightClick(ItemStack i, Object targetData,
-            EntityPlayer player)
+    public boolean canRightClick(ItemStack i, Object targetData, EntityPlayer player)
     {
         if (i.getItemDamage() == 0 && targetData instanceof Object[])
         {
@@ -106,8 +104,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
                 x += ForgeDirection.getOrientation(side).offsetX;
                 y += ForgeDirection.getOrientation(side).offsetY;
                 z += ForgeDirection.getOrientation(side).offsetZ;
-                if (world.getBlockId(x, y, z) == 0
-                        || world.getBlockId(x, y, z) == SimpleTools.plasmaTorch.blockID)
+                if (world.getBlockId(x, y, z) == 0 || world.getBlockId(x, y, z) == SimpleTools.plasmaTorch.blockID)
                     return true;
             }
         }
@@ -128,8 +125,8 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
             {
                 World world = (World) target[0];
                 
-                if (world.getBlockId(x, y, z) == SimpleTools.plasmaTorch.blockID
-                        && player != null && !player.isSneaking())
+                if (world.getBlockId(x, y, z) == SimpleTools.plasmaTorch.blockID && player != null
+                        && !player.isSneaking())
                 {
                     world.setBlock(x, y, z, 0, 0, 0x02);
                     return 1;
@@ -140,8 +137,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
                 z += ForgeDirection.getOrientation(side).offsetZ;
                 if (world.getBlockId(x, y, z) == 0)
                 {
-                    world.setBlock(x, y, z, SimpleTools.plasmaTorch.blockID, 0,
-                            0x02);
+                    world.setBlock(x, y, z, SimpleTools.plasmaTorch.blockID, 0, 0x02);
                     return -1;
                 }
                 if (world.getBlockId(x, y, z) == SimpleTools.plasmaTorch.blockID)

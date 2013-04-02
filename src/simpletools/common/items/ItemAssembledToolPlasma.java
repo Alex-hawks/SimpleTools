@@ -26,8 +26,7 @@ import universalelectricity.core.item.IItemElectric;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemAssembledToolPlasma extends Item implements IItemElectric,
-        IAssembledTool, IPlasmaStorage
+public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAssembledTool, IPlasmaStorage
 {
     private static final double JOULES_PER_USE = 2500;
     private static final int PLASMA_PER_USE = 1;
@@ -43,58 +42,42 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     }
     
     @Override
-    public ItemStack onCreate(ItemStack attachment, ItemStack core,
-            ItemStack storage)
+    public ItemStack onCreate(ItemStack attachment, ItemStack core, ItemStack storage)
     {
         ItemStack returnStack = null;
-        if (attachment.getItem() instanceof IAttachment
-                && core.getItem() instanceof ICore)
+        if (attachment.getItem() instanceof IAttachment && core.getItem() instanceof ICore)
         {
             IAttachment attachmentTemp = (IAttachment) attachment.getItem();
             ICore coreTemp = (ICore) core.getItem();
             
-            if (coreTemp.getCoreType(core) == attachmentTemp
-                    .getToolAttachmentType(attachment))
+            if (coreTemp.getCoreType(core) == attachmentTemp.getToolAttachmentType(attachment))
             {
-                if (coreTemp.getCoreTier(core) >= attachmentTemp
-                        .getMinimumTier(attachment))
+                if (coreTemp.getCoreTier(core) >= attachmentTemp.getMinimumTier(attachment))
                 {
                     int coreMeta = coreTemp.getCoreTier(core) * 1000;
-                    int attachMeta = attachmentTemp
-                            .getAttachmentUID(attachment);
+                    int attachMeta = attachmentTemp.getAttachmentUID(attachment);
                     int meta = coreMeta + attachMeta;
                     returnStack = new ItemStack(this, 1, meta);
                     
                     NBTTagCompound compound = new NBTTagCompound();
                     compound.setCompoundTag("SimpleTools", new NBTTagCompound());
-                    compound.setCompoundTag("damageVsEntity",
-                            new NBTTagCompound());
+                    compound.setCompoundTag("damageVsEntity", new NBTTagCompound());
                     compound.setBoolean("useDamageVsEntityTag", true);
                     
-                    compound.getCompoundTag("SimpleTools").setDouble(
-                            "electricity",
-                            ((IItemElectric) storage.getItem())
-                                    .getJoules(storage));
-                    compound.getCompoundTag("SimpleTools").setDouble(
-                            "maxEnergy",
-                            ((IItemElectric) storage.getItem())
-                                    .getMaxJoules(storage));
-                    compound.getCompoundTag("SimpleTools").setInteger("plasma",
-                            Integer.MAX_VALUE);
-                    compound.getCompoundTag("SimpleTools")
-                            .setInteger("maxPlasma",
-                                    (coreTemp.getCoreTier(core) + 1) * 125);
-                    compound.getCompoundTag("SimpleTools").setCompoundTag(
-                            "attachment",
+                    compound.getCompoundTag("SimpleTools").setDouble("electricity",
+                            ((IItemElectric) storage.getItem()).getJoules(storage));
+                    compound.getCompoundTag("SimpleTools").setDouble("maxEnergy",
+                            ((IItemElectric) storage.getItem()).getMaxJoules(storage));
+                    compound.getCompoundTag("SimpleTools").setInteger("plasma", Integer.MAX_VALUE);
+                    compound.getCompoundTag("SimpleTools").setInteger("maxPlasma",
+                            (coreTemp.getCoreTier(core) + 1) * 125);
+                    compound.getCompoundTag("SimpleTools").setCompoundTag("attachment",
                             attachment.writeToNBT(new NBTTagCompound()));
-                    compound.getCompoundTag("SimpleTools")
-                            .setCompoundTag("battery",
-                                    storage.writeToNBT(new NBTTagCompound()));
+                    compound.getCompoundTag("SimpleTools").setCompoundTag("battery",
+                            storage.writeToNBT(new NBTTagCompound()));
                     
-                    compound.getCompoundTag("damageVsEntity").setInteger(
-                            "",
-                            attachmentTemp.getDamageVsEntities(attachment).get(
-                                    null));
+                    compound.getCompoundTag("damageVsEntity").setInteger("",
+                            attachmentTemp.getDamageVsEntities(attachment).get(null));
                     
                     returnStack.setTagCompound(compound);
                 }
@@ -106,41 +89,30 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     @Override
     @SideOnly(Side.CLIENT)
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void addInformation(ItemStack itemStack, EntityPlayer player,
-            List currentTips, boolean advancedToolTips)
+    public void addInformation(ItemStack itemStack, EntityPlayer player, List currentTips, boolean advancedToolTips)
     {
         ItemStack attachment = null, battery = null;
         try
         {
-            NBTTagCompound batt = itemStack.getTagCompound()
-                    .getCompoundTag("SimpleTools").getCompoundTag("battery");
+            NBTTagCompound batt = itemStack.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
             battery = ItemStack.loadItemStackFromNBT(batt);
             
-            NBTBase attach = itemStack.getTagCompound()
-                    .getCompoundTag("SimpleTools").getCompoundTag("attachment");
-            attachment = ItemStack
-                    .loadItemStackFromNBT((NBTTagCompound) attach);
+            NBTBase attach = itemStack.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("attachment");
+            attachment = ItemStack.loadItemStackFromNBT((NBTTagCompound) attach);
         }
         catch (Exception e)
         {
         }
         
-        currentTips.add("Energy: "
-                + ElectricityDisplay.getDisplayShort(this.getJoules(itemStack),
-                        ElectricUnit.JOULES)
-                + " / "
-                + ElectricityDisplay.getDisplayShort(
-                        this.getMaxJoules(itemStack), ElectricUnit.JOULES));
-        currentTips.add("Plasma: " + this.getPlasma(itemStack) + " / "
-                + this.getMaxPlasma(itemStack));
+        currentTips.add("Energy: " + ElectricityDisplay.getDisplayShort(this.getJoules(itemStack), ElectricUnit.JOULES)
+                + " / " + ElectricityDisplay.getDisplayShort(this.getMaxJoules(itemStack), ElectricUnit.JOULES));
+        currentTips.add("Plasma: " + this.getPlasma(itemStack) + " / " + this.getMaxPlasma(itemStack));
         
-        if (Keyboard
-                .isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.keyCode))
+        if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.keyCode))
         {
             if (this.getCore(itemStack) != null)
             {
-                currentTips.add("Core Module: "
-                        + this.getCore(itemStack).getDisplayName());
+                currentTips.add("Core Module: " + this.getCore(itemStack).getDisplayName());
             }
             if (attachment != null)
             {
@@ -170,11 +142,10 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
         ItemStack battery = null;
         try
         {
-            NBTTagCompound batt = assembledTool.getTagCompound()
-                    .getCompoundTag("SimpleTools").getCompoundTag("battery");
+            NBTTagCompound batt = assembledTool.getTagCompound().getCompoundTag("SimpleTools")
+                    .getCompoundTag("battery");
             battery = ItemStack.loadItemStackFromNBT(batt);
-            ((IItemElectric) battery.getItem()).setJoules(
-                    this.getJoules(assembledTool), battery);
+            ((IItemElectric) battery.getItem()).setJoules(this.getJoules(assembledTool), battery);
         }
         catch (Throwable e)
         {
@@ -188,15 +159,12 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
         ItemStack attachment = null;
         try
         {
-            NBTBase attach = assembledTool.getTagCompound()
-                    .getCompoundTag("SimpleTools").getCompoundTag("attachment");
-            attachment = ItemStack
-                    .loadItemStackFromNBT((NBTTagCompound) attach);
+            NBTBase attach = assembledTool.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("attachment");
+            attachment = ItemStack.loadItemStackFromNBT((NBTTagCompound) attach);
             if (!assembledTool.getEnchantmentTagList().equals(null))
             {
                 attachment.setTagCompound(new NBTTagCompound());
-                attachment.getTagCompound().setTag(
-                        assembledTool.getEnchantmentTagList().getName(),
+                attachment.getTagCompound().setTag(assembledTool.getEnchantmentTagList().getName(),
                         assembledTool.getEnchantmentTagList());
             }
         }
@@ -209,20 +177,18 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     @Override
     public boolean canDoWork(ItemStack assembledTool)
     {
-        return this.getJoules(assembledTool) >= JOULES_PER_USE
-                && this.getPlasma(assembledTool) >= PLASMA_PER_USE;
+        return this.getJoules(assembledTool) >= JOULES_PER_USE && this.getPlasma(assembledTool) >= PLASMA_PER_USE;
     }
     
     @Override
-    public boolean canBreakBlock(ItemStack assembledTool, World world,
-            int blockID, int metadata, EntityLiving entity)
+    public boolean canBreakBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLiving entity)
     {
         return false;
     }
     
     @Override
-    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world,
-            int blockID, int metadata, EntityLiving entity)
+    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata,
+            EntityLiving entity)
     {
         return false;
     }
@@ -232,11 +198,9 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     {
         String toReturn = "";
         
-        String currEnergy = ElectricityDisplay.getDisplayShort(
-                this.getJoules(assembledTool),
+        String currEnergy = ElectricityDisplay.getDisplayShort(this.getJoules(assembledTool),
                 ElectricityDisplay.ElectricUnit.JOULES);
-        String maxEnergy = ElectricityDisplay.getDisplayShort(
-                this.getMaxJoules(assembledTool),
+        String maxEnergy = ElectricityDisplay.getDisplayShort(this.getMaxJoules(assembledTool),
                 ElectricityDisplay.ElectricUnit.JOULES);
         String currPlasma = this.getPlasma(assembledTool) + "";
         String maxPlasma = this.getMaxPlasma(assembledTool) + "";
@@ -267,8 +231,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     {
         try
         {
-            return itemStack.stackTagCompound.getCompoundTag("SimpleTools")
-                    .getDouble("electricity");
+            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getDouble("electricity");
         }
         catch (Exception e)
         {
@@ -279,8 +242,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     @Override
     public void setJoules(double joules, ItemStack itemStack)
     {
-        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setDouble(
-                "electricity", joules);
+        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setDouble("electricity", joules);
     }
     
     @Override
@@ -288,8 +250,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     {
         try
         {
-            return itemStack.stackTagCompound.getCompoundTag("SimpleTools")
-                    .getDouble("maxEnergy");
+            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getDouble("maxEnergy");
         }
         catch (Exception e)
         {
@@ -302,11 +263,9 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     {
         try
         {
-            NBTTagCompound info = itemStack.stackTagCompound.getCompoundTag(
-                    "SimpleTools").getCompoundTag("battery");
+            NBTTagCompound info = itemStack.stackTagCompound.getCompoundTag("SimpleTools").getCompoundTag("battery");
             ItemStack batteryStack = ItemStack.loadItemStackFromNBT(info);
-            return ((IItemElectric) batteryStack.getItem())
-                    .getVoltage(batteryStack);
+            return ((IItemElectric) batteryStack.getItem()).getVoltage(batteryStack);
         }
         catch (Exception e)
         {
@@ -315,19 +274,15 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     }
     
     @Override
-    public ElectricityPack onReceive(ElectricityPack electricityPack,
-            ItemStack itemStack)
+    public ElectricityPack onReceive(ElectricityPack electricityPack, ItemStack itemStack)
     {
         try
         {
             double rejectedElectricity = Math.max(
-                    this.getJoules(itemStack) + electricityPack.getWatts()
-                            - this.getMaxJoules(itemStack), 0);
-            double joulesToStore = electricityPack.getWatts()
-                    - rejectedElectricity;
+                    this.getJoules(itemStack) + electricityPack.getWatts() - this.getMaxJoules(itemStack), 0);
+            double joulesToStore = electricityPack.getWatts() - rejectedElectricity;
             this.setJoules(this.getJoules(itemStack) + joulesToStore, itemStack);
-            return ElectricityPack.getFromWatts(joulesToStore,
-                    this.getVoltage(itemStack));
+            return ElectricityPack.getFromWatts(joulesToStore, this.getVoltage(itemStack));
         }
         catch (Exception e)
         {
@@ -336,8 +291,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     }
     
     @Override
-    public ElectricityPack onProvide(ElectricityPack electricityPack,
-            ItemStack itemStack)
+    public ElectricityPack onProvide(ElectricityPack electricityPack, ItemStack itemStack)
     {
         return new ElectricityPack(0, 0);
     }
@@ -347,8 +301,8 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     {
         try
         {
-            return ElectricityPack.getFromWatts(this.getMaxJoules(itemStack)
-                    - this.getJoules(itemStack), this.getVoltage(itemStack));
+            return ElectricityPack.getFromWatts(this.getMaxJoules(itemStack) - this.getJoules(itemStack),
+                    this.getVoltage(itemStack));
         }
         catch (Exception e)
         {
@@ -367,8 +321,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     {
         try
         {
-            return assembledTool.stackTagCompound.getCompoundTag("SimpleTools")
-                    .getInteger("plasma");
+            return assembledTool.stackTagCompound.getCompoundTag("SimpleTools").getInteger("plasma");
         }
         catch (Exception e)
         {
@@ -381,8 +334,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     {
         try
         {
-            return assembledTool.stackTagCompound.getCompoundTag("SimpleTools")
-                    .getInteger("maxPlasma");
+            return assembledTool.stackTagCompound.getCompoundTag("SimpleTools").getInteger("maxPlasma");
         }
         catch (Exception e)
         {
@@ -395,8 +347,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     {
         try
         {
-            stack.stackTagCompound.getCompoundTag("SimpleTools").setInteger(
-                    "plasma", i);
+            stack.stackTagCompound.getCompoundTag("SimpleTools").setInteger("plasma", i);
         }
         catch (Exception e)
         {
@@ -430,10 +381,8 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
         {
             try
             {
-                int coreMeta = ((IAssembledTool) stack.getItem())
-                        .getCore(stack).getItemDamage();
-                return ((IAssembledTool) stack.getItem()).getCore(stack)
-                        .getItem().getIconFromDamage(coreMeta);
+                int coreMeta = ((IAssembledTool) stack.getItem()).getCore(stack).getItemDamage();
+                return ((IAssembledTool) stack.getItem()).getCore(stack).getItem().getIconFromDamage(coreMeta);
             }
             catch (Throwable e)
             {
@@ -443,10 +392,8 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
         {
             try
             {
-                int attachMeta = ((IAssembledTool) stack.getItem())
-                        .getAttachment(stack).getItemDamage();
-                return ((IAssembledTool) stack.getItem()).getAttachment(stack)
-                        .getItem().getIconFromDamage(attachMeta);
+                int attachMeta = ((IAssembledTool) stack.getItem()).getAttachment(stack).getItemDamage();
+                return ((IAssembledTool) stack.getItem()).getAttachment(stack).getItem().getIconFromDamage(attachMeta);
             }
             catch (Throwable e)
             {
@@ -456,13 +403,10 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     }
     
     @Override
-    public boolean itemInteractionForEntity(ItemStack itemstack,
-            EntityLiving entity)
+    public boolean itemInteractionForEntity(ItemStack itemstack, EntityLiving entity)
     {
-        IAttachment attach = (IAttachment) this.getAttachment(itemstack)
-                .getItem();
-        if (attach.canRightClick(this.getAttachment(itemstack), entity, null)
-                && this.canDoWork(itemstack))
+        IAttachment attach = (IAttachment) this.getAttachment(itemstack).getItem();
+        if (attach.canRightClick(this.getAttachment(itemstack), entity, null) && this.canDoWork(itemstack))
         {
             attach.onRightClick(this.getAttachment(itemstack), entity, null);
             return true;
@@ -483,24 +427,19 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric,
     }
     
     @Override
-    public boolean onItemUse(ItemStack itemStack, EntityPlayer player,
-            World world, int x, int y, int z, int side, float hitX, float HitY,
-            float hitZ)
+    public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int side,
+            float hitX, float HitY, float hitZ)
     {
-        IAttachment attach = (IAttachment) this.getAttachment(itemStack)
-                .getItem();
-        boolean canUse = attach
-                .canRightClick(this.getAttachment(itemStack), new Object[] {
-                        world, x, y, z, side, hitX, HitY, hitZ }, player)
+        IAttachment attach = (IAttachment) this.getAttachment(itemStack).getItem();
+        boolean canUse = attach.canRightClick(this.getAttachment(itemStack), new Object[] { world, x, y, z, side, hitX,
+                HitY, hitZ }, player)
                 && this.canDoWork(itemStack);
         
         if (canUse && this.canDoWork(itemStack))
         {
-            byte plasma = attach.onRightClick(this.getAttachment(itemStack),
-                    new Object[] { world, x, y, z, side, hitX, HitY, hitZ },
-                    player);
-            this.setJoules(this.getJoules(itemStack) - JOULES_PER_USE,
-                    itemStack);
+            byte plasma = attach.onRightClick(this.getAttachment(itemStack), new Object[] { world, x, y, z, side, hitX,
+                    HitY, hitZ }, player);
+            this.setJoules(this.getJoules(itemStack) - JOULES_PER_USE, itemStack);
             this.setPlasma(itemStack, this.getPlasma(itemStack) + plasma);
         }
         return canUse;

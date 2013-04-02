@@ -63,8 +63,7 @@ public class ItemCorePlasma extends Item implements ICore
     
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void getSubItems(int par1, CreativeTabs par2CreativeTabs,
-            List par3List)
+    public void getSubItems(int par1, CreativeTabs par2CreativeTabs, List par3List)
     {
         for (int i = 0; i < 4; i++)
         {
@@ -84,8 +83,7 @@ public class ItemCorePlasma extends Item implements ICore
     {
         for (int i = 0; i < this.icons.length; i++)
         {
-            this.icons[i] = iconRegister.registerIcon((this
-                    .getUnlocalizedName() + "." + i).replace("item.",
+            this.icons[i] = iconRegister.registerIcon((this.getUnlocalizedName() + "." + i).replace("item.",
                     SimpleTools.TEXTURE_NAME_PREFIX));
         }
     }

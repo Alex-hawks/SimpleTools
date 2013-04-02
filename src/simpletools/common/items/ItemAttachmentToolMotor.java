@@ -90,14 +90,12 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
     @Override
     public String getUnlocalizedName(ItemStack i)
     {
-        return this.getUnlocalizedName() + "." + this.getToolType(i) + "."
-                + this.getAttachmentTier(i);
+        return this.getUnlocalizedName() + "." + this.getToolType(i) + "." + this.getAttachmentTier(i);
     }
     
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void getSubItems(int par1, CreativeTabs par2CreativeTabs,
-            List par3List)
+    public void getSubItems(int par1, CreativeTabs par2CreativeTabs, List par3List)
     {
         for (int i = 0; i < 4; i++)
         {
@@ -174,9 +172,8 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
             for (int k = 0; k < 5; k++)
             {
                 itemStack = new ItemStack(this.itemID, 1, i * 10 + k);
-                this.icons[i * 10 + k] = iconRegister.registerIcon(this
-                        .getUnlocalizedName(itemStack).replace("item.",
-                                SimpleTools.TEXTURE_NAME_PREFIX));
+                this.icons[i * 10 + k] = iconRegister.registerIcon(this.getUnlocalizedName(itemStack).replace("item.",
+                        SimpleTools.TEXTURE_NAME_PREFIX));
             }
         }
     }
@@ -191,8 +188,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
     @Override
     public byte onRightClick(ItemStack i, Object target, EntityPlayer player)
     {
-        if (target instanceof EntityLiving
-                && this.getToolType(i).toLowerCase().equals("shears"))
+        if (target instanceof EntityLiving && this.getToolType(i).toLowerCase().equals("shears"))
         {
             EntityLiving entity = (EntityLiving) target;
             if (entity.worldObj.isRemote)
@@ -200,15 +196,12 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
             if (entity instanceof IShearable)
             {
                 IShearable interactTarget = (IShearable) entity;
-                if (interactTarget
-                        .isShearable(i, entity.worldObj, (int) entity.posX,
-                                (int) entity.posY, (int) entity.posZ))
+                if (interactTarget.isShearable(i, entity.worldObj, (int) entity.posX, (int) entity.posY,
+                        (int) entity.posZ))
                 {
-                    ArrayList<ItemStack> drops = interactTarget.onSheared(i,
-                            entity.worldObj, (int) entity.posX,
+                    ArrayList<ItemStack> drops = interactTarget.onSheared(i, entity.worldObj, (int) entity.posX,
                             (int) entity.posY, (int) entity.posZ,
-                            EnchantmentHelper.getEnchantmentLevel(
-                                    Enchantment.fortune.effectId, i));
+                            EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, i));
                     
                     Random rand = new Random();
                     for (ItemStack stack : drops)
@@ -227,8 +220,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
     @Override
     public boolean canRightClick(ItemStack i, Object target, EntityPlayer player)
     {
-        if (target instanceof EntityLiving
-                && this.getToolType(i).toLowerCase().equals("shears"))
+        if (target instanceof EntityLiving && this.getToolType(i).toLowerCase().equals("shears"))
             return (EntityLiving) target instanceof IShearable;
         return false;
     }

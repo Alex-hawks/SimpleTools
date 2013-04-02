@@ -6,8 +6,7 @@ import net.minecraft.item.ItemStack;
 
 public class SimpleToolsCreativeTab extends CreativeTabs
 {
-    public static final SimpleToolsCreativeTab INSTANCE = new SimpleToolsCreativeTab(
-            "SimpleTools");
+    public static final SimpleToolsCreativeTab INSTANCE = new SimpleToolsCreativeTab("SimpleTools");
     private ItemStack itemStack;
     
     public SimpleToolsCreativeTab(String label)

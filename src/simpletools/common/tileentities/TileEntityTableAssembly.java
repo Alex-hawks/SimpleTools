@@ -19,8 +19,8 @@ import universalelectricity.prefab.tile.TileEntityAdvanced;
 
 import com.google.common.io.ByteArrayDataInput;
 
-public class TileEntityTableAssembly extends TileEntityAdvanced implements
-        IRedstoneProvider, IPacketReceiver, ISidedInventory
+public class TileEntityTableAssembly extends TileEntityAdvanced implements IRedstoneProvider, IPacketReceiver,
+        ISidedInventory
 {
     private ItemStack[] inventory = new ItemStack[5];
     @SuppressWarnings("unused")
@@ -48,24 +48,20 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements
         NBTTagCompound stackTag;
         ItemStack returnStack = null;
         
-        if (this.inventory[var1] != null
-                && this.inventory[var1].stackSize > var2)
+        if (this.inventory[var1] != null && this.inventory[var1].stackSize > var2)
         {
             stackTag = this.inventory[var1].getTagCompound();
             this.inventory[var1].stackSize -= var2;
-            returnStack = new ItemStack(this.inventory[var1].itemID, var2,
-                    this.inventory[var1].getItemDamage());
+            returnStack = new ItemStack(this.inventory[var1].itemID, var2, this.inventory[var1].getItemDamage());
             if (!returnStack.hasTagCompound())
             {
                 returnStack.setTagCompound(stackTag);
             }
         }
-        else if (this.inventory[var1] != null
-                && this.inventory[var1].stackSize == var2)
+        else if (this.inventory[var1] != null && this.inventory[var1].stackSize == var2)
         {
             stackTag = this.inventory[var1].getTagCompound();
-            returnStack = new ItemStack(this.inventory[var1].itemID, var2,
-                    this.inventory[var1].getItemDamage());
+            returnStack = new ItemStack(this.inventory[var1].itemID, var2, this.inventory[var1].getItemDamage());
             this.inventory[var1] = null;
             if (!returnStack.hasTagCompound())
             {
@@ -161,8 +157,7 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements
             this.startAssemble();
             this.assembling = true;
         }
-        else if (this.inventory[3] == null && this.canAssemble()
-                && this.assembling)
+        else if (this.inventory[3] == null && this.canAssemble() && this.assembling)
         {
             this.finishAssemble();
             this.assembling = false;
@@ -174,16 +169,13 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements
             this.assembling = false;
         }
         
-        if (this.inventory[4] != null
-                && this.inventory[4].getItem() instanceof IAssembledTool
+        if (this.inventory[4] != null && this.inventory[4].getItem() instanceof IAssembledTool
                 && this.canDissassemble())
         {
             this.dissassemble();
         }
         
-        if (this.inventory[3] != null
-                && this.inventory[3].getItem() instanceof IAssembledTool
-                && this.assembling)
+        if (this.inventory[3] != null && this.inventory[3].getItem() instanceof IAssembledTool && this.assembling)
         {
             IAssembledTool tool = (IAssembledTool) this.inventory[3].getItem();
             ItemStack toolIS = this.inventory[3];
@@ -207,9 +199,8 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements
     }
     
     @Override
-    public void handlePacketData(INetworkManager network, int packetType,
-            Packet250CustomPayload packet, EntityPlayer player,
-            ByteArrayDataInput dataStream)
+    public void handlePacketData(INetworkManager network, int packetType, Packet250CustomPayload packet,
+            EntityPlayer player, ByteArrayDataInput dataStream)
     {
         
     }
@@ -234,26 +225,20 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements
         
         if (slot0 != null && slot1 != null && slot2 != null)
         {
-            if (slot0.getItem() instanceof IAttachment
-                    && slot1.getItem() instanceof ICore)
+            if (slot0.getItem() instanceof IAttachment && slot1.getItem() instanceof ICore)
             {
                 IAttachment attachTemp = (IAttachment) slot0.getItem();
                 ICore coreTemp = (ICore) slot1.getItem();
                 
-                if (attachTemp.getToolAttachmentType(slot0) == coreTemp
-                        .getCoreType(slot1)
-                        && attachTemp.getMinimumTier(slot0) <= coreTemp
-                                .getCoreTier(slot1))
+                if (attachTemp.getToolAttachmentType(slot0) == coreTemp.getCoreType(slot1)
+                        && attachTemp.getMinimumTier(slot0) <= coreTemp.getCoreTier(slot1))
                 {
-                    if (coreTemp.getCoreFinerType(slot1).equals("electric")
-                            && slot2.getItem() instanceof IItemElectric
-                            && ((IItemElectric) slot2.getItem())
-                                    .getProvideRequest(slot2).getWatts() > 0)
+                    if (coreTemp.getCoreFinerType(slot1).equals("electric") && slot2.getItem() instanceof IItemElectric
+                            && ((IItemElectric) slot2.getItem()).getProvideRequest(slot2).getWatts() > 0)
                         return true;
                     else if (coreTemp.getCoreFinerType(slot1).equals("plasma")
                             && slot2.getItem() instanceof IItemElectric
-                            && ((IItemElectric) slot2.getItem())
-                                    .getProvideRequest(slot2).getWatts() > 0)
+                            && ((IItemElectric) slot2.getItem()).getProvideRequest(slot2).getWatts() > 0)
                         return true;
                     
                 }
@@ -273,18 +258,16 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements
                 toReturn = false;
             }
         }
-        return toReturn && this.inventory[4] != null
-                && this.inventory[4].getItem() instanceof IAssembledTool;
+        return toReturn && this.inventory[4] != null && this.inventory[4].getItem() instanceof IAssembledTool;
     }
     
     public void startAssemble()
     {
         if (!this.worldObj.isRemote && this.canAssemble())
         {
-            IAssembledTool result = (IAssembledTool) ((ICore) this.inventory[1]
-                    .getItem()).getAssmebledToolItem(this.inventory[1]);
-            this.inventory[3] = result.onCreate(this.inventory[0],
-                    this.inventory[1], this.inventory[2]);
+            IAssembledTool result = (IAssembledTool) ((ICore) this.inventory[1].getItem())
+                    .getAssmebledToolItem(this.inventory[1]);
+            this.inventory[3] = result.onCreate(this.inventory[0], this.inventory[1], this.inventory[2]);
         }
     }
     
@@ -311,15 +294,11 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements
         if (this.canDissassemble())
         {
             ItemStack oldTool = this.inventory[4];
-            if (oldTool.getItem() instanceof IAssembledTool
-                    && oldTool.hasTagCompound())
+            if (oldTool.getItem() instanceof IAssembledTool && oldTool.hasTagCompound())
             {
-                this.inventory[0] = ((IAssembledTool) oldTool.getItem())
-                        .getAttachment(oldTool);
-                this.inventory[1] = ((IAssembledTool) oldTool.getItem())
-                        .getCore(oldTool);
-                this.inventory[2] = ((IAssembledTool) oldTool.getItem())
-                        .getStorage(oldTool);
+                this.inventory[0] = ((IAssembledTool) oldTool.getItem()).getAttachment(oldTool);
+                this.inventory[1] = ((IAssembledTool) oldTool.getItem()).getCore(oldTool);
+                this.inventory[2] = ((IAssembledTool) oldTool.getItem()).getStorage(oldTool);
                 this.inventory[4] = null;
             }
         }

@@ -19,28 +19,24 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class SimpleToolsClientProxy extends SimpleToolsCommonProxy implements
-        IGuiHandler
+public class SimpleToolsClientProxy extends SimpleToolsCommonProxy implements IGuiHandler
 {
     public static final ISimpleBlockRenderingHandler plasmaTorch = new RenderHandler();
     
     @Override
     public void init()
     {
-        GameRegistry.registerTileEntity(TileEntityTableAssembly.class,
-                "TileEntityTableAssembly");
+        GameRegistry.registerTileEntity(TileEntityTableAssembly.class, "TileEntityTableAssembly");
         BasicComponents.registerTileEntityRenderers();
         
         RenderingRegistry.registerBlockHandler(plasmaTorch);
         
         TickRegistry.registerTickHandler(STCapeHandler.INSTANCE, Side.CLIENT);
-        TickRegistry.registerTickHandler(STRenderTickHandler.INSTANCE,
-                Side.CLIENT);
+        TickRegistry.registerTickHandler(STRenderTickHandler.INSTANCE, Side.CLIENT);
     }
     
     @Override
-    public Object getClientGuiElement(int ID, EntityPlayer player, World world,
-            int x, int y, int z)
+    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
     {
         TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
         if (tileEntity != null)
@@ -48,8 +44,7 @@ public class SimpleToolsClientProxy extends SimpleToolsCommonProxy implements
             switch (ID)
             {
                 case 0:
-                    return new GuiTableAssembly(player.inventory,
-                            (TileEntityTableAssembly) tileEntity);
+                    return new GuiTableAssembly(player.inventory, (TileEntityTableAssembly) tileEntity);
             }
         }
         return null;

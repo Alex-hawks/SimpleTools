@@ -21,13 +21,11 @@ public class SimpleToolsCloakDownload implements IImageBuffer
         
         this.imageWidth = par1BufferedImage.getWidth(null);
         this.imageHeight = par1BufferedImage.getHeight(null);
-        BufferedImage bufferedimage1 = new BufferedImage(this.imageWidth,
-                this.imageHeight, 2);
+        BufferedImage bufferedimage1 = new BufferedImage(this.imageWidth, this.imageHeight, 2);
         Graphics graphics = bufferedimage1.getGraphics();
         graphics.drawImage(par1BufferedImage, 0, 0, (ImageObserver) null);
         graphics.dispose();
-        this.imageData = ((DataBufferInt) bufferedimage1.getRaster()
-                .getDataBuffer()).getData();
+        this.imageData = ((DataBufferInt) bufferedimage1.getRaster().getDataBuffer()).getData();
         boolean flag = false;
         int i;
         int j;

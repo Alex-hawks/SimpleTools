@@ -18,8 +18,8 @@ import universalelectricity.prefab.tile.TileEntityElectrical;
 
 import com.google.common.io.ByteArrayDataInput;
 
-public class TileEntityTablePlasma extends TileEntityElectrical implements
-        IRedstoneProvider, IPacketReceiver, IInventory, IElectricityStorage
+public class TileEntityTablePlasma extends TileEntityElectrical implements IRedstoneProvider, IPacketReceiver,
+        IInventory, IElectricityStorage
 {
     /**
      * 0: Battery </br>1: Tool </br>2: Deuterium AND/OR Tritium </br>3: Empty
@@ -44,24 +44,19 @@ public class TileEntityTablePlasma extends TileEntityElectrical implements
     public void updateEntity()
     {
         super.updateEntity();
-        if (this.deuterium < MAX_DEUTERIUM
-                && OreDictionary.getOres("cellDeuterium").contains(
-                        this.inventory[2]))
+        if (this.deuterium < MAX_DEUTERIUM && OreDictionary.getOres("cellDeuterium").contains(this.inventory[2]))
         {
             this.inventory[2].stackSize--;
             this.deuterium++;
         }
         
-        if (this.tritium < MAX_TRITIUM
-                && OreDictionary.getOres("cellTritium").contains(
-                        this.inventory[2]))
+        if (this.tritium < MAX_TRITIUM && OreDictionary.getOres("cellTritium").contains(this.inventory[2]))
         {
             this.inventory[2].stackSize--;
             this.tritium++;
         }
         
-        if (this.joules >= JOULES_PER_OPERATION && this.tritium > 0
-                && this.plasma + PLASMA_PER_TRITIUM <= MAX_PLASMA)
+        if (this.joules >= JOULES_PER_OPERATION && this.tritium > 0 && this.plasma + PLASMA_PER_TRITIUM <= MAX_PLASMA)
         {
             this.joules -= JOULES_PER_OPERATION;
             this.tritium--;
@@ -77,8 +72,7 @@ public class TileEntityTablePlasma extends TileEntityElectrical implements
         
         if (this.inventory[1].getItem() instanceof IPlasmaStorage)
         {
-            if (((IPlasmaStorage) this.inventory[1].getItem()).addPlasma(
-                    this.inventory[1], 1))
+            if (((IPlasmaStorage) this.inventory[1].getItem()).addPlasma(this.inventory[1], 1))
             {
                 this.plasma--;
             }
@@ -181,10 +175,8 @@ public class TileEntityTablePlasma extends TileEntityElectrical implements
                 case 1:
                     return itemstack.getItem() instanceof IAssembledTool;
                 case 2:
-                    return OreDictionary.getOres("cellDeuterium").contains(
-                            itemstack)
-                            || OreDictionary.getOres("cellTritium").contains(
-                                    itemstack);
+                    return OreDictionary.getOres("cellDeuterium").contains(itemstack)
+                            || OreDictionary.getOres("cellTritium").contains(itemstack);
             }
         }
         return false;
@@ -203,9 +195,8 @@ public class TileEntityTablePlasma extends TileEntityElectrical implements
     }
     
     @Override
-    public void handlePacketData(INetworkManager network, int packetType,
-            Packet250CustomPayload packet, EntityPlayer player,
-            ByteArrayDataInput dataStream)
+    public void handlePacketData(INetworkManager network, int packetType, Packet250CustomPayload packet,
+            EntityPlayer player, ByteArrayDataInput dataStream)
     {
         if (this.worldObj.isRemote)
         {

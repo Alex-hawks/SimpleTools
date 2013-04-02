@@ -69,24 +69,20 @@ public class STCapeHandler implements ITickHandler
             {
                 String oldCloak = player.cloakUrl;
                 
-                if (player.cloakUrl
-                        .startsWith("http://skins.minecraft.net/MinecraftCloaks/"))
+                if (player.cloakUrl.startsWith("http://skins.minecraft.net/MinecraftCloaks/"))
                 {
-                    if (ueDevelopers.contains(StringUtils.stripControlCodes(
-                            player.username).toLowerCase()))
+                    if (ueDevelopers.contains(StringUtils.stripControlCodes(player.username).toLowerCase()))
                     {
                         player.cloakUrl = developerCloakURL;
                     }
-                    else if (ueAssistants.contains(StringUtils
-                            .stripControlCodes(player.username).toLowerCase()))
+                    else if (ueAssistants.contains(StringUtils.stripControlCodes(player.username).toLowerCase()))
                     {
                         player.cloakUrl = assistantCloakURL;
                     }
                     
                     if (!oldCloak.equals(player.cloakUrl))
                     {
-                        mc.renderEngine.obtainImageData(player.cloakUrl,
-                                new SimpleToolsCloakDownload());
+                        mc.renderEngine.obtainImageData(player.cloakUrl, new SimpleToolsCloakDownload());
                     }
                 }
             }

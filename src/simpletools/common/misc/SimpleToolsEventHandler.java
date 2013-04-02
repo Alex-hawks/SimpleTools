@@ -48,11 +48,9 @@ public class SimpleToolsEventHandler
             int id = event.block.blockID;
             int meta = event.metadata;
             if (tool.canBreakBlock(usedIS, world, id, meta, event.entityPlayer)
-                    && tool.isEffectiveOnBlock(usedIS, world, id, meta,
-                            event.entityPlayer))
+                    && tool.isEffectiveOnBlock(usedIS, world, id, meta, event.entityPlayer))
             {
-                event.newSpeed = usedIS.getItem().getStrVsBlock(usedIS,
-                        event.block, event.metadata);
+                event.newSpeed = usedIS.getItem().getStrVsBlock(usedIS, event.block, event.metadata);
             }
             else
             {

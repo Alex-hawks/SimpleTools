@@ -55,8 +55,8 @@ public class SimpleTools
     // @Mod
     public static final String MOD_ID = "UE-SimpleTools";
     public static final String MOD_NAME = "Simple Tools";
-    public static final String VERSION = MAJOR_VERSION + "." + MINOR_VERSION
-            + "." + REVIS_VERSION + "." + BUILD_VERSION;
+    public static final String VERSION = MAJOR_VERSION + "." + MINOR_VERSION + "." + REVIS_VERSION + "."
+            + BUILD_VERSION;
     public static final String DEPENDENCIES = "after:UniversalElectricity;after:AtomicScience";
     public static final boolean USE_METADATA = true;
     
@@ -83,9 +83,8 @@ public class SimpleTools
     
     public static final String[] SUPPORTED_LANGUAGES = { "en_US" };
     
-    public static final File CONFIG_FILE = new File(Loader.instance()
-            .getConfigDir(), "UniversalElectricity" + File.separator
-            + "SimpleTools.cfg");
+    public static final File CONFIG_FILE = new File(Loader.instance().getConfigDir(), "UniversalElectricity"
+            + File.separator + "SimpleTools.cfg");
     public static final Configuration CONFIG = new Configuration(CONFIG_FILE);
     
     public static final String RESOURCE_PATH = "/mods/simpletools/";
@@ -114,34 +113,26 @@ public class SimpleTools
     {
         config.load();
         
-        tableAssembly = new BlockTableAssembly(config.getBlock(
-                "Assembly_Table", FIRST_BLOCK_ID).getInt());
+        tableAssembly = new BlockTableAssembly(config.getBlock("Assembly_Table", FIRST_BLOCK_ID).getInt());
         // 1 tableRefuel =
-        tablePlasma = new BlockTablePlasma(config.getBlock("Plasma_Table",
-                FIRST_BLOCK_ID + 2).getInt());
-        plasmaTorch = new BlockPlasmaTorch(config.getBlock("Plasma_Torch",
-                FIRST_BLOCK_ID + 3).getInt());
+        tablePlasma = new BlockTablePlasma(config.getBlock("Plasma_Table", FIRST_BLOCK_ID + 2).getInt());
+        plasmaTorch = new BlockPlasmaTorch(config.getBlock("Plasma_Torch", FIRST_BLOCK_ID + 3).getInt());
         
-        assembledToolElectric = new ItemAssembledToolElectric(config.getItem(
-                "Electric_Assembled_Tool", FIRST_TOOL_ID).getInt(),
-                "MechElectricAssembledTool");
-        assembledToolPlasma = new ItemAssembledToolPlasma(config.getItem(
-                "Plasma_Assembled_Tool", FIRST_TOOL_ID + 1).getInt(),
-                "PlasmaAssembledTool");
+        assembledToolElectric = new ItemAssembledToolElectric(config.getItem("Electric_Assembled_Tool", FIRST_TOOL_ID)
+                .getInt(), "MechElectricAssembledTool");
+        assembledToolPlasma = new ItemAssembledToolPlasma(config.getItem("Plasma_Assembled_Tool", FIRST_TOOL_ID + 1)
+                .getInt(), "PlasmaAssembledTool");
         // 2 assembledToolFuel
         
-        coreMechElectric = new ItemCoreMotor(config.getItem(
-                "Electric_Motor_Core", FIRST_CORE_ID).getInt(),
+        coreMechElectric = new ItemCoreMotor(config.getItem("Electric_Motor_Core", FIRST_CORE_ID).getInt(),
                 "CoreMechElectric");
-        corePlasma = new ItemCorePlasma(config.getItem("Plasma_Core",
-                FIRST_CORE_ID + 1).getInt(), "CorePlasma");
+        corePlasma = new ItemCorePlasma(config.getItem("Plasma_Core", FIRST_CORE_ID + 1).getInt(), "CorePlasma");
         // 2 coreMechFuel =
         
-        attachmentToolMotor = new ItemAttachmentToolMotor(config.getItem(
-                "Motor_Tool_Attachment", FIRST_BIT_ID).getInt(), "MotorTool");
-        attachmentToolPlasma = new ItemAttachmentPlasma(config.getItem(
-                "Plasma_Tool_Attachment", FIRST_BIT_ID + 1).getInt(),
-                "PlasmaTool");
+        attachmentToolMotor = new ItemAttachmentToolMotor(config.getItem("Motor_Tool_Attachment", FIRST_BIT_ID)
+                .getInt(), "MotorTool");
+        attachmentToolPlasma = new ItemAttachmentPlasma(config.getItem("Plasma_Tool_Attachment", FIRST_BIT_ID + 1)
+                .getInt(), "PlasmaTool");
         
         config.save();
     }
@@ -164,13 +155,10 @@ public class SimpleTools
         
         configLoad(CONFIG);
         
-        GameRegistry.registerBlock(tableAssembly, ItemBlock.class,
-                "tableAssembly", SimpleTools.MOD_ID);
+        GameRegistry.registerBlock(tableAssembly, ItemBlock.class, "tableAssembly", SimpleTools.MOD_ID);
         
-        GameRegistry.registerBlock(tablePlasma, ItemBlock.class, "tablePlasma",
-                SimpleTools.MOD_ID);
-        GameRegistry.registerBlock(plasmaTorch, ItemBlock.class, "plasmaTorch",
-                SimpleTools.MOD_ID);
+        GameRegistry.registerBlock(tablePlasma, ItemBlock.class, "tablePlasma", SimpleTools.MOD_ID);
+        GameRegistry.registerBlock(plasmaTorch, ItemBlock.class, "plasmaTorch", SimpleTools.MOD_ID);
         
         NetworkRegistry.instance().registerGuiHandler(this, SimpleTools.proxy);
     }
@@ -192,8 +180,7 @@ public class SimpleTools
         proxy.init();
         for (String element : SUPPORTED_LANGUAGES)
         {
-            LanguageRegistry.instance().loadLocalization(
-                    LANGUAGE_PATH + element + ".properties", element, false);
+            LanguageRegistry.instance().loadLocalization(LANGUAGE_PATH + element + ".properties", element, false);
         }
         MinecraftForge.EVENT_BUS.register(SimpleTools.EVENT_HANDLER);
         Item.itemsList[SimpleTools.assembledToolElectric.itemID] = SimpleTools.assembledToolElectric;
@@ -204,7 +191,6 @@ public class SimpleTools
     @PostInit
     public void postInit(FMLPostInitializationEvent event)
     {
-        SimpleToolsCreativeTab.INSTANCE.setItemStack(new ItemStack(
-                SimpleTools.tableAssembly));
+        SimpleToolsCreativeTab.INSTANCE.setItemStack(new ItemStack(SimpleTools.tableAssembly));
     }
 }

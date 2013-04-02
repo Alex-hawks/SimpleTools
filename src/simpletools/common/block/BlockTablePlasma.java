@@ -44,8 +44,7 @@ public class BlockTablePlasma extends BlockAdvanced
             case 1:
                 return this.top;
         }
-        if (side == meta + 2
-                || ForgeDirection.getOrientation(side).getOpposite().ordinal() == meta + 2)
+        if (side == meta + 2 || ForgeDirection.getOrientation(side).getOpposite().ordinal() == meta + 2)
             return this.side1;
         else if ((side & 3) + 1 == meta
                 || (ForgeDirection.getOrientation(side).getOpposite().ordinal() & 3) + 1 == meta)
@@ -60,26 +59,17 @@ public class BlockTablePlasma extends BlockAdvanced
     public void registerIcons(IconRegister par1IconRegister)
     {
         
-        this.top = par1IconRegister
-                .registerIcon(SimpleTools.TEXTURE_NAME_PREFIX
-                        + "tablePlasmaTop");
-        this.bottom = par1IconRegister
-                .registerIcon(SimpleTools.TEXTURE_NAME_PREFIX
-                        + "tablePlasmaBottom");
-        this.side1 = par1IconRegister
-                .registerIcon(SimpleTools.TEXTURE_NAME_PREFIX
-                        + "tablePlasmaSide1");
-        this.side2 = par1IconRegister
-                .registerIcon(SimpleTools.TEXTURE_NAME_PREFIX
-                        + "tablePlasmaSide2");
+        this.top = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaTop");
+        this.bottom = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaBottom");
+        this.side1 = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaSide1");
+        this.side2 = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaSide2");
     }
     
     @Override
-    public void onBlockPlacedBy(World par1World, int x, int y, int z,
-            EntityLiving par5EntityLiving, ItemStack par6ItemStack)
+    public void onBlockPlacedBy(World par1World, int x, int y, int z, EntityLiving par5EntityLiving,
+            ItemStack par6ItemStack)
     {
-        int angle = MathHelper
-                .floor_double(par5EntityLiving.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
+        int angle = MathHelper.floor_double(par5EntityLiving.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
         switch (angle)
         {
             case 0:
@@ -101,9 +91,8 @@ public class BlockTablePlasma extends BlockAdvanced
     }
     
     @Override
-    public boolean onUseWrench(World par1World, int x, int y, int z,
-            EntityPlayer par5EntityPlayer, int side, float hitX, float hitY,
-            float hitZ)
+    public boolean onUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
+            float hitX, float hitY, float hitZ)
     {
         int metadata = par1World.getBlockMetadata(x, y, z);
         
@@ -135,28 +124,24 @@ public class BlockTablePlasma extends BlockAdvanced
     }
     
     @Override
-    public boolean onMachineActivated(World par1World, int x, int y, int z,
-            EntityPlayer par5EntityPlayer, int side, float hitX, float hitY,
-            float hitZ)
+    public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
+            float hitX, float hitY, float hitZ)
     {
         if (!par1World.isRemote)
         {
-            par5EntityPlayer.openGui(SimpleTools.INSTANCE, 1, par1World, x, y,
-                    z);
+            par5EntityPlayer.openGui(SimpleTools.INSTANCE, 1, par1World, x, y, z);
             return true;
         }
         return true;
     }
     
     @Override
-    public boolean onSneakUseWrench(World par1World, int x, int y, int z,
-            EntityPlayer par5EntityPlayer, int side, float hitX, float hitY,
-            float hitZ)
+    public boolean onSneakUseWrench(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
+            float hitX, float hitY, float hitZ)
     {
         if (!par5EntityPlayer.capabilities.isCreativeMode)
         {
-            this.dropBlockAsItem(par1World, x, y, z,
-                    par1World.getBlockMetadata(x, y, z), 0);
+            this.dropBlockAsItem(par1World, x, y, z, par1World.getBlockMetadata(x, y, z), 0);
         }
         par1World.setBlock(x, y, z, 0, 0, 0x04);
         return true;

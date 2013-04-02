@@ -20,8 +20,7 @@ public interface IAssembledTool
      * @return The ItemStack that should store all of the Tool's data, ENSURE
      *         that it has NBTTags on it. null if it failed...
      */
-    public ItemStack onCreate(ItemStack attachment, ItemStack core,
-            ItemStack storage);
+    public ItemStack onCreate(ItemStack attachment, ItemStack core, ItemStack storage);
     
     /**
      * @param assembledTool
@@ -65,8 +64,7 @@ public interface IAssembledTool
      * @return true if the block should yield it's drops, and the tool should be
      *         effective against it
      */
-    public boolean canBreakBlock(ItemStack assembledTool, World world,
-            int blockID, int metadata, EntityLiving entity);
+    public boolean canBreakBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLiving entity);
     
     /**
      * @param assembledTool
@@ -77,8 +75,8 @@ public interface IAssembledTool
      * @return true if the block should yield it's drops, and the tool should be
      *         effective against it
      */
-    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world,
-            int blockID, int metadata, EntityLiving entity);
+    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata,
+            EntityLiving entity);
     
     /**
      * @param assembledTool
