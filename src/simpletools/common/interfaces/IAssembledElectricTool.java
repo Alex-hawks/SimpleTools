@@ -4,5 +4,5 @@ import universalelectricity.core.item.IItemElectric;
 
 public interface IAssembledElectricTool extends IAssembledTool, IItemElectric
 {
-	
+    
 }
