@@ -1,4 +1,4 @@
-package simpletools.common.interfaces;
+package simpletools.api;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -59,7 +59,7 @@ public interface IAttachment
      * @return The harvest speed of the Item, on its proper material. </br> The
      *         harvest level is getAttachmentTier(i) + 1
      */
-    public double getHarvestSpeed(ItemStack i);
+    public float getHarvestSpeed(ItemStack i);
     
     /**
      * @param i

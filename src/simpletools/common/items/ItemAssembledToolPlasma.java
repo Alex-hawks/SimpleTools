@@ -2,8 +2,11 @@ package simpletools.common.items;
 
 import java.util.List;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,26 +14,29 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IShearable;
+import net.minecraftforge.common.MinecraftForge;
 
 import org.lwjgl.input.Keyboard;
 
-import simpletools.common.SimpleTools;
-import simpletools.common.interfaces.IAssembledTool;
-import simpletools.common.interfaces.IAttachment;
-import simpletools.common.interfaces.ICore;
-import simpletools.common.interfaces.IPlasmaStorage;
-import universalelectricity.core.electricity.ElectricityDisplay;
-import universalelectricity.core.electricity.ElectricityDisplay.ElectricUnit;
-import universalelectricity.core.electricity.ElectricityPack;
-import universalelectricity.core.item.IItemElectric;
+import simpletools.api.IAssembledElectricTool;
+import simpletools.api.IAssembledTool;
+import simpletools.api.IAttachment;
+import simpletools.api.ICore;
+import simpletools.api.IPlasmaStorage;
+import simpletools.api.SimpleToolsItems;
+import universalelectricity.api.energy.UnitDisplay;
+import universalelectricity.api.energy.UnitDisplay.Unit;
+import universalelectricity.api.item.IEnergyItem;
+import universalelectricity.api.item.IVoltageItem;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAssembledTool, IPlasmaStorage
+public class ItemAssembledToolPlasma extends Item implements IAssembledElectricTool, IPlasmaStorage
 {
-    private static final double JOULES_PER_USE = 2500;
+    private static final long JOULES_PER_USE = 2500;
     private static final int PLASMA_PER_USE = 1;
-    
+
     public ItemAssembledToolPlasma(int par1, String name)
     {
         super(par1);
@@ -40,7 +46,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
         this.setMaxDamage(0);
         this.setCreativeTab(null);
     }
-    
+
     @Override
     public ItemStack onCreate(ItemStack attachment, ItemStack core, ItemStack storage)
     {
@@ -49,7 +55,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
         {
             IAttachment attachmentTemp = (IAttachment) attachment.getItem();
             ICore coreTemp = (ICore) core.getItem();
-            
+
             if (coreTemp.getCoreType(core) == attachmentTemp.getToolAttachmentType(attachment))
             {
                 if (coreTemp.getCoreTier(core) >= attachmentTemp.getMinimumTier(attachment))
@@ -58,34 +64,28 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
                     int attachMeta = attachmentTemp.getAttachmentUID(attachment);
                     int meta = coreMeta + attachMeta;
                     returnStack = new ItemStack(this, 1, meta);
-                    
+
                     NBTTagCompound compound = new NBTTagCompound();
                     compound.setCompoundTag("SimpleTools", new NBTTagCompound());
                     compound.setCompoundTag("damageVsEntity", new NBTTagCompound());
                     compound.setBoolean("useDamageVsEntityTag", true);
-                    
-                    compound.getCompoundTag("SimpleTools").setDouble("electricity",
-                            ((IItemElectric) storage.getItem()).getJoules(storage));
-                    compound.getCompoundTag("SimpleTools").setDouble("maxEnergy",
-                            ((IItemElectric) storage.getItem()).getMaxJoules(storage));
+
+                    compound.getCompoundTag("SimpleTools").setDouble("electricity", ((IEnergyItem) storage.getItem()).getEnergy(storage));
+                    compound.getCompoundTag("SimpleTools").setDouble("maxEnergy", ((IEnergyItem) storage.getItem()).getEnergyCapacity(storage));
                     compound.getCompoundTag("SimpleTools").setInteger("plasma", Integer.MAX_VALUE);
-                    compound.getCompoundTag("SimpleTools").setInteger("maxPlasma",
-                            (coreTemp.getCoreTier(core) + 1) * 125);
-                    compound.getCompoundTag("SimpleTools").setCompoundTag("attachment",
-                            attachment.writeToNBT(new NBTTagCompound()));
-                    compound.getCompoundTag("SimpleTools").setCompoundTag("battery",
-                            storage.writeToNBT(new NBTTagCompound()));
-                    
-                    compound.getCompoundTag("damageVsEntity").setInteger("",
-                            attachmentTemp.getDamageVsEntities(attachment).get(null));
-                    
+                    compound.getCompoundTag("SimpleTools").setInteger("maxPlasma", (coreTemp.getCoreTier(core) + 1) * 125);
+                    compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
+                    compound.getCompoundTag("SimpleTools").setCompoundTag("battery", storage.writeToNBT(new NBTTagCompound()));
+
+                    compound.getCompoundTag("damageVsEntity").setInteger("", attachmentTemp.getDamageVsEntities(attachment).get(null));
+
                     returnStack.setTagCompound(compound);
                 }
             }
         }
         return returnStack;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -96,18 +96,18 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
         {
             NBTTagCompound batt = itemStack.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
             battery = ItemStack.loadItemStackFromNBT(batt);
-            
+
             NBTBase attach = itemStack.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("attachment");
             attachment = ItemStack.loadItemStackFromNBT((NBTTagCompound) attach);
         }
         catch (Exception e)
         {
         }
-        
-        currentTips.add("Energy: " + ElectricityDisplay.getDisplayShort(this.getJoules(itemStack), ElectricUnit.JOULES)
-                + " / " + ElectricityDisplay.getDisplayShort(this.getMaxJoules(itemStack), ElectricUnit.JOULES));
+
+        currentTips.add("Energy: " + UnitDisplay.getDisplayShort(this.getEnergy(itemStack), Unit.JOULES) + " / "
+            + UnitDisplay.getDisplayShort(this.getEnergyCapacity(itemStack), Unit.JOULES));
         currentTips.add("Plasma: " + this.getPlasma(itemStack) + " / " + this.getMaxPlasma(itemStack));
-        
+
         if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.keyCode))
         {
             if (this.getCore(itemStack) != null)
@@ -128,31 +128,30 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
             currentTips.add("Hold Sneak for more information");
         }
     }
-    
+
     @Override
     public ItemStack getCore(ItemStack assembledTool)
     {
         int tier = assembledTool.getItemDamage() / 1000;
-        return new ItemStack(SimpleTools.corePlasma, 1, tier);
+        return new ItemStack(SimpleToolsItems.corePlasma, 1, tier);
     }
-    
+
     @Override
     public ItemStack getStorage(ItemStack assembledTool)
     {
         ItemStack battery = null;
         try
         {
-            NBTTagCompound batt = assembledTool.getTagCompound().getCompoundTag("SimpleTools")
-                    .getCompoundTag("battery");
+            NBTTagCompound batt = assembledTool.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
             battery = ItemStack.loadItemStackFromNBT(batt);
-            ((IItemElectric) battery.getItem()).setJoules(this.getJoules(assembledTool), battery);
+            ((IEnergyItem) battery.getItem()).setEnergy(battery, this.getEnergy(assembledTool));
         }
         catch (Throwable e)
         {
         }
         return battery;
     }
-    
+
     @Override
     public ItemStack getAttachment(ItemStack assembledTool)
     {
@@ -164,8 +163,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
             if (!assembledTool.getEnchantmentTagList().equals(null))
             {
                 attachment.setTagCompound(new NBTTagCompound());
-                attachment.getTagCompound().setTag(assembledTool.getEnchantmentTagList().getName(),
-                        assembledTool.getEnchantmentTagList());
+                attachment.getTagCompound().setTag(assembledTool.getEnchantmentTagList().getName(), assembledTool.getEnchantmentTagList());
             }
         }
         catch (Throwable e)
@@ -173,149 +171,119 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
         }
         return attachment;
     }
-    
+
     @Override
     public boolean canDoWork(ItemStack assembledTool)
     {
-        return this.getJoules(assembledTool) >= JOULES_PER_USE && this.getPlasma(assembledTool) >= PLASMA_PER_USE;
+        return this.getEnergy(assembledTool) >= JOULES_PER_USE && this.getPlasma(assembledTool) >= PLASMA_PER_USE;
     }
-    
+
     @Override
-    public boolean canBreakBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLiving entity)
+    public boolean canBreakBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLivingBase entity)
     {
-        return false;
+        Block block = Block.blocksList[blockID];
+
+        int pick = MinecraftForge.getBlockHarvestLevel(block, metadata, "pickaxe");
+        int axe = MinecraftForge.getBlockHarvestLevel(block, metadata, "axe");
+        int shovel = MinecraftForge.getBlockHarvestLevel(block, metadata, "shovel");
+        int all = Math.max(pick, Math.max(axe, shovel));
+
+        int tool = ((IAttachment) this.getAttachment(assembledTool).getItem()).getAttachmentTier(this.getAttachment(assembledTool));
+
+        return tool >= all;
     }
-    
+
     @Override
-    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata,
-            EntityLiving entity)
+    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLivingBase entity)
     {
-        return false;
+        return this.canBreakBlock(assembledTool, world, blockID, metadata, entity);
     }
-    
+
     @Override
-    public String getStoredForDisplay(ItemStack assembledTool)
+    public float[] getAdditionalDisplayData(ItemStack assembledTool)
     {
-        String toReturn = "";
-        
-        String currEnergy = ElectricityDisplay.getDisplayShort(this.getJoules(assembledTool),
-                ElectricityDisplay.ElectricUnit.JOULES);
-        String maxEnergy = ElectricityDisplay.getDisplayShort(this.getMaxJoules(assembledTool),
-                ElectricityDisplay.ElectricUnit.JOULES);
-        String currPlasma = this.getPlasma(assembledTool) + "";
-        String maxPlasma = this.getMaxPlasma(assembledTool) + "";
-        
-        if (this.getJoules(assembledTool) != Double.POSITIVE_INFINITY)
-        {
-            toReturn += currEnergy + " of " + maxEnergy + "  /  ";
-        }
-        else
-        {
-            toReturn += "Infinite  /  ";
-        }
-        
-        if (this.getPlasma(assembledTool) != Integer.MAX_VALUE)
-        {
-            toReturn += currPlasma + " of " + maxPlasma;
-        }
-        else
-        {
-            toReturn += "Infinite";
-        }
-        
+        float[] toReturn = new float[2];
+
+        float currEnergy = this.getEnergy(assembledTool);
+        float maxEnergy = this.getEnergyCapacity(assembledTool);
+        float currPlasma = this.getPlasma(assembledTool);
+        float maxPlasma = this.getMaxPlasma(assembledTool);
+
+        toReturn[0] = (float) (currEnergy / maxEnergy);
+        toReturn[1] = currPlasma / maxPlasma;
+
         return toReturn;
     }
-    
+
     @Override
-    public double getJoules(ItemStack itemStack)
+    public long getEnergy(ItemStack itemStack)
     {
         try
         {
-            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getDouble("electricity");
+            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getLong("electricity");
         }
         catch (Exception e)
         {
-            return 0D;
+            return 0L;
         }
     }
-    
+
     @Override
-    public void setJoules(double joules, ItemStack itemStack)
+    public void setEnergy(ItemStack itemStack, long energy)
     {
-        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setDouble("electricity", joules);
+        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setLong("electricity", energy);
     }
-    
+
     @Override
-    public double getMaxJoules(ItemStack itemStack)
+    public long getEnergyCapacity(ItemStack itemStack)
     {
         try
         {
-            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getDouble("maxEnergy");
+            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getLong("maxEnergy");
         }
         catch (Exception e)
         {
-            return 0D;
+            return 0L;
         }
     }
-    
+
     @Override
-    public double getVoltage(ItemStack itemStack)
+    public long getVoltage(ItemStack itemStack)
     {
         try
         {
             NBTTagCompound info = itemStack.stackTagCompound.getCompoundTag("SimpleTools").getCompoundTag("battery");
             ItemStack batteryStack = ItemStack.loadItemStackFromNBT(info);
-            return ((IItemElectric) batteryStack.getItem()).getVoltage(batteryStack);
+            return ((IVoltageItem) batteryStack.getItem()).getVoltage(batteryStack);
         }
         catch (Exception e)
         {
-            return 35D;
+            return 35L;
         }
     }
-    
+
     @Override
-    public ElectricityPack onReceive(ElectricityPack electricityPack, ItemStack itemStack)
+    public long recharge(ItemStack itemStack, long energy, boolean doRecharge)
     {
         try
         {
-            double rejectedElectricity = Math.max(
-                    this.getJoules(itemStack) + electricityPack.getWatts() - this.getMaxJoules(itemStack), 0);
-            double joulesToStore = electricityPack.getWatts() - rejectedElectricity;
-            this.setJoules(this.getJoules(itemStack) + joulesToStore, itemStack);
-            return ElectricityPack.getFromWatts(joulesToStore, this.getVoltage(itemStack));
+            long rejectedElectricity = Math.max(this.getEnergy(itemStack) + energy - this.getEnergyCapacity(itemStack), 0);
+            long energyToStore = energy - rejectedElectricity;
+            this.setEnergy(itemStack, this.getEnergy(itemStack) + energyToStore);
+            return energyToStore;
         }
         catch (Exception e)
         {
-            return electricityPack;
+            return energy;
         }
     }
-    
+
     @Override
-    public ElectricityPack onProvide(ElectricityPack electricityPack, ItemStack itemStack)
+    public long discharge(ItemStack itemStack, long energy, boolean doDischarge)
     {
-        return new ElectricityPack(0, 0);
+        return 0L;
     }
-    
-    @Override
-    public ElectricityPack getReceiveRequest(ItemStack itemStack)
-    {
-        try
-        {
-            return ElectricityPack.getFromWatts(this.getMaxJoules(itemStack) - this.getJoules(itemStack),
-                    this.getVoltage(itemStack));
-        }
-        catch (Exception e)
-        {
-            return new ElectricityPack(0, 0);
-        }
-    }
-    
-    @Override
-    public ElectricityPack getProvideRequest(ItemStack itemStack)
-    {
-        return new ElectricityPack(0, 0);
-    }
-    
+
     @Override
     public int getPlasma(ItemStack assembledTool)
     {
@@ -328,7 +296,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
             return 0;
         }
     }
-    
+
     @Override
     public int getMaxPlasma(ItemStack assembledTool)
     {
@@ -341,7 +309,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
             return 0;
         }
     }
-    
+
     @Override
     public void setPlasma(ItemStack stack, int i)
     {
@@ -351,27 +319,27 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
         }
         catch (Exception e)
         {
-            
+
         }
     }
-    
+
     public boolean onItemUse(ItemStack i)
     {
         if (this.canDoWork(i))
         {
-            this.setJoules(this.getJoules(i) - JOULES_PER_USE, i);
+            this.setEnergy(i, this.getEnergy(i) - JOULES_PER_USE);
             return true;
         }
         return false;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public boolean requiresMultipleRenderPasses()
     {
         return true;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public Icon getIcon(ItemStack stack, int pass)
@@ -401,9 +369,9 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
         }
         return null;
     }
-    
+
     @Override
-    public boolean itemInteractionForEntity(ItemStack itemstack, EntityLiving entity)
+    public boolean itemInteractionForEntity(ItemStack itemstack, EntityPlayer player, EntityLivingBase entity)
     {
         IAttachment attach = (IAttachment) this.getAttachment(itemstack).getItem();
         if (attach.canRightClick(this.getAttachment(itemstack), entity, null) && this.canDoWork(itemstack))
@@ -413,7 +381,7 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
         }
         return false;
     }
-    
+
     @Override
     public boolean addPlasma(ItemStack stack, int i)
     {
@@ -425,24 +393,107 @@ public class ItemAssembledToolPlasma extends Item implements IItemElectric, IAss
         else
             return false;
     }
-    
+
     @Override
-    public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int side,
-            float hitX, float HitY, float hitZ)
+    public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float HitY, float hitZ)
     {
         IAttachment attach = (IAttachment) this.getAttachment(itemStack).getItem();
-        boolean canUse = attach.canRightClick(this.getAttachment(itemStack), new Object[] { world, x, y, z, side, hitX,
-                HitY, hitZ }, player)
-                && this.canDoWork(itemStack);
-        
+        boolean canUse = attach.canRightClick(this.getAttachment(itemStack), new Object[] { world, x, y, z, side, hitX, HitY, hitZ }, player) && this.canDoWork(itemStack);
+
         if (canUse && this.canDoWork(itemStack))
         {
-            byte plasma = attach.onRightClick(this.getAttachment(itemStack), new Object[] { world, x, y, z, side, hitX,
-                    HitY, hitZ }, player);
-            this.setJoules(this.getJoules(itemStack) - JOULES_PER_USE, itemStack);
+            byte plasma = attach.onRightClick(this.getAttachment(itemStack), new Object[] { world, x, y, z, side, hitX, HitY, hitZ }, player);
+            this.setEnergy(itemStack, this.getEnergy(itemStack) - JOULES_PER_USE);
             this.setPlasma(itemStack, this.getPlasma(itemStack) + plasma);
         }
         return canUse;
     }
-    
+
+    @Override
+    public float getStrVsBlock(ItemStack assembledTool, Block block, int meta)
+    {
+        int pick = MinecraftForge.getBlockHarvestLevel(block, meta, "pickaxe");
+        int axe = MinecraftForge.getBlockHarvestLevel(block, meta, "axe");
+        int shovel = MinecraftForge.getBlockHarvestLevel(block, meta, "shovel");
+        int all = Math.max(pick, Math.max(axe, shovel));
+
+        int tool = ((IAttachment) this.getAttachment(assembledTool).getItem()).getAttachmentTier(this.getAttachment(assembledTool));
+
+        return tool >= all ? ((IAttachment) this.getAttachment(assembledTool).getItem()).getHarvestSpeed(this.getAttachment(assembledTool)) : 1.0f;
+    }
+
+    @Override
+    public boolean onBlockDestroyed(ItemStack par1ItemStack, World par2World, int id, int x, int y, int z, EntityLivingBase par7EntityLiving)
+    {
+        Block block = Block.blocksList[id];
+        int metadata = par2World.getBlockMetadata(x, y, z);
+        double blockHardness = block.getBlockHardness(par2World, x, y, z);
+        if (((IAttachment) this.getAttachment(par1ItemStack).getItem()).getToolType(this.getAttachment(par1ItemStack)).equals("shears"))
+        {
+            if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass) || block.equals(Block.deadBush) || block.equals(Block.vine) || block.equals(Block.tripWire)
+                || block instanceof IShearable)
+                return true;
+        }
+        if (blockHardness != 0D && this.canBreakBlock(par1ItemStack, par2World, id, metadata, par7EntityLiving)
+            && !block.canHarvestBlock((EntityPlayer) par7EntityLiving, par2World.getBlockMetadata(x, y, z)))
+        {
+            if (this.onItemUse(par1ItemStack))
+            {
+                if (this.getEnchantmentLvl(Enchantment.silkTouch, par1ItemStack) > 0)
+                {
+                    this.dropBlockAsItem_do(par2World, x, y, z, new ItemStack(block, 1, par2World.getBlockMetadata(x, y, z)));
+                }
+                else
+                {
+                    int fortune = this.getEnchantmentLvl(Enchantment.fortune, par1ItemStack);
+                    block.dropBlockAsItem(par2World, x, y, z, par2World.getBlockMetadata(x, y, z), fortune);
+                }
+                return true;
+            }
+            else
+                return false;
+        }
+        else if (blockHardness != 0D && this.canBreakBlock(par1ItemStack, par2World, id, metadata, par7EntityLiving))
+        {
+            if (this.onItemUse(par1ItemStack))
+            {
+                if (block.blockMaterial.isToolNotRequired())
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public int getEnchantmentLvl(Enchantment enchant, ItemStack assembledTool)
+    {
+        int level = -1;
+        if (assembledTool.getEnchantmentTagList() != null)
+        {
+            for (int i = 0; i < assembledTool.getEnchantmentTagList().tagCount(); i++)
+            {
+                if (assembledTool.getEnchantmentTagList().tagAt(i) instanceof NBTTagCompound)
+                {
+                    if (((NBTTagCompound) assembledTool.getEnchantmentTagList().tagAt(i)).getShort("id") == enchant.effectId)
+                    {
+                        level = ((NBTTagCompound) assembledTool.getEnchantmentTagList().tagAt(i)).getShort("lvl");
+                    }
+                }
+            }
+        }
+        return level;
+    }
+
+    protected void dropBlockAsItem_do(World par1World, int par2, int par3, int par4, ItemStack par5ItemStack)
+    {
+        if (!par1World.isRemote && par1World.getGameRules().getGameRuleBooleanValue("doTileDrops"))
+        {
+            float var6 = 0.7F;
+            double var7 = par1World.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
+            double var9 = par1World.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
+            double var11 = par1World.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
+            EntityItem var13 = new EntityItem(par1World, par2 + var7, par3 + var9, par4 + var11, par5ItemStack);
+            var13.delayBeforeCanPickup = 10;
+            par1World.spawnEntityInWorld(var13);
+        }
+    }
 }

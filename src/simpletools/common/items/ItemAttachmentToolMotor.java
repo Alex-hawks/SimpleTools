@@ -16,8 +16,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.IShearable;
+import simpletools.api.IAttachment;
 import simpletools.common.SimpleTools;
-import simpletools.common.interfaces.IAttachment;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 
 import com.google.common.collect.BiMap;
@@ -113,7 +113,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
     }
     
     @Override
-    public double getHarvestSpeed(ItemStack i)
+    public float getHarvestSpeed(ItemStack i)
     {
         switch (this.getAttachmentTier(i))
         {
@@ -164,7 +164,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void updateIcons(IconRegister iconRegister)
+    public void registerIcons(IconRegister iconRegister)
     {
         ItemStack itemStack;
         for (int i = 0; i < 4; i++)
@@ -172,8 +172,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
             for (int k = 0; k < 5; k++)
             {
                 itemStack = new ItemStack(this.itemID, 1, i * 10 + k);
-                this.icons[i * 10 + k] = iconRegister.registerIcon(this.getUnlocalizedName(itemStack).replace("item.",
-                        SimpleTools.TEXTURE_NAME_PREFIX));
+                this.icons[i * 10 + k] = iconRegister.registerIcon(this.getUnlocalizedName(itemStack).replace("item.", SimpleTools.DOMAIN));
             }
         }
     }
@@ -196,11 +195,9 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
             if (entity instanceof IShearable)
             {
                 IShearable interactTarget = (IShearable) entity;
-                if (interactTarget.isShearable(i, entity.worldObj, (int) entity.posX, (int) entity.posY,
-                        (int) entity.posZ))
+                if (interactTarget.isShearable(i, entity.worldObj, (int) entity.posX, (int) entity.posY, (int) entity.posZ))
                 {
-                    ArrayList<ItemStack> drops = interactTarget.onSheared(i, entity.worldObj, (int) entity.posX,
-                            (int) entity.posY, (int) entity.posZ,
+                    ArrayList<ItemStack> drops = interactTarget.onSheared(i, entity.worldObj, (int) entity.posX, (int) entity.posY, (int) entity.posZ,
                             EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, i));
                     
                     Random rand = new Random();

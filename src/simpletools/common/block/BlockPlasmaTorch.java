@@ -58,6 +58,6 @@ public class BlockPlasmaTorch extends Block
     @Override
     public void registerIcons(IconRegister i)
     {
-        this.blockIcon = i.registerIcon(this.getUnlocalizedName().replaceAll("tile.", SimpleTools.TEXTURE_NAME_PREFIX));
+        this.blockIcon = i.registerIcon(this.getUnlocalizedName().replaceAll("tile.", SimpleTools.DOMAIN));
     }
 }

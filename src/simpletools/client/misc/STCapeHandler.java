@@ -5,10 +5,14 @@ import java.util.EnumSet;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
+import simpletools.common.SimpleTools;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -20,42 +24,26 @@ public class STCapeHandler implements ITickHandler
      * Don't add to this, use {@link STCapeHandler#registerUEDeveloper}
      */
     private static List<String> ueDevelopers = new ArrayList<String>();
-    
+
     /**
      * Don't add to this, use {@link STCapeHandler#registerUEAssistant}
      */
     private static List<String> ueAssistants = new ArrayList<String>();
-    
+
     public static final STCapeHandler INSTANCE = new STCapeHandler();
-    private static final String developerCloakURL = "https://raw.github.com/Alex-hawks/SimpleTools/master/misc/UE-Dev-Cape.png";
-    private static final String assistantCloakURL = "https://raw.github.com/Alex-hawks/SimpleTools/master/misc/UE-Assistant-Cape.png";
-    
+
+    private static final ResourceLocation developerCloak = new ResourceLocation(SimpleTools.PREFIX, SimpleTools.CLOAK_PATH + "Dev-Cape.png");
+    private static final ResourceLocation assistantCloak = new ResourceLocation(SimpleTools.PREFIX, SimpleTools.CLOAK_PATH + "Assistant-Cape.png");
+
     private STCapeHandler()
     {
         // Major Coders
         this.registerUEDeveloper("Alex_hawks"); // Alex_hawks
-        this.registerUEDeveloper("Mattredsox"); // Mattredsox
         this.registerUEDeveloper("calclavia"); // Calclavia
-        this.registerUEDeveloper("briman0094"); // Briman
         this.registerUEDeveloper("TrainerGuy22"); // TheMike
-        this.registerUEDeveloper("liquidyyy64"); // LiQuiD
         this.registerUEDeveloper("Darkguardsman"); // Darkguardsman
-        this.registerUEDeveloper("aidancbrady"); // aidancbrady
-        this.registerUEDeveloper("micdoodle8"); // micdoodle
-        
-        // Major Texture Artists
-        this.registerUEDeveloper("Tifflor"); // Comply
-        
-        // Donators
-        this.registerUEAssistant("Crimsus"); // Donated $500.00 to UE. I wanted
-                                             // to give him the developer
-                                             // cape...
-        
-        // Assistants
-        // this.registerUEAssistant("b1gb0ss"); // A friend that split up the
-        // Simple Tools and EE textures
     }
-    
+
     @Override
     public void tickStart(EnumSet<TickType> type, Object... tickData)
     {
@@ -63,50 +51,49 @@ public class STCapeHandler implements ITickHandler
         {
             @SuppressWarnings("unchecked")
             List<EntityPlayer> players = mc.theWorld.playerEntities;
-            
+
             // the loops that goes through each player
-            for (EntityPlayer player : players)
+            for (EntityPlayer ePlayer : players)
             {
-                String oldCloak = player.cloakUrl;
-                
-                if (player.cloakUrl.startsWith("http://skins.minecraft.net/MinecraftCloaks/"))
+                if (ePlayer instanceof AbstractClientPlayer)
                 {
-                    if (ueDevelopers.contains(StringUtils.stripControlCodes(player.username).toLowerCase()))
+                    AbstractClientPlayer player = (AbstractClientPlayer) ePlayer;
+
+                    //  For if they want to keep their custom cape. It will only replace their cape, if it is their own
+                    if (AbstractClientPlayer.getCapeUrl(player.username).startsWith("http://skins.minecraft.net/MinecraftCloaks/" + player.username))
                     {
-                        player.cloakUrl = developerCloakURL;
-                    }
-                    else if (ueAssistants.contains(StringUtils.stripControlCodes(player.username).toLowerCase()))
-                    {
-                        player.cloakUrl = assistantCloakURL;
-                    }
-                    
-                    if (!oldCloak.equals(player.cloakUrl))
-                    {
-                        mc.renderEngine.obtainImageData(player.cloakUrl, new SimpleToolsCloakDownload());
+                        if (ueDevelopers.contains(StringUtils.stripControlCodes(player.username).toLowerCase()))
+                        {
+                            ReflectionHelper.setPrivateValue(AbstractClientPlayer.class, player, developerCloak, "locationCape", "field_" + "110313_e");
+                        }
+                        else if (ueAssistants.contains(StringUtils.stripControlCodes(player.username).toLowerCase()))
+                        {
+                            ReflectionHelper.setPrivateValue(AbstractClientPlayer.class, player, assistantCloak, "locationCape", "field_" + "110313_e");
+                        }
                     }
                 }
             }
         }
     }
-    
+
     @Override
     public void tickEnd(EnumSet<TickType> type, Object... tickData)
     {
-        
+
     }
-    
+
     @Override
     public EnumSet<TickType> ticks()
     {
         return EnumSet.of(TickType.CLIENT);
     }
-    
+
     @Override
     public String getLabel()
     {
         return "SimpleToolsClientTickHandler";
     }
-    
+
     /**
      * All Coders are developers, but not all developers are coders... </br>
      * This cape goes to anyone who has had a significant positive impact on the
@@ -122,7 +109,7 @@ public class STCapeHandler implements ITickHandler
             ueDevelopers.add(userName.toLowerCase());
         }
     }
-    
+
     /**
      * This cape goes to anyone who has had a small positive impact, and no
      * negative impacts, on the UE Mod Collection. This includes most donators.

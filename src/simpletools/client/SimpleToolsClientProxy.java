@@ -9,7 +9,6 @@ import simpletools.client.misc.STRenderTickHandler;
 import simpletools.client.render.RenderHandler;
 import simpletools.common.SimpleToolsCommonProxy;
 import simpletools.common.tileentities.TileEntityTableAssembly;
-import universalelectricity.components.common.BasicComponents;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.network.IGuiHandler;
@@ -27,7 +26,6 @@ public class SimpleToolsClientProxy extends SimpleToolsCommonProxy implements IG
     public void init()
     {
         GameRegistry.registerTileEntity(TileEntityTableAssembly.class, "TileEntityTableAssembly");
-        BasicComponents.registerTileEntityRenderers();
         
         RenderingRegistry.registerBlockHandler(plasmaTorch);
         

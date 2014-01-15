@@ -2,7 +2,7 @@ package simpletools.common.block;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -13,8 +13,8 @@ import net.minecraftforge.common.ForgeDirection;
 import simpletools.common.SimpleTools;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 import simpletools.common.tileentities.TileEntityTablePlasma;
-import universalelectricity.prefab.block.BlockAdvanced;
-import universalelectricity.prefab.tile.TileEntityAdvanced;
+import calclavia.lib.prefab.block.BlockAdvanced;
+import calclavia.lib.prefab.tile.TileAdvanced;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -35,7 +35,7 @@ public class BlockTablePlasma extends BlockAdvanced
     
     @Override
     @SideOnly(Side.CLIENT)
-    public Icon getBlockTextureFromSideAndMetadata(int side, int meta)
+    public Icon getIcon(int side, int meta)
     {
         switch (side)
         {
@@ -59,35 +59,33 @@ public class BlockTablePlasma extends BlockAdvanced
     public void registerIcons(IconRegister par1IconRegister)
     {
         
-        this.top = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaTop");
-        this.bottom = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaBottom");
-        this.side1 = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaSide1");
-        this.side2 = par1IconRegister.registerIcon(SimpleTools.TEXTURE_NAME_PREFIX + "tablePlasmaSide2");
+        this.top = par1IconRegister.registerIcon(SimpleTools.DOMAIN + "tablePlasmaTop");
+        this.bottom = par1IconRegister.registerIcon(SimpleTools.DOMAIN + "tablePlasmaBottom");
+        this.side1 = par1IconRegister.registerIcon(SimpleTools.DOMAIN + "tablePlasmaSide1");
+        this.side2 = par1IconRegister.registerIcon(SimpleTools.DOMAIN + "tablePlasmaSide2");
     }
     
     @Override
-    public void onBlockPlacedBy(World par1World, int x, int y, int z, EntityLiving par5EntityLiving,
-            ItemStack par6ItemStack)
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLiving, ItemStack itemStack)
     {
-        int angle = MathHelper.floor_double(par5EntityLiving.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
+        int angle = MathHelper.floor_double(entityLiving.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
         switch (angle)
         {
             case 0:
-                par1World.setBlock(x, y, z, this.blockID, 1, 0x04);
+                world.setBlock(x, y, z, this.blockID, 1, 0x04);
                 break;
             case 1:
-                par1World.setBlock(x, y, z, this.blockID, 2, 0x04);
+                world.setBlock(x, y, z, this.blockID, 2, 0x04);
                 break;
             case 2:
-                par1World.setBlock(x, y, z, this.blockID, 0, 0x04);
+                world.setBlock(x, y, z, this.blockID, 0, 0x04);
                 break;
             case 3:
-                par1World.setBlock(x, y, z, this.blockID, 3, 0x04);
+                world.setBlock(x, y, z, this.blockID, 3, 0x04);
                 break;
         }
         
-        ((TileEntityAdvanced) par1World.getBlockTileEntity(x, y, z)).initiate();
-        par1World.notifyBlocksOfNeighborChange(x, y, z, this.blockID);
+        world.notifyBlocksOfNeighborChange(x, y, z, this.blockID);
     }
     
     @Override
@@ -118,8 +116,6 @@ public class BlockTablePlasma extends BlockAdvanced
         par1World.setBlock(x, y, z, this.blockID, change, 0x04);
         par1World.markBlockForRenderUpdate(x, y, z);
         
-        ((TileEntityAdvanced) par1World.getBlockTileEntity(x, y, z)).initiate();
-        
         return true;
     }
     
@@ -127,12 +123,12 @@ public class BlockTablePlasma extends BlockAdvanced
     public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
             float hitX, float hitY, float hitZ)
     {
-        if (!par1World.isRemote)
-        {
+        //if (!par1World.isRemote)
+        //{
             par5EntityPlayer.openGui(SimpleTools.INSTANCE, 1, par1World, x, y, z);
             return true;
-        }
-        return true;
+        //}
+        //return true;
     }
     
     @Override
@@ -148,7 +144,7 @@ public class BlockTablePlasma extends BlockAdvanced
     }
     
     @Override
-    public TileEntity createNewTileEntity(World var1)
+    public TileEntity createTileEntity(World world, int metadata)
     {
         return new TileEntityTablePlasma();
     }

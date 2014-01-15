@@ -3,10 +3,12 @@ package simpletools.client.render;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 
 import org.lwjgl.opengl.GL11;
 
+import simpletools.api.SimpleToolsItems;
 import simpletools.client.model.ModelPlasmaTorch;
 import simpletools.common.SimpleTools;
 import cpw.mods.fml.client.FMLClientHandler;
@@ -21,6 +23,8 @@ public class RenderHandler implements ISimpleBlockRenderingHandler
     public ModelPlasmaTorch plasmaTorch = new ModelPlasmaTorch();
     public final int RENDER_ID;
     
+    private static final ResourceLocation textureLocation = new ResourceLocation(SimpleTools.DOMAIN, "/blocks/plasmaTorch.png");
+    
     public RenderHandler()
     {
         SimpleTools.STLogger.warning("Registered Render Handler");
@@ -30,13 +34,10 @@ public class RenderHandler implements ISimpleBlockRenderingHandler
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer)
     {
-        if (block.blockID == SimpleTools.plasmaTorch.blockID)
+        if (block.blockID == SimpleToolsItems.plasmaTorch.blockID)
         {
             GL11.glPushMatrix();
-            GL11.glBindTexture(
-                    3553,
-                    FMLClientHandler.instance().getClient().renderEngine.getTexture(SimpleTools.BLOCK_TEXTURES
-                            + "plasmaTorch.png"));
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, FMLClientHandler.instance().getClient().renderEngine.getTexture(textureLocation).getGlTextureId());
             GL11.glTranslatef(0.5F, 2.5F, 0.5F);
             GL11.glScalef(2F, -2F, -2F);
             this.plasmaTorch.render(null, 0, 0, 0, 0, 0, 0.0625F);

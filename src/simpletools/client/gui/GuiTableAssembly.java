@@ -6,7 +6,7 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
-import simpletools.common.SimpleTools;
+import simpletools.client.TextureLocations;
 import simpletools.common.containers.ContainerTableAssembly;
 import simpletools.common.tileentities.TileEntityTableAssembly;
 import cpw.mods.fml.relauncher.Side;
@@ -37,7 +37,7 @@ public class GuiTableAssembly extends GuiContainer
     protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3)
     {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.renderEngine.bindTexture(SimpleTools.TEXTURE_PATH + "TableAssembly.png");
+        this.mc.renderEngine.bindTexture(TextureLocations.GUI_TABLE_ASSEMBLY);
         
         this.containerWidth = (this.width - this.xSize) / 2;
         this.containerHeight = (this.height - this.ySize) / 2;

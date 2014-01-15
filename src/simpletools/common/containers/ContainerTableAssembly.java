@@ -5,13 +5,13 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import simpletools.common.interfaces.IAssembledTool;
-import simpletools.common.interfaces.IAttachment;
-import simpletools.common.interfaces.ICore;
+import simpletools.api.IAssembledTool;
+import simpletools.api.IAttachment;
+import simpletools.api.ICore;
 import simpletools.common.misc.SlotOutput;
 import simpletools.common.misc.SlotSTStorage;
 import simpletools.common.tileentities.TileEntityTableAssembly;
-import universalelectricity.prefab.SlotSpecific;
+import calclavia.lib.prefab.slot.SlotSpecific;
 
 public class ContainerTableAssembly extends Container
 {
@@ -59,9 +59,9 @@ public class ContainerTableAssembly extends Container
     }
     
     @Override
-    public void onCraftGuiClosed(EntityPlayer entityplayer)
+    public void onContainerClosed(EntityPlayer entityplayer)
     {
-        super.onCraftGuiClosed(entityplayer);
+        super.onContainerClosed(entityplayer);
         this.tileEntity.closeChest();
     }
     

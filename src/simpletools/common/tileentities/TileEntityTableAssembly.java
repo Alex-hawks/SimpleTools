@@ -1,26 +1,24 @@
 package simpletools.common.tileentities;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.common.ISidedInventory;
-import simpletools.common.interfaces.IAssembledTool;
-import simpletools.common.interfaces.IAttachment;
-import simpletools.common.interfaces.ICore;
-import universalelectricity.core.item.IItemElectric;
-import universalelectricity.prefab.implement.IRedstoneProvider;
-import universalelectricity.prefab.network.IPacketReceiver;
-import universalelectricity.prefab.tile.TileEntityAdvanced;
+import simpletools.api.IAssembledTool;
+import simpletools.api.IAttachment;
+import simpletools.api.ICore;
+import simpletools.api.SimpleToolsItems;
+import universalelectricity.api.item.IEnergyItem;
+import calclavia.lib.network.IPacketReceiver;
+import calclavia.lib.prefab.tile.IRedstoneProvider;
+import calclavia.lib.prefab.tile.TileAdvanced;
 
 import com.google.common.io.ByteArrayDataInput;
 
-public class TileEntityTableAssembly extends TileEntityAdvanced implements IRedstoneProvider, IPacketReceiver,
-        ISidedInventory
+public class TileEntityTableAssembly extends TileAdvanced implements IRedstoneProvider, IPacketReceiver, ISidedInventory
 {
     private ItemStack[] inventory = new ItemStack[5];
     @SuppressWarnings("unused")
@@ -91,7 +89,7 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
     @Override
     public String getInvName()
     {
-        return StatCollector.translateToLocal("container.tableAssembly");
+        return StatCollector.translateToLocal(SimpleToolsItems.tableAssembly.getUnlocalizedName() + ".name");
     }
     
     @Override
@@ -116,31 +114,6 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
     public void closeChest()
     {
         this.playersUsing--;
-    }
-    
-    @Override
-    public int getStartInventorySide(ForgeDirection side)
-    {
-        switch (side.ordinal())
-        {
-            case 0:
-                return 0;
-            case 1:
-                return 2;
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                return 1;
-            default:
-                return 4;
-        }
-    }
-    
-    @Override
-    public int getSizeInventorySide(ForgeDirection side)
-    {
-        return 1;
     }
     
     @Override
@@ -199,13 +172,6 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
     }
     
     @Override
-    public void handlePacketData(INetworkManager network, int packetType, Packet250CustomPayload packet,
-            EntityPlayer player, ByteArrayDataInput dataStream)
-    {
-        
-    }
-    
-    @Override
     public boolean isPoweringTo(ForgeDirection side)
     {
         return this.canAssemble();
@@ -233,12 +199,12 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
                 if (attachTemp.getToolAttachmentType(slot0) == coreTemp.getCoreType(slot1)
                         && attachTemp.getMinimumTier(slot0) <= coreTemp.getCoreTier(slot1))
                 {
-                    if (coreTemp.getCoreFinerType(slot1).equals("electric") && slot2.getItem() instanceof IItemElectric
-                            && ((IItemElectric) slot2.getItem()).getProvideRequest(slot2).getWatts() > 0)
+                    if (coreTemp.getCoreFinerType(slot1).equals("electric") && slot2.getItem() instanceof IEnergyItem
+                            && ((IEnergyItem) slot2.getItem()).discharge(slot2, 1, false) > 0)
                         return true;
                     else if (coreTemp.getCoreFinerType(slot1).equals("plasma")
-                            && slot2.getItem() instanceof IItemElectric
-                            && ((IItemElectric) slot2.getItem()).getProvideRequest(slot2).getWatts() > 0)
+                            && slot2.getItem() instanceof IEnergyItem
+                            && ((IEnergyItem) slot2.getItem()).discharge(slot2, 1, false) > 0)
                         return true;
                     
                 }
@@ -350,7 +316,7 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
     }
     
     @Override
-    public boolean isStackValidForSlot(int i, ItemStack itemstack)
+    public boolean isItemValidForSlot(int i, ItemStack itemstack)
     {
         if (i < this.inventory.length && itemstack != null)
         {
@@ -361,11 +327,7 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
                 case 1:
                     return itemstack.getItem() instanceof ICore;
                 case 2:
-                    return itemstack.getItem() instanceof IItemElectric; // TODO
-                                                                         // add
-                                                                         // support
-                                                                         // for
-                                                                         // fuel
+                    return itemstack.getItem() instanceof IEnergyItem; // TODO add support for fuel
                 case 3:
                     return false;
                 case 4:
@@ -373,5 +335,49 @@ public class TileEntityTableAssembly extends TileEntityAdvanced implements IReds
             }
         }
         return false;
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(int var1)
+    {
+        switch (var1)
+        {
+            case 0:
+                return new int[] {0, 4};
+            case 1:
+                return new int[] {2, 4};
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                return new int[] {1, 4};
+            default:
+                return new int[] {4};
+        }
+    }
+
+    @Override
+    public boolean canInsertItem(int i, ItemStack itemstack, int j)
+    {
+        if (j == 3)
+            return false;
+        for (int k : getAccessibleSlotsFromSide(i))
+        {
+            if (k == j && isItemValidForSlot(j, itemstack))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canExtractItem(int i, ItemStack itemstack, int j)
+    {
+        return j == 3;
+    }
+
+    @Override
+    public void onReceivePacket(ByteArrayDataInput data, EntityPlayer player, Object... extra)
+    {
+        
     }
 }

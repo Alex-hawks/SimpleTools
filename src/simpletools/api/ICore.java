@@ -1,4 +1,4 @@
-package simpletools.common.interfaces;
+package simpletools.api;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

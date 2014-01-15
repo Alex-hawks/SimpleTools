@@ -7,8 +7,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
+import simpletools.api.ICore;
+import simpletools.api.SimpleToolsItems;
 import simpletools.common.SimpleTools;
-import simpletools.common.interfaces.ICore;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -52,7 +53,7 @@ public class ItemCorePlasma extends Item implements ICore
     @Override
     public Item getAssmebledToolItem(ItemStack i)
     {
-        return SimpleTools.assembledToolPlasma;
+        return SimpleToolsItems.assembledToolPlasma;
     }
     
     @Override
@@ -79,12 +80,12 @@ public class ItemCorePlasma extends Item implements ICore
     
     @Override
     @SideOnly(Side.CLIENT)
-    public void updateIcons(IconRegister iconRegister)
+    public void registerIcons(IconRegister iconRegister)
     {
         for (int i = 0; i < this.icons.length; i++)
         {
             this.icons[i] = iconRegister.registerIcon((this.getUnlocalizedName() + "." + i).replace("item.",
-                    SimpleTools.TEXTURE_NAME_PREFIX));
+                    SimpleTools.DOMAIN));
         }
     }
     

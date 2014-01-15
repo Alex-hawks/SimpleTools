@@ -1,6 +1,6 @@
-package simpletools.common.interfaces;
+package simpletools.api;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
@@ -8,7 +8,7 @@ import net.minecraft.world.World;
  * @author Alex_hawks
  * 
  */
-public interface IAssembledTool
+public interface IAssembledTool extends IAdditionalMeterData
 {
     /**
      * @param attachment
@@ -41,7 +41,7 @@ public interface IAssembledTool
     
     /**
      * @param assembledTool
-     *            The assembled tool for which the storage is wanted
+     *            The assembled tool for which the attachment is wanted
      * @return The ItemStack of the attachment on the tool. stackSize of 1, MUST
      *         BE CORRECT TIER AND TYPE! Also, the attachment stores the
      *         enchantments...
@@ -64,7 +64,7 @@ public interface IAssembledTool
      * @return true if the block should yield it's drops, and the tool should be
      *         effective against it
      */
-    public boolean canBreakBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLiving entity);
+    public boolean canBreakBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLivingBase entity);
     
     /**
      * @param assembledTool
@@ -75,14 +75,5 @@ public interface IAssembledTool
      * @return true if the block should yield it's drops, and the tool should be
      *         effective against it
      */
-    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata,
-            EntityLiving entity);
-    
-    /**
-     * @param assembledTool
-     *            the Assembled Tool for which the current storage is wanted
-     * @return the current storage of the max storage, formatted for a short
-     *         display
-     */
-    public String getStoredForDisplay(ItemStack assembledTool);
+    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLivingBase entity);
 }

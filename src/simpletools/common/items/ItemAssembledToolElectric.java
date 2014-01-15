@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumToolMaterial;
@@ -26,15 +26,15 @@ import net.minecraftforge.common.MinecraftForge;
 
 import org.lwjgl.input.Keyboard;
 
-import simpletools.common.SimpleTools;
-import simpletools.common.interfaces.IAssembledElectricTool;
-import simpletools.common.interfaces.IAssembledTool;
-import simpletools.common.interfaces.IAttachment;
-import simpletools.common.interfaces.ICore;
-import universalelectricity.core.electricity.ElectricityDisplay;
-import universalelectricity.core.electricity.ElectricityDisplay.ElectricUnit;
-import universalelectricity.core.electricity.ElectricityPack;
-import universalelectricity.core.item.IItemElectric;
+import simpletools.api.IAssembledElectricTool;
+import simpletools.api.IAssembledTool;
+import simpletools.api.IAttachment;
+import simpletools.api.ICore;
+import simpletools.api.SimpleToolsItems;
+import universalelectricity.api.energy.UnitDisplay;
+import universalelectricity.api.energy.UnitDisplay.Unit;
+import universalelectricity.api.item.IEnergyItem;
+import universalelectricity.api.item.IVoltageItem;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -44,8 +44,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemAssembledToolElectric extends ItemTool implements IAssembledElectricTool
 {
-    private final double joulesPerUse = 2000; // in Joules
-    
+    private final long energyPerUse = 2000; // in Joules
+
     public ItemAssembledToolElectric(int itemID, String name)
     {
         super(itemID, 0, EnumToolMaterial.EMERALD, new Block[0]);
@@ -55,106 +55,85 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         this.setMaxDamage(0);
         this.setCreativeTab(null);
     }
-    
+
     @Override
-    public double getMaxJoules(ItemStack itemStack)
+    public long getEnergyCapacity(ItemStack theItem)
     {
         try
         {
-            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getDouble("maxEnergy");
+            return theItem.stackTagCompound.getCompoundTag("SimpleTools").getLong("maxEnergy");
         }
         catch (Exception e)
         {
-            return 0D;
+            return 0L;
         }
     }
-    
+
     @Override
-    public double getVoltage(ItemStack itemStack)
+    public long getVoltage(ItemStack itemStack)
     {
         try
         {
             NBTTagCompound info = itemStack.stackTagCompound.getCompoundTag("SimpleTools").getCompoundTag("battery");
             ItemStack batteryStack = ItemStack.loadItemStackFromNBT(info);
-            return ((IItemElectric) batteryStack.getItem()).getVoltage(batteryStack);
+            return ((IVoltageItem) batteryStack.getItem()).getVoltage(batteryStack);
         }
         catch (Exception e)
         {
-            return 35D;
+            return 35L;
         }
     }
-    
+
     @Override
-    public double getJoules(ItemStack itemStack)
+    public long getEnergy(ItemStack theItem)
     {
         try
         {
-            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getDouble("electricity");
+            return theItem.stackTagCompound.getCompoundTag("SimpleTools").getLong("electricity");
         }
         catch (Exception e)
         {
-            return 0D;
+            return 0L;
         }
     }
-    
+
     @Override
-    public void setJoules(double joules, ItemStack itemStack)
+    public void setEnergy(ItemStack itemStack, long energy)
     {
-        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setDouble("electricity", joules);
+        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setLong("electricity", energy);
     }
-    
+
     @Override
-    public ElectricityPack onReceive(ElectricityPack electricityPack, ItemStack itemStack)
+    public long recharge(ItemStack itemStack, long energy, boolean doRecharge)
     {
         try
         {
-            double rejectedElectricity = Math.max(
-                    this.getJoules(itemStack) + electricityPack.getWatts() - this.getMaxJoules(itemStack), 0);
-            double joulesToStore = electricityPack.getWatts() - rejectedElectricity;
-            this.setJoules(this.getJoules(itemStack) + joulesToStore, itemStack);
-            return ElectricityPack.getFromWatts(joulesToStore, this.getVoltage(itemStack));
+            long rejectedElectricity = Math.max(this.getEnergy(itemStack) + energy - this.getEnergyCapacity(itemStack), 0);
+            long energyToStore = energy - rejectedElectricity;
+            this.setEnergy(itemStack, this.getEnergy(itemStack) + energyToStore);
+            return energyToStore;
         }
         catch (Exception e)
         {
-            return electricityPack;
+            return energy;
         }
     }
-    
+
     @Override
-    public ElectricityPack onProvide(ElectricityPack electricityPack, ItemStack itemStack)
+    public long discharge(ItemStack itemStack, long energy, boolean doDischarge)
     {
         try
         {
-            double electricityToUse = Math.min(this.getJoules(itemStack), electricityPack.getWatts());
-            this.setJoules(this.getJoules(itemStack) - electricityToUse, itemStack);
-            return ElectricityPack.getFromWatts(electricityToUse, this.getVoltage(itemStack));
+            long electricityToUse = Math.min(this.getEnergy(itemStack), energy);
+            this.setEnergy(itemStack, this.getEnergy(itemStack) - electricityToUse);
+            return electricityToUse;
         }
         catch (Exception e)
         {
-            return new ElectricityPack(0, 0);
+            return 0L;
         }
     }
-    
-    @Override
-    public ElectricityPack getReceiveRequest(ItemStack itemStack)
-    {
-        try
-        {
-            return ElectricityPack.getFromWatts(this.getMaxJoules(itemStack) - this.getJoules(itemStack),
-                    this.getVoltage(itemStack));
-        }
-        catch (Exception e)
-        {
-            return new ElectricityPack(0, 0);
-        }
-    }
-    
-    @Override
-    public ElectricityPack getProvideRequest(ItemStack itemStack)
-    {
-        return new ElectricityPack(0, 0);
-    }
-    
+
     /**
      * @param attachment
      *            The attachment, passed in as an ItemStack
@@ -172,7 +151,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         {
             IAttachment attachmentTemp = (IAttachment) attachment.getItem();
             ICore coreTemp = (ICore) core.getItem();
-            
+
             if (coreTemp.getCoreType(core) == attachmentTemp.getToolAttachmentType(attachment))
             {
                 if (coreTemp.getCoreTier(core) >= attachmentTemp.getMinimumTier(attachment))
@@ -181,31 +160,26 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
                     int attachMeta = attachmentTemp.getAttachmentUID(attachment);
                     int meta = coreMeta + attachMeta;
                     returnStack = new ItemStack(this, 1, meta);
-                    
+
                     NBTTagCompound compound = new NBTTagCompound();
                     compound.setCompoundTag("SimpleTools", new NBTTagCompound());
                     compound.setCompoundTag("damageVsEntity", new NBTTagCompound());
                     compound.setBoolean("useDamageVsEntityTag", true);
-                    
-                    compound.getCompoundTag("SimpleTools").setDouble("electricity",
-                            ((IItemElectric) battery.getItem()).getJoules(battery));
-                    compound.getCompoundTag("SimpleTools").setDouble("maxEnergy",
-                            ((IItemElectric) battery.getItem()).getMaxJoules(battery));
-                    compound.getCompoundTag("SimpleTools").setCompoundTag("attachment",
-                            attachment.writeToNBT(new NBTTagCompound()));
-                    compound.getCompoundTag("SimpleTools").setCompoundTag("battery",
-                            battery.writeToNBT(new NBTTagCompound()));
-                    
-                    compound.getCompoundTag("damageVsEntity").setInteger("",
-                            attachmentTemp.getDamageVsEntities(attachment).get(null));
-                    
+
+                    compound.getCompoundTag("SimpleTools").setDouble("electricity", ((IEnergyItem) battery.getItem()).getEnergy(battery));
+                    compound.getCompoundTag("SimpleTools").setDouble("maxEnergy", ((IEnergyItem) battery.getItem()).getEnergyCapacity(battery));
+                    compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
+                    compound.getCompoundTag("SimpleTools").setCompoundTag("battery", battery.writeToNBT(new NBTTagCompound()));
+
+                    compound.getCompoundTag("damageVsEntity").setInteger("", attachmentTemp.getDamageVsEntities(attachment).get(null));
+
                     returnStack.setTagCompound(compound);
                 }
             }
         }
         return returnStack;
     }
-    
+
     @Override
     public float getStrVsBlock(ItemStack itemStack, Block block, int meta)
     {
@@ -213,14 +187,14 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         String toolClass = ((IAttachment) attachment.getItem()).getToolType(attachment);
         int toolLevel = ((IAttachment) attachment.getItem()).getAttachmentTier(attachment);
         int blockLevel = MinecraftForge.getBlockHarvestLevel(block, meta, toolClass);
-        
+
         if (toolLevel >= blockLevel)
             return (float) ((IAttachment) attachment.getItem()).getHarvestSpeed(attachment);
         else
             return 1f;
-        
+
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -231,17 +205,17 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         {
             NBTTagCompound batt = itemStack.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
             battery = ItemStack.loadItemStackFromNBT(batt);
-            
+
             NBTBase attach = itemStack.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("attachment");
             attachment = ItemStack.loadItemStackFromNBT((NBTTagCompound) attach);
         }
         catch (Exception e)
         {
         }
-        
-        currentTips.add("Energy: " + ElectricityDisplay.getDisplayShort(this.getJoules(itemStack), ElectricUnit.JOULES)
-                + " / " + ElectricityDisplay.getDisplayShort(this.getMaxJoules(itemStack), ElectricUnit.JOULES));
-        
+
+        currentTips.add("Energy: " + UnitDisplay.getDisplayShort(this.getEnergy(itemStack), Unit.JOULES) + " / "
+            + UnitDisplay.getDisplayShort(this.getEnergyCapacity(itemStack), Unit.JOULES));
+
         if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.keyCode))
         {
             if (this.getCore(itemStack) != null)
@@ -262,59 +236,55 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
             currentTips.add("Hold Sneak for more information");
         }
     }
-    
+
     public boolean onItemUse(ItemStack i)
     {
         if (this.canDoWork(i))
         {
-            this.setJoules(this.getJoules(i) - this.joulesPerUse, i);
+            this.setEnergy(i, this.getEnergy(i) - this.energyPerUse);
             return true;
         }
         return false;
     }
-    
+
     @Override
     public boolean canDoWork(ItemStack i)
     {
-        return this.getJoules(i) >= this.joulesPerUse;
+        return this.getEnergy(i) >= this.energyPerUse;
     }
-    
+
     @Override
     public int getItemEnchantability()
     {
         return 0;
     }
-    
+
     @Override
     public boolean getIsRepairable(ItemStack par1ItemStack, ItemStack par2ItemStack)
     {
         return false;
     }
-    
+
     @Override
-    public boolean onBlockDestroyed(ItemStack par1ItemStack, World par2World, int id, int x, int y, int z,
-            EntityLiving par7EntityLiving)
+    public boolean onBlockDestroyed(ItemStack par1ItemStack, World par2World, int id, int x, int y, int z, EntityLivingBase par7EntityLiving)
     {
         Block block = Block.blocksList[id];
         int metadata = par2World.getBlockMetadata(x, y, z);
         double blockHardness = block.getBlockHardness(par2World, x, y, z);
-        if (((IAttachment) this.getAttachment(par1ItemStack).getItem()).getToolType(this.getAttachment(par1ItemStack))
-                .equals("shears"))
+        if (((IAttachment) this.getAttachment(par1ItemStack).getItem()).getToolType(this.getAttachment(par1ItemStack)).equals("shears"))
         {
-            if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass)
-                    || block.equals(Block.deadBush) || block.equals(Block.vine) || block.equals(Block.tripWire)
-                    || block instanceof IShearable)
+            if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass) || block.equals(Block.deadBush) || block.equals(Block.vine) || block.equals(Block.tripWire)
+                || block instanceof IShearable)
                 return true;
         }
         if (blockHardness != 0D && this.canBreakBlock(par1ItemStack, par2World, id, metadata, par7EntityLiving)
-                && !block.canHarvestBlock((EntityPlayer) par7EntityLiving, par2World.getBlockMetadata(x, y, z)))
+            && !block.canHarvestBlock((EntityPlayer) par7EntityLiving, par2World.getBlockMetadata(x, y, z)))
         {
             if (this.onItemUse(par1ItemStack))
             {
                 if (this.getEnchantmentLvl(Enchantment.silkTouch, par1ItemStack) > 0)
                 {
-                    this.dropBlockAsItem_do(par2World, x, y, z,
-                            new ItemStack(block, 1, par2World.getBlockMetadata(x, y, z)));
+                    this.dropBlockAsItem_do(par2World, x, y, z, new ItemStack(block, 1, par2World.getBlockMetadata(x, y, z)));
                 }
                 else
                 {
@@ -336,31 +306,30 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         }
         return false;
     }
-    
+
     @Override
     public ItemStack getCore(ItemStack assembledTool)
     {
         int tier = assembledTool.getItemDamage() / 1000;
-        return new ItemStack(SimpleTools.coreMechElectric, 1, tier);
+        return new ItemStack(SimpleToolsItems.coreMechElectric, 1, tier);
     }
-    
+
     @Override
     public ItemStack getStorage(ItemStack assembledTool)
     {
         ItemStack battery = null;
         try
         {
-            NBTTagCompound batt = assembledTool.getTagCompound().getCompoundTag("SimpleTools")
-                    .getCompoundTag("battery");
+            NBTTagCompound batt = assembledTool.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
             battery = ItemStack.loadItemStackFromNBT(batt);
-            ((IItemElectric) battery.getItem()).setJoules(this.getJoules(assembledTool), battery);
+            ((IEnergyItem) battery.getItem()).setEnergy(battery, this.getEnergy(assembledTool));
         }
         catch (Throwable e)
         {
         }
         return battery;
     }
-    
+
     @Override
     public ItemStack getAttachment(ItemStack assembledTool)
     {
@@ -372,8 +341,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
             if (!assembledTool.getEnchantmentTagList().equals(null))
             {
                 attachment.setTagCompound(new NBTTagCompound());
-                attachment.getTagCompound().setTag(assembledTool.getEnchantmentTagList().getName(),
-                        assembledTool.getEnchantmentTagList());
+                attachment.getTagCompound().setTag(assembledTool.getEnchantmentTagList().getName(), assembledTool.getEnchantmentTagList());
             }
         }
         catch (Throwable e)
@@ -381,14 +349,14 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         }
         return attachment;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public boolean requiresMultipleRenderPasses()
     {
         return true;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
     public Icon getIcon(ItemStack stack, int pass)
@@ -418,10 +386,9 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         }
         return null;
     }
-    
+
     @Override
-    public boolean canBreakBlock(ItemStack par1ItemStack, World par2World, int par3, int metadata,
-            EntityLiving par7EntityLiving)
+    public boolean canBreakBlock(ItemStack par1ItemStack, World par2World, int par3, int metadata, EntityLivingBase par7EntityLiving)
     {
         Block block = Block.blocksList[par3];
         ItemStack attachment = this.getAttachment(par1ItemStack);
@@ -430,7 +397,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         int blockLevel = MinecraftForge.getBlockHarvestLevel(block, metadata, toolClass);
         return toolLevel >= blockLevel && this.canDoWork(par1ItemStack);
     }
-    
+
     /**
      * @param enchant
      *            The enchantment to check for.
@@ -457,7 +424,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         }
         return level;
     }
-    
+
     protected void dropBlockAsItem_do(World par1World, int par2, int par3, int par4, ItemStack par5ItemStack)
     {
         if (!par1World.isRemote && par1World.getGameRules().getGameRuleBooleanValue("doTileDrops"))
@@ -471,14 +438,13 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
             par1World.spawnEntityInWorld(var13);
         }
     }
-    
+
     @Override
-    public boolean hitEntity(ItemStack par1ItemStack, EntityLiving par2EntityLiving, EntityLiving par3EntityLiving)
+    public boolean hitEntity(ItemStack par1ItemStack, EntityLivingBase par2EntityLiving, EntityLivingBase par3EntityLiving)
     {
         if (par1ItemStack.getTagCompound().hasKey("damageVsEntity"))
         {
-            if (!par1ItemStack.getTagCompound().getCompoundTag("damageVsEntity")
-                    .hasKey(par2EntityLiving.getEntityName()))
+            if (!par1ItemStack.getTagCompound().getCompoundTag("damageVsEntity").hasKey(par2EntityLiving.getEntityName()))
             {
                 ;
             }
@@ -487,8 +453,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
                 if (damageMap.containsKey(par2EntityLiving))
                 {
                     int damage = damageMap.get(par2EntityLiving);
-                    par1ItemStack.getTagCompound().getCompoundTag("damageVsEntity")
-                            .setInteger(par2EntityLiving.getEntityName(), damage);
+                    par1ItemStack.getTagCompound().getCompoundTag("damageVsEntity").setInteger(par2EntityLiving.getEntityName(), damage);
                 }
             }
         }
@@ -497,9 +462,9 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         else
             return false;
     }
-    
+
     @Override
-    public boolean itemInteractionForEntity(ItemStack itemstack, EntityLiving entity)
+    public boolean itemInteractionForEntity(ItemStack itemstack, EntityPlayer par2EntityPlayer, EntityLivingBase entity)
     {
         IAttachment attach = (IAttachment) this.getAttachment(itemstack).getItem();
         if (attach.canRightClick(this.getAttachment(itemstack), entity, null) && this.canDoWork(itemstack))
@@ -509,30 +474,27 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         }
         return false;
     }
-    
+
     @Override
     @SideOnly(Side.CLIENT)
-    public void updateIcons(IconRegister par1IconRegister)
+    public void registerIcons(IconRegister par1IconRegister)
     {
     }
-    
+
     @Override
     public boolean onBlockStartBreak(ItemStack itemstack, int x, int y, int z, EntityPlayer player)
     {
         if (player.worldObj.isRemote)
             return false;
         int id = player.worldObj.getBlockId(x, y, z);
-        if (Block.blocksList[id] instanceof IShearable
-                && ((IAttachment) this.getAttachment(itemstack).getItem()).getToolType(this.getAttachment(itemstack))
-                        .toLowerCase().equals("shears"))
+        if (Block.blocksList[id] instanceof IShearable && ((IAttachment) this.getAttachment(itemstack).getItem()).getToolType(this.getAttachment(itemstack)).toLowerCase().equals("shears"))
         {
             IShearable target = (IShearable) Block.blocksList[id];
             if (target.isShearable(itemstack, player.worldObj, x, y, z) && this.onItemUse(itemstack))
             {
-                ArrayList<ItemStack> drops = target.onSheared(itemstack, player.worldObj, x, y, z,
-                        EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
+                ArrayList<ItemStack> drops = target.onSheared(itemstack, player.worldObj, x, y, z, EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
                 Random rand = new Random();
-                
+
                 for (ItemStack stack : drops)
                 {
                     float f = 0.7F;
@@ -543,62 +505,50 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
                     entityitem.delayBeforeCanPickup = 10;
                     player.worldObj.spawnEntityInWorld(entityitem);
                 }
-                
+
                 player.addStat(StatList.mineBlockStatArray[id], 1);
             }
         }
         return false;
     }
-    
+
     @Override
-    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata,
-            EntityLiving entity)
+    public boolean isEffectiveOnBlock(ItemStack assembledTool, World world, int blockID, int metadata, EntityLivingBase entity)
     {
         Block block = Block.blocksList[blockID];
-        if (((IAttachment) this.getAttachment(assembledTool).getItem()).getToolType(this.getAttachment(assembledTool))
-                .equals("shears"))
+        if (((IAttachment) this.getAttachment(assembledTool).getItem()).getToolType(this.getAttachment(assembledTool)).equals("shears"))
         {
-            if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass)
-                    || block.equals(Block.deadBush) || block.equals(Block.vine) || block.equals(Block.tripWire)
-                    || block instanceof IShearable)
+            if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass) || block.equals(Block.deadBush) || block.equals(Block.vine) || block.equals(Block.tripWire)
+                || block instanceof IShearable)
                 return true;
         }
-        
+
         IAttachment attach = (IAttachment) this.getAttachment(assembledTool).getItem();
         String toolClass = attach.getToolType(this.getAttachment(assembledTool));
         int harvestLevel = MinecraftForge.getBlockHarvestLevel(block, metadata, toolClass);
         return harvestLevel <= attach.getAttachmentTier(this.getAttachment(assembledTool)) + 1 && !(harvestLevel < 0);
     }
-    
+
     @Override
-    public String getStoredForDisplay(ItemStack assembledTool)
+    public float[] getAdditionalDisplayData(ItemStack assembledTool)
     {
-        String currEnergy = ElectricityDisplay.getDisplayShort(this.getJoules(assembledTool),
-                ElectricityDisplay.ElectricUnit.JOULES);
-        String maxEnergy = ElectricityDisplay.getDisplayShort(this.getMaxJoules(assembledTool),
-                ElectricityDisplay.ElectricUnit.JOULES);
-        if (this.getJoules(assembledTool) != Double.POSITIVE_INFINITY)
-            return currEnergy + " of " + maxEnergy;
-        else
-            return "Infinite";
+        float currEnergy = this.getEnergy(assembledTool);
+        float maxEnergy = this.getEnergyCapacity(assembledTool);
+        return new float[] { currEnergy / maxEnergy };
     }
-    
+
     @Override
-    public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side,
-            float hitX, float HitY, float hitZ)
+    public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float HitY, float hitZ)
     {
         IAttachment attach = (IAttachment) this.getAttachment(itemstack).getItem();
-        return attach.canRightClick(this.getAttachment(itemstack), new Object[] { world, x, y, z, side, hitX, HitY,
-                hitZ }, player)
-                && this.canDoWork(itemstack);
+        return attach.canRightClick(this.getAttachment(itemstack), new Object[] { world, x, y, z, side, hitX, HitY, hitZ }, player) && this.canDoWork(itemstack);
     }
-    
+
     @Override
-    public int getDamageVsEntity(Entity par1Entity, ItemStack itemStack)
+    public float getDamageVsEntity(Entity par1Entity, ItemStack itemStack)
     {
         NBTTagCompound damageTag = itemStack.getTagCompound().getCompoundTag("damageVsEntity");
-        int damage = damageTag.hasKey(par1Entity.getEntityName()) ? damageTag.getInteger(par1Entity.getEntityName())
-                : damageTag.hasKey("") ? damageTag.getInteger("") : 0;
+        float damage = damageTag.hasKey(par1Entity.getEntityName()) ? damageTag.getFloat(par1Entity.getEntityName()) : damageTag.hasKey("") ? damageTag.getFloat("") : 0;
         return damage;
     }
 }

@@ -3,8 +3,7 @@ package simpletools.common.misc;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import universalelectricity.core.electricity.ElectricityPack;
-import universalelectricity.core.item.IItemElectric;
+import universalelectricity.api.item.IEnergyItem;
 
 public class SlotSTStorage extends Slot
 {
@@ -16,30 +15,29 @@ public class SlotSTStorage extends Slot
     @Override
     public boolean isItemValid(ItemStack i)
     {
-        if (i.getItem() instanceof IItemElectric)
+        if (i.getItem() instanceof IEnergyItem)
         {
-            IItemElectric batt = (IItemElectric) i.getItem();
-            ElectricityPack test = ElectricityPack.getFromWatts(10, 20);
-            double original = batt.getJoules(i);
+            IEnergyItem batt = (IEnergyItem) i.getItem();
+            long test = 10;
             
-            if (batt.getJoules(i) > 0)
+            if (batt.getEnergy(i) > 10)
             {
-                if (batt.getProvideRequest(i).getWatts() > 0)
+                if (batt.discharge(i, test, true) > 0)
                     return true;
                 else
                     return false;
             }
             else
             {
-                batt.onReceive(test, i);
-                if (batt.getProvideRequest(i).getWatts() > 0)
+                batt.setEnergy(i, batt.getEnergyCapacity(i) + 10);
+                if (batt.discharge(i, test, true) > 0)
                 {
-                    batt.onProvide(test, i);
+                    batt.setEnergy(i, batt.getEnergyCapacity(i) - 10);
                     return true;
                 }
                 else
                 {
-                    batt.setJoules(original, i);
+                    batt.setEnergy(i, batt.getEnergyCapacity(i) - 10);
                     return false;
                 }
             }

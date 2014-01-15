@@ -3,71 +3,67 @@ package simpletools.common.tileentities;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
-import simpletools.common.interfaces.IAssembledTool;
-import simpletools.common.interfaces.IPlasmaStorage;
-import universalelectricity.core.block.IElectricityStorage;
-import universalelectricity.core.item.IItemElectric;
-import universalelectricity.prefab.implement.IRedstoneProvider;
-import universalelectricity.prefab.network.IPacketReceiver;
-import universalelectricity.prefab.tile.TileEntityElectrical;
+import simpletools.api.IPlasmaStorage;
+import universalelectricity.api.energy.IEnergyContainer;
+import universalelectricity.api.energy.IEnergyInterface;
+import universalelectricity.api.item.IEnergyItem;
+import calclavia.lib.network.IPacketReceiver;
+import calclavia.lib.prefab.tile.IRedstoneProvider;
+import calclavia.lib.prefab.tile.TileElectrical;
 
 import com.google.common.io.ByteArrayDataInput;
 
-public class TileEntityTablePlasma extends TileEntityElectrical implements IRedstoneProvider, IPacketReceiver,
-        IInventory, IElectricityStorage
+public class TileEntityTablePlasma extends TileElectrical
+implements IRedstoneProvider, IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
 {
     /**
-     * 0: Battery </br>1: Tool </br>2: Deuterium AND/OR Tritium </br>3: Empty
-     * Cells
+     *      0: Battery to power the plasma machine
+     * </br>1: Tool 
+     * </br>2: Deuterium, Tritium, or Water
+     * </br>3: Empty Cells
      */
     private ItemStack[] inventory = new ItemStack[4];
-    private double joules = 0;
+    private long joules = 0;
     private int plasma = 0;
-    private int deuterium = 0;
-    private int tritium = 0;
+    private int rawFuel = 0;
     
-    private static final double MAX_JOULES = 50000;
-    private static final int MAX_PLASMA = 200;
-    private static final int MAX_DEUTERIUM = 100;
-    private static final int MAX_TRITIUM = 100;
+    private static final long MAX_JOULES = 50000;
+    /** In Milli-Buckets */
+    private static final int MAX_RAW_FUEL = 10_000;
+    /** In Units */
+    private static final int MAX_PLASMA = 1000;
     
-    private static final int PLASMA_PER_DEUTERIUM = 5;
-    private static final int PLASMA_PER_TRITIUM = 10;
+    private static final double RAW_FUEL_PER_DEUTERIUM = 1500;
+    private static final double RAW_FUEL_PER_TRITIUM = 3000;
+    /** In Milli-Buckets */
+    private static final double INPUT_PER_OPERATION = 1000;
     private static final double JOULES_PER_OPERATION = 5000;
+    private static final double PLASMA_PER_OPERATION = 15;
     
     @Override
     public void updateEntity()
     {
         super.updateEntity();
-        if (this.deuterium < MAX_DEUTERIUM && OreDictionary.getOres("cellDeuterium").contains(this.inventory[2]))
+        if (this.rawFuel <= MAX_RAW_FUEL - RAW_FUEL_PER_DEUTERIUM)
         {
             this.inventory[2].stackSize--;
-            this.deuterium++;
+            this.rawFuel += RAW_FUEL_PER_DEUTERIUM;
         }
         
-        if (this.tritium < MAX_TRITIUM && OreDictionary.getOres("cellTritium").contains(this.inventory[2]))
+        if (this.rawFuel <= MAX_RAW_FUEL - RAW_FUEL_PER_TRITIUM && OreDictionary.getOres("cellTritium").contains(this.inventory[2]))
         {
             this.inventory[2].stackSize--;
-            this.tritium++;
+            this.rawFuel += RAW_FUEL_PER_TRITIUM;
         }
         
-        if (this.joules >= JOULES_PER_OPERATION && this.tritium > 0 && this.plasma + PLASMA_PER_TRITIUM <= MAX_PLASMA)
+        if (this.joules >= JOULES_PER_OPERATION && this.rawFuel >= INPUT_PER_OPERATION && this.plasma + PLASMA_PER_OPERATION <= MAX_PLASMA)
         {
             this.joules -= JOULES_PER_OPERATION;
-            this.tritium--;
-            this.plasma += PLASMA_PER_TRITIUM;
-        }
-        else if (this.joules >= JOULES_PER_OPERATION && this.deuterium > 0
-                && this.plasma + PLASMA_PER_DEUTERIUM <= MAX_PLASMA)
-        {
-            this.joules -= JOULES_PER_OPERATION;
-            this.deuterium--;
-            this.plasma += PLASMA_PER_DEUTERIUM;
+            this.rawFuel -= RAW_FUEL_PER_TRITIUM;
+            this.plasma += PLASMA_PER_OPERATION;
         }
         
         if (this.inventory[1].getItem() instanceof IPlasmaStorage)
@@ -164,16 +160,16 @@ public class TileEntityTablePlasma extends TileEntityElectrical implements IReds
     }
     
     @Override
-    public boolean isStackValidForSlot(int i, ItemStack itemstack)
+    public boolean isItemValidForSlot(int i, ItemStack itemstack)
     {
         if (itemstack != null)
         {
             switch (i)
             {
                 case 0:
-                    return itemstack.getItem() instanceof IItemElectric;
+                    return itemstack.getItem() instanceof IEnergyItem;
                 case 1:
-                    return itemstack.getItem() instanceof IAssembledTool;
+                    return itemstack.getItem() instanceof IPlasmaStorage;
                 case 2:
                     return OreDictionary.getOres("cellDeuterium").contains(itemstack)
                             || OreDictionary.getOres("cellTritium").contains(itemstack);
@@ -183,7 +179,7 @@ public class TileEntityTablePlasma extends TileEntityElectrical implements IReds
     }
     
     @Override
-    public double getMaxJoules()
+    public long getEnergyCapacity(ForgeDirection from)
     {
         return MAX_JOULES;
     }
@@ -195,18 +191,16 @@ public class TileEntityTablePlasma extends TileEntityElectrical implements IReds
     }
     
     @Override
-    public void handlePacketData(INetworkManager network, int packetType, Packet250CustomPayload packet,
-            EntityPlayer player, ByteArrayDataInput dataStream)
+    public void onReceivePacket(ByteArrayDataInput data, EntityPlayer player, Object... extra)
     {
         if (this.worldObj.isRemote)
         {
             // client
             try
             {
-                this.joules = dataStream.readDouble();
-                this.plasma = dataStream.readInt();
-                this.deuterium = dataStream.readInt();
-                this.tritium = dataStream.readInt();
+                this.joules = data.readLong();
+                this.plasma = data.readInt();
+                this.rawFuel = data.readInt();
             }
             catch (Exception e)
             {
@@ -231,17 +225,5 @@ public class TileEntityTablePlasma extends TileEntityElectrical implements IReds
     {
         // TODO Auto-generated method stub
         return false;
-    }
-    
-    @Override
-    public double getJoules()
-    {
-        return this.joules;
-    }
-    
-    @Override
-    public void setJoules(double joules)
-    {
-        this.joules = joules;
     }
 }

@@ -4,14 +4,15 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import simpletools.api.SimpleToolsItems;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class RecipeRegistry
 {
     public static void registerRecipes()
     {
-        Item attach = SimpleTools.attachmentToolMotor;
-        Item core = SimpleTools.coreMechElectric;
+        Item attach = SimpleToolsItems.attachmentToolMotor;
+        Item core = SimpleToolsItems.coreMechElectric;
         
         // Drill
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(attach, 1, 00), new Object[] { " ! ", "!@!", "!@!",
@@ -73,7 +74,7 @@ public class RecipeRegistry
         GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(core, 1, 3), new Object[] { "!@#", "!!#", " $ ", '!',
                 "ingotSteel", '@', "eliteCircuit", '#', Block.blockDiamond, '$', Item.emerald }));
         
-        GameRegistry.addRecipe(new ShapedOreRecipe(SimpleTools.tableAssembly, new Object[] { "!@!", "#$#", "%%%", '!',
+        GameRegistry.addRecipe(new ShapedOreRecipe(SimpleToolsItems.tableAssembly, new Object[] { "!@!", "#$#", "%%%", '!',
                 "plateCopper", '@', "advancedCircuit", '#', "plateSteel", '$', Block.workbench, '%', "plateTin" }));
     }
 }

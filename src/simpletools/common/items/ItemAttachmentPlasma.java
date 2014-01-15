@@ -6,8 +6,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
-import simpletools.common.SimpleTools;
-import simpletools.common.interfaces.IAttachment;
+import simpletools.api.IAttachment;
+import simpletools.api.SimpleToolsItems;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 
 import com.google.common.collect.BiMap;
@@ -15,7 +15,7 @@ import com.google.common.collect.HashBiMap;
 
 public class ItemAttachmentPlasma extends Item implements IAttachment
 {
-    private final String[] names = { "plasmaTorch" };
+    private final String[] names = { "tool.0", "tool.1", "tool.2", "tool.3", "plasmaTorch" };
     
     public ItemAttachmentPlasma(int itemID, String name)
     {
@@ -38,6 +38,16 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
     @Override
     public String getToolType(ItemStack i)
     {
+        switch (i.getItemDamage())
+        {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+                return "all";
+            case 4:
+                return "";
+        }
         return "";
     }
     
@@ -53,6 +63,11 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
         switch (i.getItemDamage())
         {
             case 0:
+            case 1:
+            case 2:
+            case 3:
+                return i.getItemDamage();
+            case 4:
                 return 1;
         }
         return 0;
@@ -67,13 +82,37 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
     @Override
     public int getAttachmentTier(ItemStack i)
     {
-        return 0;
+        switch (i.getItemDamage())
+        {
+            case 0:
+                return 0;
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 3:
+                return 3;
+            default:
+                return -1;
+        }
     }
     
     @Override
-    public double getHarvestSpeed(ItemStack i)
+    public float getHarvestSpeed(ItemStack i)
     {
-        return 0;
+        switch (i.getItemDamage())
+        {
+            case 0:
+                return 4;
+            case 1:
+                return 6;
+            case 2:
+                return 8;
+            case 3:
+                return 12;
+            default:
+                return 0;
+        }
     }
     
     @Override
@@ -87,7 +126,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
     @Override
     public boolean canRightClick(ItemStack i, Object targetData, EntityPlayer player)
     {
-        if (i.getItemDamage() == 0 && targetData instanceof Object[])
+        if (i.getItemDamage() == 4 && targetData instanceof Object[])
         {
             Object[] target = (Object[]) targetData;
             int x = (Integer) target[1];
@@ -98,13 +137,13 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
             {
                 World world = (World) target[0];
                 
-                if (world.getBlockId(x, y, z) == SimpleTools.plasmaTorch.blockID)
+                if (world.getBlockId(x, y, z) == SimpleToolsItems.plasmaTorch.blockID)
                     return true;
                 
                 x += ForgeDirection.getOrientation(side).offsetX;
                 y += ForgeDirection.getOrientation(side).offsetY;
                 z += ForgeDirection.getOrientation(side).offsetZ;
-                if (world.getBlockId(x, y, z) == 0 || world.getBlockId(x, y, z) == SimpleTools.plasmaTorch.blockID)
+                if (world.getBlockId(x, y, z) == 0 || world.getBlockId(x, y, z) == SimpleToolsItems.plasmaTorch.blockID)
                     return true;
             }
         }
@@ -114,7 +153,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
     @Override
     public byte onRightClick(ItemStack i, Object targetData, EntityPlayer player)
     {
-        if (i.getItemDamage() == 0 && targetData instanceof Object[])
+        if (i.getItemDamage() == 4 && targetData instanceof Object[])
         {
             Object[] target = (Object[]) targetData;
             int x = (Integer) target[1];
@@ -125,8 +164,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
             {
                 World world = (World) target[0];
                 
-                if (world.getBlockId(x, y, z) == SimpleTools.plasmaTorch.blockID && player != null
-                        && !player.isSneaking())
+                if (world.getBlockId(x, y, z) == SimpleToolsItems.plasmaTorch.blockID && player != null && !player.isSneaking())
                 {
                     world.setBlock(x, y, z, 0, 0, 0x02);
                     return 1;
@@ -137,10 +175,10 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
                 z += ForgeDirection.getOrientation(side).offsetZ;
                 if (world.getBlockId(x, y, z) == 0)
                 {
-                    world.setBlock(x, y, z, SimpleTools.plasmaTorch.blockID, 0, 0x02);
+                    world.setBlock(x, y, z, SimpleToolsItems.plasmaTorch.blockID, 0, 0x02);
                     return -1;
                 }
-                if (world.getBlockId(x, y, z) == SimpleTools.plasmaTorch.blockID)
+                if (world.getBlockId(x, y, z) == SimpleToolsItems.plasmaTorch.blockID)
                 {
                     world.setBlock(x, y, z, 0, 0, 0x02);
                     return 1;
