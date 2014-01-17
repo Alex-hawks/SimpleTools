@@ -1,11 +1,13 @@
 package simpletools.common;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
@@ -197,9 +199,12 @@ public class SimpleTools
         {
             try
             {
-                codechicken.nei.api.API.hideItem(SimpleToolsItems.itemAssembledToolElectric.itemID);
-                codechicken.nei.api.API.hideItem(SimpleToolsItems.itemAssembledToolPlasma.itemID);
-                codechicken.nei.api.API.hideItem(SimpleToolsItems.blockPlasmaTorch.blockID);
+                Class clazz = Class.forName("codechicken.nei.api.API");
+                Method m = clazz.getMethod("hideItem", Integer.TYPE);
+
+                m.invoke(null, SimpleToolsItems.itemAssembledToolElectric.itemID);
+                m.invoke(null, SimpleToolsItems.itemAssembledToolPlasma.itemID);
+                m.invoke(null, SimpleToolsItems.blockPlasmaTorch.blockID);
             }
             catch (Throwable e)
             {
