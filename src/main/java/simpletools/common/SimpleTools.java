@@ -46,10 +46,10 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 public class SimpleTools
 {
     // @Mod Prerequisites
-    public static final int MAJOR_VERSION = 0;
-    public static final int MINOR_VERSION = 0;
-    public static final int REVIS_VERSION = 2;
-    public static final int BUILD_VERSION = 2;
+    public static final String MAJOR_VERSION = "@MAJOR@";
+    public static final String MINOR_VERSION = "@MINOR@";
+    public static final String REVIS_VERSION = "@REVIS@";
+    public static final String BUILD_VERSION = "@BUILD@";
     
     // @Mod
     public static final String MOD_ID = "UE-SimpleTools";
