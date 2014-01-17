@@ -3,6 +3,7 @@ package simpletools.common.misc;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import universalelectricity.api.CompatibilityModule;
 import universalelectricity.api.item.IEnergyItem;
 
 public class SlotSTStorage extends Slot
@@ -15,6 +16,7 @@ public class SlotSTStorage extends Slot
     @Override
     public boolean isItemValid(ItemStack i)
     {
+        // TODO CompatibilityModule.isHandler(handler)
         if (i.getItem() instanceof IEnergyItem)
         {
             IEnergyItem batt = (IEnergyItem) i.getItem();
@@ -22,7 +24,7 @@ public class SlotSTStorage extends Slot
             
             if (batt.getEnergy(i) > 10)
             {
-                if (batt.discharge(i, test, true) > 0)
+                if (batt.discharge(i, test, false) > 0)
                     return true;
                 else
                     return false;
@@ -30,7 +32,7 @@ public class SlotSTStorage extends Slot
             else
             {
                 batt.setEnergy(i, batt.getEnergyCapacity(i) + 10);
-                if (batt.discharge(i, test, true) > 0)
+                if (batt.discharge(i, test, false) > 0)
                 {
                     batt.setEnergy(i, batt.getEnergyCapacity(i) - 10);
                     return true;

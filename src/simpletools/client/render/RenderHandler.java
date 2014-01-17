@@ -23,7 +23,7 @@ public class RenderHandler implements ISimpleBlockRenderingHandler
     public ModelPlasmaTorch plasmaTorch = new ModelPlasmaTorch();
     public final int RENDER_ID;
     
-    private static final ResourceLocation textureLocation = new ResourceLocation(SimpleTools.DOMAIN, "/blocks/plasmaTorch.png");
+    private static final ResourceLocation textureLocation = new ResourceLocation(SimpleTools.DOMAIN, "/blocks/blockPlasmaTorch.png");
     
     public RenderHandler()
     {
@@ -34,7 +34,7 @@ public class RenderHandler implements ISimpleBlockRenderingHandler
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer)
     {
-        if (block.blockID == SimpleToolsItems.plasmaTorch.blockID)
+        if (block.blockID == SimpleToolsItems.blockPlasmaTorch.blockID)
         {
             GL11.glPushMatrix();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, FMLClientHandler.instance().getClient().renderEngine.getTexture(textureLocation).getGlTextureId());

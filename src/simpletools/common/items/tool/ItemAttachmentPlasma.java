@@ -1,5 +1,8 @@
-package simpletools.common.items;
+package simpletools.common.items.tool;
 
+import java.util.List;
+
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -16,7 +19,7 @@ import com.google.common.collect.HashBiMap;
 public class ItemAttachmentPlasma extends Item implements IAttachment
 {
     private final String[] names = { "tool.0", "tool.1", "tool.2", "tool.3", "plasmaTorch" };
-    
+
     public ItemAttachmentPlasma(int itemID, String name)
     {
         super(itemID);
@@ -24,7 +27,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
         this.setUnlocalizedName(name);
         this.setMaxStackSize(16);
     }
-    
+
     @Override
     public String getUnlocalizedName(ItemStack is)
     {
@@ -32,9 +35,9 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
             return this.getUnlocalizedName() + "." + this.names[is.getItemDamage()];
         else
             return this.getUnlocalizedName() + ".unknown";
-        
+
     }
-    
+
     @Override
     public String getToolType(ItemStack i)
     {
@@ -50,13 +53,13 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
         }
         return "";
     }
-    
+
     @Override
     public int getToolAttachmentType(ItemStack i)
     {
         return 1;
     }
-    
+
     @Override
     public int getMinimumTier(ItemStack i)
     {
@@ -72,13 +75,13 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
         }
         return 0;
     }
-    
+
     @Override
     public short getAttachmentUID(ItemStack i)
     {
         return ((Integer) (i.getItemDamage() + 40)).shortValue();
     }
-    
+
     @Override
     public int getAttachmentTier(ItemStack i)
     {
@@ -96,7 +99,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
                 return -1;
         }
     }
-    
+
     @Override
     public float getHarvestSpeed(ItemStack i)
     {
@@ -114,7 +117,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
                 return 0;
         }
     }
-    
+
     @Override
     public BiMap<Entity, Integer> getDamageVsEntities(ItemStack i)
     {
@@ -122,7 +125,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
         toReturn.put(null, 3);
         return toReturn;
     }
-    
+
     @Override
     public boolean canRightClick(ItemStack i, Object targetData, EntityPlayer player)
     {
@@ -136,20 +139,20 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
             if (target[0] != null && target[0] instanceof World)
             {
                 World world = (World) target[0];
-                
-                if (world.getBlockId(x, y, z) == SimpleToolsItems.plasmaTorch.blockID)
+
+                if (world.getBlockId(x, y, z) == SimpleToolsItems.blockPlasmaTorch.blockID)
                     return true;
-                
+
                 x += ForgeDirection.getOrientation(side).offsetX;
                 y += ForgeDirection.getOrientation(side).offsetY;
                 z += ForgeDirection.getOrientation(side).offsetZ;
-                if (world.getBlockId(x, y, z) == 0 || world.getBlockId(x, y, z) == SimpleToolsItems.plasmaTorch.blockID)
+                if (world.getBlockId(x, y, z) == 0 || world.getBlockId(x, y, z) == SimpleToolsItems.blockPlasmaTorch.blockID)
                     return true;
             }
         }
         return false;
     }
-    
+
     @Override
     public byte onRightClick(ItemStack i, Object targetData, EntityPlayer player)
     {
@@ -163,22 +166,22 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
             if (target[0] != null && target[0] instanceof World)
             {
                 World world = (World) target[0];
-                
-                if (world.getBlockId(x, y, z) == SimpleToolsItems.plasmaTorch.blockID && player != null && !player.isSneaking())
+
+                if (world.getBlockId(x, y, z) == SimpleToolsItems.blockPlasmaTorch.blockID && player != null && !player.isSneaking())
                 {
                     world.setBlock(x, y, z, 0, 0, 0x02);
                     return 1;
                 }
-                
+
                 x += ForgeDirection.getOrientation(side).offsetX;
                 y += ForgeDirection.getOrientation(side).offsetY;
                 z += ForgeDirection.getOrientation(side).offsetZ;
                 if (world.getBlockId(x, y, z) == 0)
                 {
-                    world.setBlock(x, y, z, SimpleToolsItems.plasmaTorch.blockID, 0, 0x02);
+                    world.setBlock(x, y, z, SimpleToolsItems.blockPlasmaTorch.blockID, 0, 0x02);
                     return -1;
                 }
-                if (world.getBlockId(x, y, z) == SimpleToolsItems.plasmaTorch.blockID)
+                if (world.getBlockId(x, y, z) == SimpleToolsItems.blockPlasmaTorch.blockID)
                 {
                     world.setBlock(x, y, z, 0, 0, 0x02);
                     return 1;
@@ -187,5 +190,15 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
         }
         return 0;
     }
-    
+
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void getSubItems(int par1, CreativeTabs par2CreativeTabs, List par3List)
+    {
+        for (int i = 0; i < names.length; i++)
+        {
+            par3List.add(new ItemStack(par1, 1, i));
+        }
+    }
+
 }

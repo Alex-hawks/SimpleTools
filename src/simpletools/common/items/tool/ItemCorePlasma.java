@@ -1,4 +1,4 @@
-package simpletools.common.items;
+package simpletools.common.items.tool;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class ItemCorePlasma extends Item implements ICore
     @Override
     public Item getAssmebledToolItem(ItemStack i)
     {
-        return SimpleToolsItems.assembledToolPlasma;
+        return SimpleToolsItems.itemAssembledToolPlasma;
     }
     
     @Override

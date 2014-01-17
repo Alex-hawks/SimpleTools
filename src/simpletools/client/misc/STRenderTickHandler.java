@@ -7,6 +7,7 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
@@ -86,7 +87,14 @@ public class STRenderTickHandler implements ITickHandler
                 gui = this.mc.ingameGUI;
             }
             else
+            {
                 gui = this.mc.currentScreen;
+            }
+            
+            if (gui instanceof GuiContainer)
+            {
+                return;
+            }
             
             //GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             GL11.glEnable(GL11.GL_ALPHA_TEST);

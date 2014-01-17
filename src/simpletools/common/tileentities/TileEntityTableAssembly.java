@@ -89,7 +89,7 @@ public class TileEntityTableAssembly extends TileAdvanced implements IRedstonePr
     @Override
     public String getInvName()
     {
-        return StatCollector.translateToLocal(SimpleToolsItems.tableAssembly.getUnlocalizedName() + ".name");
+        return StatCollector.translateToLocal(SimpleToolsItems.blockTableAssembly.getUnlocalizedName() + ".name");
     }
     
     @Override
@@ -233,7 +233,7 @@ public class TileEntityTableAssembly extends TileAdvanced implements IRedstonePr
         {
             IAssembledTool result = (IAssembledTool) ((ICore) this.inventory[1].getItem())
                     .getAssmebledToolItem(this.inventory[1]);
-            this.inventory[3] = result.onCreate(this.inventory[0], this.inventory[1], this.inventory[2]);
+            this.inventory[3] = result.onAssemble(this.inventory[0], this.inventory[1], this.inventory[2]);
         }
     }
     

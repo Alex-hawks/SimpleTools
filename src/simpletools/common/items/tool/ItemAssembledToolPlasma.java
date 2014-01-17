@@ -1,4 +1,4 @@
-package simpletools.common.items;
+package simpletools.common.items.tool;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemAssembledToolPlasma extends Item implements IAssembledElectricTool, IPlasmaStorage
 {
-    private static final long JOULES_PER_USE = 2500;
+    private static final long JOULES_PER_USE = 50000;
     private static final int PLASMA_PER_USE = 1;
 
     public ItemAssembledToolPlasma(int par1, String name)
@@ -48,7 +48,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     }
 
     @Override
-    public ItemStack onCreate(ItemStack attachment, ItemStack core, ItemStack storage)
+    public ItemStack onAssemble(ItemStack attachment, ItemStack core, ItemStack storage)
     {
         ItemStack returnStack = null;
         if (attachment.getItem() instanceof IAttachment && core.getItem() instanceof ICore)
@@ -133,7 +133,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     public ItemStack getCore(ItemStack assembledTool)
     {
         int tier = assembledTool.getItemDamage() / 1000;
-        return new ItemStack(SimpleToolsItems.corePlasma, 1, tier);
+        return new ItemStack(SimpleToolsItems.itemCorePlasma, 1, tier);
     }
 
     @Override

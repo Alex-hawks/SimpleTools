@@ -14,7 +14,6 @@ import simpletools.common.SimpleTools;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 import simpletools.common.tileentities.TileEntityTablePlasma;
 import calclavia.lib.prefab.block.BlockAdvanced;
-import calclavia.lib.prefab.tile.TileAdvanced;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

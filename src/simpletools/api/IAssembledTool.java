@@ -20,7 +20,7 @@ public interface IAssembledTool extends IAdditionalMeterData
      * @return The ItemStack that should store all of the Tool's data, ENSURE
      *         that it has NBTTags on it. null if it failed...
      */
-    public ItemStack onCreate(ItemStack attachment, ItemStack core, ItemStack storage);
+    public ItemStack onAssemble(ItemStack attachment, ItemStack core, ItemStack storage);
     
     /**
      * @param assembledTool

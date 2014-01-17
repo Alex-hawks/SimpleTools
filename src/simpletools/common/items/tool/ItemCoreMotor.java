@@ -1,4 +1,4 @@
-package simpletools.common.items;
+package simpletools.common.items.tool;
 
 import java.util.List;
 
@@ -75,7 +75,7 @@ public class ItemCoreMotor extends Item implements ICore
     @Override
     public Item getAssmebledToolItem(ItemStack i)
     {
-        return SimpleToolsItems.assembledToolElectric;
+        return SimpleToolsItems.itemAssembledToolElectric;
     }
     
     @Override

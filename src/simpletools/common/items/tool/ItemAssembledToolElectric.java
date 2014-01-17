@@ -1,4 +1,4 @@
-package simpletools.common.items;
+package simpletools.common.items.tool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemAssembledToolElectric extends ItemTool implements IAssembledElectricTool
 {
-    private final long energyPerUse = 2000; // in Joules
+    private final long energyPerUse = 50000; // in Joules
 
     public ItemAssembledToolElectric(int itemID, String name)
     {
@@ -144,7 +144,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
      * @return the resultant Item, as an ItemStack. null if it failed.
      */
     @Override
-    public ItemStack onCreate(ItemStack attachment, ItemStack core, ItemStack battery)
+    public ItemStack onAssemble(ItemStack attachment, ItemStack core, ItemStack battery)
     {
         ItemStack returnStack = null;
         if (attachment.getItem() instanceof IAttachment && core.getItem() instanceof ICore)
@@ -166,8 +166,8 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
                     compound.setCompoundTag("damageVsEntity", new NBTTagCompound());
                     compound.setBoolean("useDamageVsEntityTag", true);
 
-                    compound.getCompoundTag("SimpleTools").setDouble("electricity", ((IEnergyItem) battery.getItem()).getEnergy(battery));
-                    compound.getCompoundTag("SimpleTools").setDouble("maxEnergy", ((IEnergyItem) battery.getItem()).getEnergyCapacity(battery));
+                    compound.getCompoundTag("SimpleTools").setLong("electricity", ((IEnergyItem) battery.getItem()).getEnergy(battery));
+                    compound.getCompoundTag("SimpleTools").setLong("maxEnergy", ((IEnergyItem) battery.getItem()).getEnergyCapacity(battery));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("battery", battery.writeToNBT(new NBTTagCompound()));
 
@@ -311,7 +311,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     public ItemStack getCore(ItemStack assembledTool)
     {
         int tier = assembledTool.getItemDamage() / 1000;
-        return new ItemStack(SimpleToolsItems.coreMechElectric, 1, tier);
+        return new ItemStack(SimpleToolsItems.itemCoreMechElectric, 1, tier);
     }
 
     @Override

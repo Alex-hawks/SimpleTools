@@ -5,21 +5,23 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.item.Item;
+import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.oredict.OreDictionary;
 import simpletools.api.SimpleToolsItems;
 import simpletools.common.block.BlockPlasmaTorch;
 import simpletools.common.block.BlockTableAssembly;
 import simpletools.common.block.BlockTablePlasma;
-import simpletools.common.items.ItemAssembledToolElectric;
-import simpletools.common.items.ItemAssembledToolPlasma;
-import simpletools.common.items.ItemAttachmentPlasma;
-import simpletools.common.items.ItemAttachmentToolMotor;
-import simpletools.common.items.ItemCoreMotor;
-import simpletools.common.items.ItemCorePlasma;
+import simpletools.common.items.battery.Battery;
+import simpletools.common.items.tool.ItemAssembledToolElectric;
+import simpletools.common.items.tool.ItemAssembledToolPlasma;
+import simpletools.common.items.tool.ItemAttachmentPlasma;
+import simpletools.common.items.tool.ItemAttachmentToolMotor;
+import simpletools.common.items.tool.ItemCoreMotor;
+import simpletools.common.items.tool.ItemCorePlasma;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 import simpletools.common.misc.SimpleToolsEventHandler;
 import calclavia.lib.network.PacketHandler;
@@ -68,6 +70,7 @@ public class SimpleTools
     private static final int FIRST_TOOL_ID = 16000;
     private static final int FIRST_CORE_ID = 16005;
     private static final int FIRST_BIT_ID = 16010;
+    private static final int FIRST_ITEM_ID = 16015;
     
     @Instance(SimpleTools.MOD_ID)
     public static SimpleTools INSTANCE;
@@ -97,22 +100,26 @@ public class SimpleTools
     {
         config.load();
         
-        SimpleToolsItems.tableAssembly = new BlockTableAssembly(config.getBlock("Assembly_Table", FIRST_BLOCK_ID).getInt());
-        // 1 tableRefuel =
-        SimpleToolsItems.tablePlasma = new BlockTablePlasma(config.getBlock("Plasma_Table", FIRST_BLOCK_ID + 2).getInt());
-        SimpleToolsItems.plasmaTorch = new BlockPlasmaTorch(config.getBlock("Plasma_Torch", FIRST_BLOCK_ID + 3).getInt());
+        SimpleToolsItems.blockTableAssembly = new BlockTableAssembly(config.getBlock("Assembly_Table", FIRST_BLOCK_ID).getInt());
+        // 1 blockTableRefuel =
+        SimpleToolsItems.blockTablePlasma = new BlockTablePlasma(config.getBlock("Plasma_Table", FIRST_BLOCK_ID + 2).getInt());
+        SimpleToolsItems.blockPlasmaTorch = new BlockPlasmaTorch(config.getBlock("Plasma_Torch", FIRST_BLOCK_ID + 3).getInt());
         
-        SimpleToolsItems.assembledToolElectric = new ItemAssembledToolElectric(config.getItem("Electric_Assembled_Tool", FIRST_TOOL_ID).getInt(), "MechElectricAssembledTool");
-        SimpleToolsItems.assembledToolPlasma = new ItemAssembledToolPlasma(config.getItem("Plasma_Assembled_Tool", FIRST_TOOL_ID + 1).getInt(), "PlasmaAssembledTool");
-        // 2 assembledToolFuel
+        SimpleToolsItems.itemAssembledToolElectric = new ItemAssembledToolElectric(config.getItem("Electric_Assembled_Tool", FIRST_TOOL_ID).getInt(), "MechElectricAssembledTool");
+        SimpleToolsItems.itemAssembledToolPlasma = new ItemAssembledToolPlasma(config.getItem("Plasma_Assembled_Tool", FIRST_TOOL_ID + 1).getInt(), "PlasmaAssembledTool");
+        // 2 itemAssembledToolFuel
         
-        SimpleToolsItems.coreMechElectric = new ItemCoreMotor(config.getItem("Electric_Motor_Core", FIRST_CORE_ID).getInt(), "CoreMechElectric");
-        SimpleToolsItems.corePlasma = new ItemCorePlasma(config.getItem("Plasma_Core", FIRST_CORE_ID + 1).getInt(), "CorePlasma");
-        // 2 coreMechFuel =
+        SimpleToolsItems.itemCoreMechElectric = new ItemCoreMotor(config.getItem("Electric_Motor_Core", FIRST_CORE_ID).getInt(), "CoreMechElectric");
+        SimpleToolsItems.itemCorePlasma = new ItemCorePlasma(config.getItem("Plasma_Core", FIRST_CORE_ID + 1).getInt(), "CorePlasma");
+        // 2 itemCoreMechFuel =
         
-        SimpleToolsItems.attachmentToolMotor = new ItemAttachmentToolMotor(config.getItem("Motor_Tool_Attachment", FIRST_BIT_ID).getInt(), "MotorTool");
-        SimpleToolsItems.attachmentToolPlasma = new ItemAttachmentPlasma(config.getItem("Plasma_Tool_Attachment", FIRST_BIT_ID + 1).getInt(), "PlasmaTool");
+        SimpleToolsItems.itemAttachmentToolMotor = new ItemAttachmentToolMotor(config.getItem("Motor_Tool_Attachment", FIRST_BIT_ID).getInt(), "MotorTool");
+        SimpleToolsItems.itemAttachmentToolPlasma = new ItemAttachmentPlasma(config.getItem("Plasma_Tool_Attachment", FIRST_BIT_ID + 1).getInt(), "PlasmaTool");
         
+        SimpleToolsItems.itemBattteryTier1 = new Battery(config.getItem("Tier 1 Battery", FIRST_ITEM_ID + 0).getInt(), 1);
+        SimpleToolsItems.itemBattteryTier2 = new Battery(config.getItem("Tier 2 Battery", FIRST_ITEM_ID + 1).getInt(), 2);
+        SimpleToolsItems.itemBattteryTier3 = new Battery(config.getItem("Tier 3 Battery", FIRST_ITEM_ID + 2).getInt(), 3);
+        SimpleToolsItems.itemBattteryTier4 = new Battery(config.getItem("Tier 4 Battery", FIRST_ITEM_ID + 3).getInt(), 4);
         if (config.hasChanged())
             config.save();
     }
@@ -133,7 +140,7 @@ public class SimpleTools
         meta.name = SimpleTools.MOD_NAME;
         meta.description = "Adding (somewhat) simple modular tools to Universal Electricity";
         
-        meta.url = "http://universalelectricity.com"; // TODO fix the URL
+        //meta.url = "http://universalelectricity.com"; // TODO fix the URL
         meta.updateUrl = ""; // TODO: Add the update URL
         
         meta.logoFile = ""; // TODO: Add the Logo
@@ -144,13 +151,25 @@ public class SimpleTools
         
         configLoad(CONFIG);
         
-        GameRegistry.registerBlock(SimpleToolsItems.tableAssembly, ItemBlock.class, "tableAssembly", SimpleTools.MOD_ID);
+        GameRegistry.registerBlock(SimpleToolsItems.blockTableAssembly, ItemBlock.class, "tableAssembly", SimpleTools.MOD_ID);
+        GameRegistry.registerBlock(SimpleToolsItems.blockTablePlasma, ItemBlock.class, "tablePlasma", SimpleTools.MOD_ID);
+        GameRegistry.registerBlock(SimpleToolsItems.blockPlasmaTorch, ItemBlock.class, "plasmaTorch", SimpleTools.MOD_ID);
+
+        GameRegistry.registerItem(SimpleToolsItems.itemAssembledToolElectric, "assembledToolElectric", SimpleTools.MOD_ID);
+        GameRegistry.registerItem(SimpleToolsItems.itemAssembledToolPlasma, "assembledToolPlasma", SimpleTools.MOD_ID);
         
-        GameRegistry.registerBlock(SimpleToolsItems.tablePlasma, ItemBlock.class, "tablePlasma", SimpleTools.MOD_ID);
-        GameRegistry.registerBlock(SimpleToolsItems.plasmaTorch, ItemBlock.class, "plasmaTorch", SimpleTools.MOD_ID);
-        
+        GameRegistry.registerItem(SimpleToolsItems.itemAttachmentToolMotor, "attachmentToolMotor", SimpleTools.MOD_ID);
+        GameRegistry.registerItem(SimpleToolsItems.itemAttachmentToolPlasma, "attachmentToolPlasma", SimpleTools.MOD_ID);
+
+        GameRegistry.registerItem(SimpleToolsItems.itemCoreMechElectric, "coreMechElectric", SimpleTools.MOD_ID);
+        GameRegistry.registerItem(SimpleToolsItems.itemCorePlasma, "corePlasma", SimpleTools.MOD_ID);
+
+        GameRegistry.registerItem(SimpleToolsItems.itemBattteryTier1, "battteryTier1", SimpleTools.MOD_ID);
+        GameRegistry.registerItem(SimpleToolsItems.itemBattteryTier2, "battteryTier2", SimpleTools.MOD_ID);
+        GameRegistry.registerItem(SimpleToolsItems.itemBattteryTier3, "battteryTier3", SimpleTools.MOD_ID);
+        GameRegistry.registerItem(SimpleToolsItems.itemBattteryTier4, "battteryTier4", SimpleTools.MOD_ID);
+
         NetworkRegistry.instance().registerGuiHandler(this, proxy);
-        //NetworkRegistry.instance().registerGuiHandler(this, SimpleTools.proxy);
     }
     
     @EventHandler
@@ -164,25 +183,25 @@ public class SimpleTools
             LanguageRegistry.instance().loadLocalization(LANGUAGE_PATH + element + ".properties", element, false);
         }
         MinecraftForge.EVENT_BUS.register(SimpleTools.EVENT_HANDLER);
-        Item.itemsList[SimpleToolsItems.assembledToolElectric.itemID] = SimpleToolsItems.assembledToolElectric;
-        
+
+        OreDictionary.registerOre("craftingTableWood", new ItemStack(Block.workbench));
         RecipeRegistry.registerRecipes();
     }
     
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
-        SimpleToolsCreativeTab.INSTANCE.setItemStack(new ItemStack(SimpleToolsItems.tableAssembly));
+        SimpleToolsCreativeTab.INSTANCE.setItemStack(new ItemStack(SimpleToolsItems.blockTableAssembly));
         
         if (Loader.isModLoaded("NotEnoughItems"))
         {
             try
             {
-                codechicken.nei.api.API.hideItem(SimpleToolsItems.assembledToolElectric.itemID);
-                codechicken.nei.api.API.hideItem(SimpleToolsItems.assembledToolPlasma.itemID);
-                codechicken.nei.api.API.hideItem(SimpleToolsItems.plasmaTorch.blockID);
+                codechicken.nei.api.API.hideItem(SimpleToolsItems.itemAssembledToolElectric.itemID);
+                codechicken.nei.api.API.hideItem(SimpleToolsItems.itemAssembledToolPlasma.itemID);
+                codechicken.nei.api.API.hideItem(SimpleToolsItems.blockPlasmaTorch.blockID);
             }
-            catch (Exception e)
+            catch (Throwable e)
             {
                 log(Level.WARNING, "NEI Integration has failed...");
                 log(Level.WARNING, "Please give Alex_hawks the following stacktrace.");

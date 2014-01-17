@@ -1,4 +1,4 @@
-package simpletools.common.items;
+package simpletools.common.items.tool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,13 +118,13 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
         switch (this.getAttachmentTier(i))
         {
             case 0:
-                return 4.0F;
+                return 7.0F;
             case 1:
-                return 6.0F;
-            case 2:
-                return 8.0F;
-            case 3:
                 return 12.0F;
+            case 2:
+                return 17.0F;
+            case 3:
+                return 22.0F;
             default:
                 return 1.0F;
         }
@@ -155,8 +155,7 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
         }
         else if (type.equals("shears"))
         {
-            toolBonus = -(this.getAttachmentTier(i) + 1); // shears will hit for
-                                                          // 0
+            toolBonus = -(this.getAttachmentTier(i) + 1); // shears will hit for 0
         }
         toReturn.put(null, this.getAttachmentTier(i) + toolBonus + 1);
         return toReturn;

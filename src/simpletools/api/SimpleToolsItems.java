@@ -13,32 +13,37 @@ import net.minecraft.item.Item;
  */
 public class SimpleToolsItems
 {
-    public static Block tableAssembly;
+    public static Block blockTableAssembly;
     @Deprecated
-    public static Block tableRefuel;
+    public static Block blockTableRefuel;
     @Deprecated
-    public static Block tablePlasma;
-    public static Block plasmaTorch;
+    public static Block blockTablePlasma;
+    public static Block blockPlasmaTorch;
     
-    public static Item assembledToolElectric;
-    public static Item assembledToolPlasma;
+    public static Item itemAssembledToolElectric;
+    public static Item itemAssembledToolPlasma;
     @Deprecated
-    public static Item assembledToolFuel;
+    public static Item itemAssembledToolFuel;
     
-    public static Item coreMechElectric;
-    public static Item corePlasma;
+    public static Item itemCoreMechElectric;
+    public static Item itemCorePlasma;
     @Deprecated
-    public static Item coreMechFuel;
+    public static Item itemCoreMechFuel;
     
-    public static Item attachmentToolMotor;
-    public static Item attachmentToolPlasma;
+    public static Item itemAttachmentToolMotor;
+    public static Item itemAttachmentToolPlasma;
     
     @Deprecated
-    public static Item electricBoots;
+    public static Item itemElectricBoots;
     @Deprecated
-    public static Item electricLegs;
+    public static Item itemElectricLegs;
     @Deprecated
-    public static Item electricChestPlate;
+    public static Item itemElectricChestPlate;
     @Deprecated
-    public static Item electricHelmet;
+    public static Item itemElectricHelmet;
+    
+    public static Item itemBattteryTier1;
+    public static Item itemBattteryTier2;
+    public static Item itemBattteryTier3;
+    public static Item itemBattteryTier4;
 }
