@@ -72,7 +72,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
 
                     compound.getCompoundTag("SimpleTools").setLong("electricity", ((IEnergyItem) storage.getItem()).getEnergy(storage));
                     compound.getCompoundTag("SimpleTools").setLong("maxEnergy", ((IEnergyItem) storage.getItem()).getEnergyCapacity(storage));
-                    compound.getCompoundTag("SimpleTools").setInteger("plasma", (coreTemp.getCoreTier(core) + 1) * 5000 + 5000);
+                    compound.getCompoundTag("SimpleTools").setInteger("plasma", 0);
                     compound.getCompoundTag("SimpleTools").setInteger("maxPlasma", (coreTemp.getCoreTier(core) + 1) * 5000 + 5000);
                     compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("battery", storage.writeToNBT(new NBTTagCompound()));

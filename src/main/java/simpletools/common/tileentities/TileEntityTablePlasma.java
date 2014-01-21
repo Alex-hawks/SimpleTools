@@ -5,21 +5,23 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.INetworkManager;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import simpletools.api.IPlasmaStorage;
 import universalelectricity.api.CompatibilityModule;
+import universalelectricity.api.energy.EnergyStorageHandler;
 import universalelectricity.api.energy.IEnergyContainer;
 import universalelectricity.api.energy.IEnergyInterface;
-import calclavia.lib.network.IPacketReceiver;
 import calclavia.lib.prefab.tile.TileElectrical;
-
-import com.google.common.io.ByteArrayDataInput;
+import cpw.mods.fml.common.network.PacketDispatcher;
 
 public class TileEntityTablePlasma extends TileElectrical
-implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
+implements IInventory, IEnergyInterface, IEnergyContainer
 {
     /**
      *      0: Battery to power the plasma machine
@@ -29,11 +31,10 @@ implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
      */
 
     private ItemStack[] inventory = new ItemStack[INVENTORY_SIZE];
-    private long joules = 0;
     private int plasma = 0;
     private int rawFuel = 0;
 
-    public static final long MAX_ENERGY = 500000;
+    public static final long MAX_ENERGY = 50000000;
     /** In Milli-Buckets */
     public static final int MAX_RAW_FUEL = 10_000;
     /** In Milli-Buckets */
@@ -43,27 +44,29 @@ implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
     public static final int RAW_FUEL_PER_DEUTERIUM = 1500;
     public static final int RAW_FUEL_PER_TRITIUM = 3000;
     /** In Milli-Buckets */
-    public static final int INPUT_PER_OPERATION = 1000;
-    public static final int JOULES_PER_OPERATION = 5000;
-    public static final int PLASMA_PER_OPERATION = 1000;
+    public static final int RAW_FUEL_PER_OPERATION = 500;
+    public static final int ENERGY_PER_OPERATION = 500000;
+    public static final int PLASMA_PER_OPERATION = 200;
     public static final int PLASMA_PER_FUELING = 200;
     public static final int INVENTORY_SIZE = 4;
+
+    public TileEntityTablePlasma()
+    {
+        this.energy = new EnergyStorageHandler(MAX_ENERGY);
+    }
 
     @Override
     public void updateEntity()
     {
         super.updateEntity();
         this.updateStorage();
-        
-        if(this.inventory[0] != null && this.inventory[0].getItem() != null && CompatibilityModule.isEnergyContainer(this.inventory[0]))
+
+        this.discharge(this.inventory[0]);
+
+        if (this.getEnergy(null) >= ENERGY_PER_OPERATION && this.rawFuel >= RAW_FUEL_PER_OPERATION && this.plasma + PLASMA_PER_OPERATION <= MAX_PLASMA)
         {
-            this.energy.modifyEnergyStored(CompatibilityModule.dischargeItem(this.inventory[0], Math.min(this.getEnergyCapacity(null) / 100, this.getEnergyCapacity(null) - this.getEnergy(null)), true));
-        }
-        
-        if (this.joules >= JOULES_PER_OPERATION && this.rawFuel >= INPUT_PER_OPERATION && this.plasma + PLASMA_PER_OPERATION <= MAX_PLASMA)
-        {
-            this.joules -= JOULES_PER_OPERATION;
-            this.rawFuel -= JOULES_PER_OPERATION;
+            this.energy.extractEnergy(ENERGY_PER_OPERATION, true);
+            this.rawFuel -= RAW_FUEL_PER_OPERATION;
             this.plasma += PLASMA_PER_OPERATION;
         }
 
@@ -74,6 +77,9 @@ implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
                 this.plasma -= PLASMA_PER_FUELING;
             }
         }
+        
+        if(this.ticks % 3 == 0)
+            this.sendPacket();
     }
 
     @Override
@@ -183,28 +189,22 @@ implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
     }
 
     @Override
-    public long getEnergyCapacity(ForgeDirection from)
-    {
-        return MAX_ENERGY;
-    }
-
-    @Override
     public boolean canConnect(ForgeDirection direction)
     {
         return true;
     }
 
     @Override
-    public void onReceivePacket(ByteArrayDataInput data, EntityPlayer player, Object... extra)
+    public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) 
     {
         if (this.worldObj.isRemote)
         {
             // client
             try
             {
-                this.joules = data.readLong();
-                this.plasma = data.readInt();
-                this.rawFuel = data.readInt();
+                this.setEnergy(null, pkt.data.getLong("energy"));
+                this.plasma = pkt.data.getInteger("plasma");
+                this.rawFuel = pkt.data.getInteger("fuel");
             }
             catch (Exception e)
             {
@@ -216,6 +216,29 @@ implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
         {
             // server
         }
+    }
+
+    @Override
+    public Packet getDescriptionPacket() 
+    {
+        if (!this.worldObj.isRemote) 
+        {
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setLong("energy", this.getEnergy(null));
+            tag.setInteger("plasma", this.plasma);
+            tag.setInteger("fuel", this.rawFuel);
+            
+            return new Packet132TileEntityData(this.xCoord, this.yCoord, this.zCoord, 0, tag);
+        }
+        return null;
+    }
+    
+    public void sendPacket()
+    {
+        Packet packet = this.getDescriptionPacket();
+        
+        if (packet != null)
+            PacketDispatcher.sendPacketToAllInDimension(packet, this.worldObj.provider.dimensionId);
     }
 
     @Override
@@ -244,6 +267,7 @@ implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
     @Override
     public void readFromNBT(NBTTagCompound tag)
     {
+        super.readFromNBT(tag);
         this.plasma = tag.getInteger("plasma");
         this.rawFuel = tag.getInteger("fuel");
         NBTTagList var2 = tag.getTagList("Items");
@@ -319,11 +343,11 @@ implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
                 this.inventory[2].stackSize--;
             }
         }
-        
+
         if (this.inventory[2].stackSize <= 0)
             this.inventory[2] = null;
     }
-    
+
     private boolean addItem(int slot, ItemStack is, boolean simulate)
     {
         boolean canDo = false;
@@ -334,9 +358,9 @@ implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
         if (this.inventory[slot] == null)
             canDo = true;
         else if (this.inventory[slot].isItemEqual(is) && ItemStack.areItemStackTagsEqual(this.inventory[slot], is) 
-            && this.inventory[slot].stackSize + is.stackSize <= Math.min(this.inventory[slot].getMaxStackSize(), is.getMaxStackSize()))
+        && this.inventory[slot].stackSize + is.stackSize <= Math.min(this.inventory[slot].getMaxStackSize(), is.getMaxStackSize()))
             canDo = true;
-        
+
         if (!simulate && canDo)
         {
             if (this.inventory[slot] == null)
@@ -348,7 +372,7 @@ implements IPacketReceiver, IInventory, IEnergyInterface, IEnergyContainer
                 this.inventory[slot].stackSize += is.stackSize;
             }
         }
-        
+
         return canDo;
     }
 }

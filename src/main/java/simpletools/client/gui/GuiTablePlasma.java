@@ -36,7 +36,8 @@ public class GuiTablePlasma extends GuiContainer
         this.mc.renderEngine.bindTexture(TextureLocations.GUI_TABLE_PLASMA);
         int plasma = (int) (this.tileEntity.getPlasma() / this.tileEntity.getMaxPlasma() * 50);
         int fuel = (int) (this.tileEntity.getFuel() / this.tileEntity.getMaxFuel() * 50);
-        int energy = (int) (((float) this.tileEntity.getEnergy(null)) / this.tileEntity.getMaxFuel() * 50);
+        int energy = (int) (((float) this.tileEntity.getEnergy(null)) / this.tileEntity.getEnergyCapacity(null) * 50);
+        
         int plasmaTop = 50 - plasma;
         int fuelTop = 50 - fuel;
         int energyTop = 50 - energy;
