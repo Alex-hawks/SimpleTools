@@ -12,7 +12,7 @@ public class SlotSTStorage extends Slot
     {
         super(par1iInventory, par2, par3, par4);
     }
-    
+
     @Override
     public boolean isItemValid(ItemStack i)
     {
@@ -21,28 +21,11 @@ public class SlotSTStorage extends Slot
         {
             IEnergyItem batt = (IEnergyItem) i.getItem();
             long test = 10;
-            
-            if (batt.getEnergy(i) > 10)
-            {
-                if (batt.discharge(i, test, false) > 0)
-                    return true;
-                else
-                    return false;
-            }
+
+            if (batt.discharge(i, test, false) > 0)
+                return true;
             else
-            {
-                batt.setEnergy(i, batt.getEnergyCapacity(i) + 10);
-                if (batt.discharge(i, test, false) > 0)
-                {
-                    batt.setEnergy(i, batt.getEnergyCapacity(i) - 10);
-                    return true;
-                }
-                else
-                {
-                    batt.setEnergy(i, batt.getEnergyCapacity(i) - 10);
-                    return false;
-                }
-            }
+                return false;
         }
         else
             return false;

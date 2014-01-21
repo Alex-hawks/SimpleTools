@@ -34,8 +34,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemAssembledToolPlasma extends Item implements IAssembledElectricTool, IPlasmaStorage
 {
-    private static final long JOULES_PER_USE = 50000;
-    private static final int PLASMA_PER_USE = 1;
+    private static final long JOULES_PER_USE = 25000;
+    private static final int PLASMA_PER_USE = 100;
 
     public ItemAssembledToolPlasma(int par1, String name)
     {
@@ -70,10 +70,10 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
                     compound.setCompoundTag("damageVsEntity", new NBTTagCompound());
                     compound.setBoolean("useDamageVsEntityTag", true);
 
-                    compound.getCompoundTag("SimpleTools").setDouble("electricity", ((IEnergyItem) storage.getItem()).getEnergy(storage));
-                    compound.getCompoundTag("SimpleTools").setDouble("maxEnergy", ((IEnergyItem) storage.getItem()).getEnergyCapacity(storage));
-                    compound.getCompoundTag("SimpleTools").setInteger("plasma", Integer.MAX_VALUE);
-                    compound.getCompoundTag("SimpleTools").setInteger("maxPlasma", (coreTemp.getCoreTier(core) + 1) * 125);
+                    compound.getCompoundTag("SimpleTools").setLong("electricity", ((IEnergyItem) storage.getItem()).getEnergy(storage));
+                    compound.getCompoundTag("SimpleTools").setLong("maxEnergy", ((IEnergyItem) storage.getItem()).getEnergyCapacity(storage));
+                    compound.getCompoundTag("SimpleTools").setInteger("plasma", (coreTemp.getCoreTier(core) + 1) * 5000 + 5000);
+                    compound.getCompoundTag("SimpleTools").setInteger("maxPlasma", (coreTemp.getCoreTier(core) + 1) * 5000 + 5000);
                     compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("battery", storage.writeToNBT(new NBTTagCompound()));
 
@@ -209,7 +209,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
         float currPlasma = this.getPlasma(assembledTool);
         float maxPlasma = this.getMaxPlasma(assembledTool);
 
-        toReturn[0] = (float) (currEnergy / maxEnergy);
+        toReturn[0] = currEnergy / maxEnergy;
         toReturn[1] = currPlasma / maxPlasma;
 
         return toReturn;
@@ -315,7 +315,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     {
         try
         {
-            stack.stackTagCompound.getCompoundTag("SimpleTools").setInteger("plasma", i);
+            stack.stackTagCompound.getCompoundTag("SimpleTools").setInteger("plasma", Math.min(this.getMaxPlasma(stack), Math.max(i,  0)));
         }
         catch (Exception e)
         {
@@ -328,6 +328,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
         if (this.canDoWork(i))
         {
             this.setEnergy(i, this.getEnergy(i) - JOULES_PER_USE);
+            this.setPlasma(i, this.getPlasma(i) - PLASMA_PER_USE);
             return true;
         }
         return false;
@@ -404,7 +405,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
         {
             byte plasma = attach.onRightClick(this.getAttachment(itemStack), new Object[] { world, x, y, z, side, hitX, HitY, hitZ }, player);
             this.setEnergy(itemStack, this.getEnergy(itemStack) - JOULES_PER_USE);
-            this.setPlasma(itemStack, this.getPlasma(itemStack) + plasma);
+            this.setPlasma(itemStack, this.getPlasma(itemStack) + (plasma * 200));
         }
         return canUse;
     }

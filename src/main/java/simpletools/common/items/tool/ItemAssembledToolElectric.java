@@ -166,6 +166,8 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
                     compound.setCompoundTag("damageVsEntity", new NBTTagCompound());
                     compound.setBoolean("useDamageVsEntityTag", true);
 
+                    returnStack.setTagCompound(compound);
+
                     compound.getCompoundTag("SimpleTools").setLong("electricity", ((IEnergyItem) battery.getItem()).getEnergy(battery));
                     compound.getCompoundTag("SimpleTools").setLong("maxEnergy", ((IEnergyItem) battery.getItem()).getEnergyCapacity(battery));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
@@ -173,7 +175,6 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
 
                     compound.getCompoundTag("damageVsEntity").setInteger("", attachmentTemp.getDamageVsEntities(attachment).get(null));
 
-                    returnStack.setTagCompound(compound);
                 }
             }
         }

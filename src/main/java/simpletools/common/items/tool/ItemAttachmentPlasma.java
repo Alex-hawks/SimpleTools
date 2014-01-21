@@ -106,15 +106,15 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
         switch (i.getItemDamage())
         {
             case 0:
-                return 4;
+                return 7.0F;
             case 1:
-                return 6;
+                return 12.0F;
             case 2:
-                return 8;
+                return 17.0F;
             case 3:
-                return 12;
+                return 22.0F;
             default:
-                return 0;
+                return 1.0F;
         }
     }
 

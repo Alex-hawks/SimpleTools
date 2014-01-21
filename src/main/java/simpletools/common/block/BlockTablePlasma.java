@@ -1,5 +1,6 @@
 package simpletools.common.block;
 
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,7 +18,7 @@ import calclavia.lib.prefab.block.BlockAdvanced;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockTablePlasma extends BlockAdvanced
+public class BlockTablePlasma extends BlockAdvanced implements ITileEntityProvider
 {
     Icon top;
     Icon bottom;
@@ -122,12 +123,12 @@ public class BlockTablePlasma extends BlockAdvanced
     public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
             float hitX, float hitY, float hitZ)
     {
-        //if (!par1World.isRemote)
-        //{
+        if (!par1World.isRemote)
+        {
             par5EntityPlayer.openGui(SimpleTools.INSTANCE, 1, par1World, x, y, z);
             return true;
-        //}
-        //return true;
+        }
+        return true;
     }
     
     @Override
@@ -143,9 +144,8 @@ public class BlockTablePlasma extends BlockAdvanced
     }
     
     @Override
-    public TileEntity createTileEntity(World world, int metadata)
+    public TileEntity createNewTileEntity(World world)
     {
         return new TileEntityTablePlasma();
     }
-    
 }

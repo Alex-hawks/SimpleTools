@@ -30,7 +30,7 @@ archivesBaseName = "SimpleTools"
 minecraft {
     version = "${config.version.minecraft}-${config.version.forge}"
 	
-	replaceIn "Reference.java"
+	replaceIn "SimpleTools.java"
 	replace "@MAJOR@", config.version.mod.major
 	replace "@MINOR@", config.version.mod.minor
 	replace "@REVIS@", config.version.mod.revis

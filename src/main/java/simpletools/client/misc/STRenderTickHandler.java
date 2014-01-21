@@ -23,6 +23,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
+@SuppressWarnings("unused")
 public class STRenderTickHandler implements ITickHandler
 {
     private static final int SCALE = 4;
@@ -112,12 +113,12 @@ public class STRenderTickHandler implements ITickHandler
                     {
                         int x = SCALE * (res.getScaledWidth() - (15 * horizLocation));
                         int y = SCALE * (res.getScaledHeight() - (70 * ++vertLocation));
-                        int height = (int) (INNER_Y * energy + BORDER_WIDTH);
+                        int height = (int) (INNER_Y * energy);
                         
                         mc.renderEngine.bindTexture(TextureLocations.HUD_METER_FRAME);
                         gui.drawTexturedModalRect(x, y, 0, 0, OUTER_X, OUTER_Y);
                         mc.renderEngine.bindTexture(TextureLocations.HUD_METER_FILL);
-                        gui.drawTexturedModalRect(x, y + (INNER_Y - height), 0, OUTER_Y - height - 2 * BORDER_WIDTH, OUTER_X, height + BORDER_WIDTH);
+                        gui.drawTexturedModalRect(x, y + (INNER_Y - height) + BORDER_WIDTH, 0, OUTER_Y - height - BORDER_WIDTH, OUTER_X, height + BORDER_WIDTH);
 
                     }
                 }
@@ -129,13 +130,13 @@ public class STRenderTickHandler implements ITickHandler
                     
                     int x = SCALE * (res.getScaledWidth() - (15 * horizLocation));
                     int y = SCALE * (res.getScaledHeight() - (70 * ++vertLocation));
-                    int height = (int) (INNER_Y * damage + BORDER_WIDTH);
+                    int height = (int) (INNER_Y * damage);
                     
 
                     mc.renderEngine.bindTexture(TextureLocations.HUD_METER_FRAME);
                     gui.drawTexturedModalRect(x, y, 0, 0, OUTER_X, OUTER_Y);
                     mc.renderEngine.bindTexture(TextureLocations.HUD_METER_FILL);
-                    gui.drawTexturedModalRect(x, y + (INNER_Y - height), 0, OUTER_Y - height - 2 * BORDER_WIDTH, OUTER_X, height + BORDER_WIDTH);
+                    gui.drawTexturedModalRect(x, y + (INNER_Y - height) + BORDER_WIDTH, 0, OUTER_Y - height - BORDER_WIDTH, OUTER_X, height + BORDER_WIDTH);
                 }
                 horizLocation++;
                 vertLocation = 0;

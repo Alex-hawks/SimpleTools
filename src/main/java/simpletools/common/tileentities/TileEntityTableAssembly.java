@@ -18,10 +18,10 @@ import calclavia.lib.prefab.tile.TileAdvanced;
 
 import com.google.common.io.ByteArrayDataInput;
 
+@SuppressWarnings("unused")
 public class TileEntityTableAssembly extends TileAdvanced implements IRedstoneProvider, IPacketReceiver, ISidedInventory
 {
     private ItemStack[] inventory = new ItemStack[5];
-    @SuppressWarnings("unused")
     private int playersUsing = 0;
     private boolean assembling = false;
     

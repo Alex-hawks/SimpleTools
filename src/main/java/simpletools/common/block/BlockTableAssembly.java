@@ -15,7 +15,6 @@ import simpletools.common.SimpleTools;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 import simpletools.common.tileentities.TileEntityTableAssembly;
 import calclavia.lib.prefab.block.BlockAdvanced;
-import calclavia.lib.prefab.tile.TileAdvanced;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -129,12 +128,12 @@ public class BlockTableAssembly extends BlockAdvanced implements ITileEntityProv
     public boolean onMachineActivated(World par1World, int x, int y, int z, EntityPlayer par5EntityPlayer, int side,
             float hitX, float hitY, float hitZ)
     {
-        //if (!par1World.isRemote)
-        //{
+        if (!par1World.isRemote)
+        {
             par5EntityPlayer.openGui(SimpleTools.INSTANCE, 0, par1World, x, y, z);
             return true;
-        //}
-        //return true;
+        }
+        return true;
     }
     
     @Override
