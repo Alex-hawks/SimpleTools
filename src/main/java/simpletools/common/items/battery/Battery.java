@@ -2,8 +2,10 @@ package simpletools.common.items.battery;
 
 import net.minecraft.item.ItemStack;
 import simpletools.common.SimpleTools;
+import universalelectricity.api.UniversalClass;
 import universalelectricity.api.item.ItemElectric;
 
+@UniversalClass
 public class Battery extends ItemElectric
 {
     public static final long[] CAPACITY = new long[] {10_000_000L, 50_000_000L, 100_000_000L, 500_000_000L};

@@ -40,7 +40,6 @@ public class STCapeHandler implements ITickHandler
         // Major Coders
         this.registerUEDeveloper("Alex_hawks"); // Alex_hawks
         this.registerUEDeveloper("calclavia"); // Calclavia
-        this.registerUEDeveloper("TrainerGuy22"); // TheMike
         this.registerUEDeveloper("Darkguardsman"); // Darkguardsman
     }
 

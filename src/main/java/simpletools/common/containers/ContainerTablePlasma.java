@@ -1,5 +1,7 @@
 package simpletools.common.containers;
 
+import ic2.api.item.IElectricItem;
+import cofh.api.energy.IEnergyContainerItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -7,6 +9,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import simpletools.api.IPlasmaStorage;
 import simpletools.common.tileentities.TileEntityTablePlasma;
+import universalelectricity.api.item.IEnergyItem;
 import calclavia.lib.prefab.slot.SlotEnergyItem;
 import calclavia.lib.prefab.slot.SlotSpecific;
 
@@ -20,7 +23,7 @@ public class ContainerTablePlasma extends Container
         // The Slot for the Battery
         this.addSlotToContainer(new SlotEnergyItem(tileEntity, 0, 16, 22));
         // The Slot for the Tool
-        this.addSlotToContainer(new SlotSpecific(tileEntity, 1, 90, 36, IPlasmaStorage.class));
+        this.addSlotToContainer(new SlotSpecific(tileEntity, 1, 90, 36, IPlasmaStorage.class, IEnergyItem.class, IElectricItem.class, IEnergyContainerItem.class));
         // The slot for the deuterieum / tritium / water
         this.addSlotToContainer(new Slot(tileEntity, 2, 16, 50));
         this.addSlotToContainer(new Slot(tileEntity, 3, 40, 50));

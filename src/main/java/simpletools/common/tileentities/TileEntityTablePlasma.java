@@ -14,12 +14,14 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import simpletools.api.IPlasmaStorage;
 import universalelectricity.api.CompatibilityModule;
+import universalelectricity.api.UniversalClass;
 import universalelectricity.api.energy.EnergyStorageHandler;
 import universalelectricity.api.energy.IEnergyContainer;
 import universalelectricity.api.energy.IEnergyInterface;
 import calclavia.lib.prefab.tile.TileElectrical;
 import cpw.mods.fml.common.network.PacketDispatcher;
 
+@UniversalClass
 public class TileEntityTablePlasma extends TileElectrical
 implements IInventory, IEnergyInterface, IEnergyContainer
 {
@@ -45,7 +47,7 @@ implements IInventory, IEnergyInterface, IEnergyContainer
     public static final int RAW_FUEL_PER_TRITIUM = 3000;
     /** In Milli-Buckets */
     public static final int RAW_FUEL_PER_OPERATION = 500;
-    public static final int ENERGY_PER_OPERATION = 500000;
+    public static final int ENERGY_PER_OPERATION = 45000;
     public static final int PLASMA_PER_OPERATION = 200;
     public static final int PLASMA_PER_FUELING = 200;
     public static final int INVENTORY_SIZE = 4;
@@ -70,12 +72,14 @@ implements IInventory, IEnergyInterface, IEnergyContainer
             this.plasma += PLASMA_PER_OPERATION;
         }
 
-        if (this.inventory[1] != null && this.inventory[1].getItem() instanceof IPlasmaStorage)
+        if (this.inventory[1] != null)
         {
-            if (((IPlasmaStorage) this.inventory[1].getItem()).addPlasma(this.inventory[1], PLASMA_PER_FUELING))
+            if (this.inventory[1].getItem() instanceof IPlasmaStorage && ((IPlasmaStorage) this.inventory[1].getItem()).addPlasma(this.inventory[1], PLASMA_PER_FUELING))
             {
                 this.plasma -= PLASMA_PER_FUELING;
             }
+            
+            this.recharge(this.inventory[1]);
         }
         
         if(this.ticks % 3 == 0)

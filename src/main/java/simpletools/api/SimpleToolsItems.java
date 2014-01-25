@@ -16,7 +16,6 @@ public class SimpleToolsItems
     public static Block blockTableAssembly;
     @Deprecated
     public static Block blockTableRefuel;
-    @Deprecated
     public static Block blockTablePlasma;
     public static Block blockPlasmaTorch;
     

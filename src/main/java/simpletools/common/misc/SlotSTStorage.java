@@ -4,7 +4,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import universalelectricity.api.CompatibilityModule;
-import universalelectricity.api.item.IEnergyItem;
 
 public class SlotSTStorage extends Slot
 {
@@ -16,18 +15,6 @@ public class SlotSTStorage extends Slot
     @Override
     public boolean isItemValid(ItemStack i)
     {
-        // TODO CompatibilityModule.isHandler(handler)
-        if (i.getItem() instanceof IEnergyItem)
-        {
-            IEnergyItem batt = (IEnergyItem) i.getItem();
-            long test = 10;
-
-            if (batt.discharge(i, test, false) > 0)
-                return true;
-            else
-                return false;
-        }
-        else
-            return false;
+        return CompatibilityModule.isHandler(i.getItem());
     }
 }

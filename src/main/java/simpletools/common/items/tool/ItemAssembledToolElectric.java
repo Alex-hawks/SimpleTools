@@ -31,10 +31,10 @@ import simpletools.api.IAssembledTool;
 import simpletools.api.IAttachment;
 import simpletools.api.ICore;
 import simpletools.api.SimpleToolsItems;
+import universalelectricity.api.CompatibilityModule;
+import universalelectricity.api.UniversalClass;
 import universalelectricity.api.energy.UnitDisplay;
 import universalelectricity.api.energy.UnitDisplay.Unit;
-import universalelectricity.api.item.IEnergyItem;
-import universalelectricity.api.item.IVoltageItem;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -42,6 +42,7 @@ import com.google.common.collect.HashBiMap;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+@UniversalClass
 public class ItemAssembledToolElectric extends ItemTool implements IAssembledElectricTool
 {
     private final long energyPerUse = 50000; // in Joules
@@ -59,79 +60,38 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     @Override
     public long getEnergyCapacity(ItemStack theItem)
     {
-        try
-        {
-            return theItem.stackTagCompound.getCompoundTag("SimpleTools").getLong("maxEnergy");
-        }
-        catch (Exception e)
-        {
-            return 0L;
-        }
-    }
-
-    @Override
-    public long getVoltage(ItemStack itemStack)
-    {
-        try
-        {
-            NBTTagCompound info = itemStack.stackTagCompound.getCompoundTag("SimpleTools").getCompoundTag("battery");
-            ItemStack batteryStack = ItemStack.loadItemStackFromNBT(info);
-            return ((IVoltageItem) batteryStack.getItem()).getVoltage(batteryStack);
-        }
-        catch (Exception e)
-        {
-            return 35L;
-        }
+        return CompatibilityModule.getMaxEnergyItem(this.getStorage(theItem));
     }
 
     @Override
     public long getEnergy(ItemStack theItem)
     {
-        try
-        {
-            return theItem.stackTagCompound.getCompoundTag("SimpleTools").getLong("electricity");
-        }
-        catch (Exception e)
-        {
-            return 0L;
-        }
+        return CompatibilityModule.getEnergyItem(this.getStorage(theItem));
     }
 
     @Override
     public void setEnergy(ItemStack itemStack, long energy)
     {
-        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setLong("electricity", energy);
+        //itemStack.stackTagCompound.getCompoundTag("SimpleTools").setLong("electricity", energy);
+        // TODO Find a workaround for TE and IC2 Items
     }
 
     @Override
     public long recharge(ItemStack itemStack, long energy, boolean doRecharge)
     {
-        try
-        {
-            long rejectedElectricity = Math.max(this.getEnergy(itemStack) + energy - this.getEnergyCapacity(itemStack), 0);
-            long energyToStore = energy - rejectedElectricity;
-            this.setEnergy(itemStack, this.getEnergy(itemStack) + energyToStore);
-            return energyToStore;
-        }
-        catch (Exception e)
-        {
-            return energy;
-        }
+        ItemStack is = this.getStorage(itemStack);
+        long toReturn = CompatibilityModule.chargeItem(is, energy, doRecharge);
+        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setCompoundTag("battery", is.writeToNBT(new NBTTagCompound()));
+        return toReturn;
     }
 
     @Override
     public long discharge(ItemStack itemStack, long energy, boolean doDischarge)
     {
-        try
-        {
-            long electricityToUse = Math.min(this.getEnergy(itemStack), energy);
-            this.setEnergy(itemStack, this.getEnergy(itemStack) - electricityToUse);
-            return electricityToUse;
-        }
-        catch (Exception e)
-        {
-            return 0L;
-        }
+        ItemStack is = this.getStorage(itemStack);
+        long toReturn = CompatibilityModule.dischargeItem(is, energy, doDischarge);
+        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setCompoundTag("battery", is.writeToNBT(new NBTTagCompound()));
+        return toReturn;
     }
 
     /**
@@ -146,6 +106,9 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     @Override
     public ItemStack onAssemble(ItemStack attachment, ItemStack core, ItemStack battery)
     {
+        if (!CompatibilityModule.isHandler(battery.getItem()))
+            return null;
+
         ItemStack returnStack = null;
         if (attachment.getItem() instanceof IAttachment && core.getItem() instanceof ICore)
         {
@@ -168,8 +131,6 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
 
                     returnStack.setTagCompound(compound);
 
-                    compound.getCompoundTag("SimpleTools").setLong("electricity", ((IEnergyItem) battery.getItem()).getEnergy(battery));
-                    compound.getCompoundTag("SimpleTools").setLong("maxEnergy", ((IEnergyItem) battery.getItem()).getEnergyCapacity(battery));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("battery", battery.writeToNBT(new NBTTagCompound()));
 
@@ -215,7 +176,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         }
 
         currentTips.add("Energy: " + UnitDisplay.getDisplayShort(this.getEnergy(itemStack), Unit.JOULES) + " / "
-            + UnitDisplay.getDisplayShort(this.getEnergyCapacity(itemStack), Unit.JOULES));
+        + UnitDisplay.getDisplayShort(this.getEnergyCapacity(itemStack), Unit.JOULES));
 
         if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.keyCode))
         {
@@ -242,8 +203,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     {
         if (this.canDoWork(i))
         {
-            this.setEnergy(i, this.getEnergy(i) - this.energyPerUse);
-            return true;
+            return this.discharge(i, energyPerUse, true) >= energyPerUse;
         }
         return false;
     }
@@ -275,15 +235,15 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         if (((IAttachment) this.getAttachment(par1ItemStack).getItem()).getToolType(this.getAttachment(par1ItemStack)).equals("shears"))
         {
             if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass) || block.equals(Block.deadBush) || block.equals(Block.vine) || block.equals(Block.tripWire)
-                || block instanceof IShearable)
+            || block instanceof IShearable)
                 return true;
         }
         if (blockHardness != 0D && this.canBreakBlock(par1ItemStack, par2World, id, metadata, par7EntityLiving)
-            && !block.canHarvestBlock((EntityPlayer) par7EntityLiving, par2World.getBlockMetadata(x, y, z)))
+        && !block.canHarvestBlock((EntityPlayer) par7EntityLiving, par2World.getBlockMetadata(x, y, z)))
         {
             if (this.onItemUse(par1ItemStack))
             {
-                if (this.getEnchantmentLvl(Enchantment.silkTouch, par1ItemStack) > 0)
+                if (this.getEnchantmentLvl(Enchantment.silkTouch, par1ItemStack) > 0 && block.canSilkHarvest(par2World, (EntityPlayer) par7EntityLiving, x, y, z, metadata))
                 {
                     this.dropBlockAsItem_do(par2World, x, y, z, new ItemStack(block, 1, par2World.getBlockMetadata(x, y, z)));
                 }
@@ -323,7 +283,6 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         {
             NBTTagCompound batt = assembledTool.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
             battery = ItemStack.loadItemStackFromNBT(batt);
-            ((IEnergyItem) battery.getItem()).setEnergy(battery, this.getEnergy(assembledTool));
         }
         catch (Throwable e)
         {
@@ -520,7 +479,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         if (((IAttachment) this.getAttachment(assembledTool).getItem()).getToolType(this.getAttachment(assembledTool)).equals("shears"))
         {
             if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass) || block.equals(Block.deadBush) || block.equals(Block.vine) || block.equals(Block.tripWire)
-                || block instanceof IShearable)
+            || block instanceof IShearable)
                 return true;
         }
 

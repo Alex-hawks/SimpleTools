@@ -141,7 +141,7 @@ public class SimpleTools
         meta.name = SimpleTools.MOD_NAME;
         meta.description = "Adding (somewhat) simple modular tools to Universal Electricity";
         
-        //meta.url = "http://universalelectricity.com"; // TODO fix the URL
+        meta.url = "http://calclavia.com/simple-tools/";
         meta.updateUrl = ""; // TODO: Add the update URL
         
         meta.logoFile = ""; // TODO: Add the Logo

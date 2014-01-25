@@ -11,6 +11,7 @@ import simpletools.api.IAssembledTool;
 import simpletools.api.IAttachment;
 import simpletools.api.ICore;
 import simpletools.api.SimpleToolsItems;
+import universalelectricity.api.CompatibilityModule;
 import universalelectricity.api.item.IEnergyItem;
 import calclavia.lib.network.IPacketReceiver;
 import calclavia.lib.prefab.tile.IRedstoneProvider;
@@ -199,12 +200,9 @@ public class TileEntityTableAssembly extends TileAdvanced implements IRedstonePr
                 if (attachTemp.getToolAttachmentType(slot0) == coreTemp.getCoreType(slot1)
                         && attachTemp.getMinimumTier(slot0) <= coreTemp.getCoreTier(slot1))
                 {
-                    if (coreTemp.getCoreFinerType(slot1).equals("electric") && slot2.getItem() instanceof IEnergyItem
-                            && ((IEnergyItem) slot2.getItem()).discharge(slot2, 1, false) > 0)
+                    if (coreTemp.getCoreFinerType(slot1).equals("electric") && CompatibilityModule.isHandler(slot2.getItem()))
                         return true;
-                    else if (coreTemp.getCoreFinerType(slot1).equals("plasma")
-                            && slot2.getItem() instanceof IEnergyItem
-                            && ((IEnergyItem) slot2.getItem()).discharge(slot2, 1, false) > 0)
+                    else if (coreTemp.getCoreFinerType(slot1).equals("plasma") && CompatibilityModule.isHandler(slot2.getItem()))
                         return true;
                     
                 }

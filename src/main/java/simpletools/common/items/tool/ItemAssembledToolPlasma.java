@@ -25,13 +25,14 @@ import simpletools.api.IAttachment;
 import simpletools.api.ICore;
 import simpletools.api.IPlasmaStorage;
 import simpletools.api.SimpleToolsItems;
+import universalelectricity.api.CompatibilityModule;
+import universalelectricity.api.UniversalClass;
 import universalelectricity.api.energy.UnitDisplay;
 import universalelectricity.api.energy.UnitDisplay.Unit;
-import universalelectricity.api.item.IEnergyItem;
-import universalelectricity.api.item.IVoltageItem;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+@UniversalClass
 public class ItemAssembledToolPlasma extends Item implements IAssembledElectricTool, IPlasmaStorage
 {
     private static final long JOULES_PER_USE = 25000;
@@ -50,7 +51,11 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     @Override
     public ItemStack onAssemble(ItemStack attachment, ItemStack core, ItemStack storage)
     {
+        if (!CompatibilityModule.isHandler(storage.getItem()))
+            return null;
+
         ItemStack returnStack = null;
+
         if (attachment.getItem() instanceof IAttachment && core.getItem() instanceof ICore)
         {
             IAttachment attachmentTemp = (IAttachment) attachment.getItem();
@@ -70,8 +75,6 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
                     compound.setCompoundTag("damageVsEntity", new NBTTagCompound());
                     compound.setBoolean("useDamageVsEntityTag", true);
 
-                    compound.getCompoundTag("SimpleTools").setLong("electricity", ((IEnergyItem) storage.getItem()).getEnergy(storage));
-                    compound.getCompoundTag("SimpleTools").setLong("maxEnergy", ((IEnergyItem) storage.getItem()).getEnergyCapacity(storage));
                     compound.getCompoundTag("SimpleTools").setInteger("plasma", 0);
                     compound.getCompoundTag("SimpleTools").setInteger("maxPlasma", (coreTemp.getCoreTier(core) + 1) * 5000 + 5000);
                     compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
@@ -105,7 +108,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
         }
 
         currentTips.add("Energy: " + UnitDisplay.getDisplayShort(this.getEnergy(itemStack), Unit.JOULES) + " / "
-            + UnitDisplay.getDisplayShort(this.getEnergyCapacity(itemStack), Unit.JOULES));
+        + UnitDisplay.getDisplayShort(this.getEnergyCapacity(itemStack), Unit.JOULES));
         currentTips.add("Plasma: " + this.getPlasma(itemStack) + " / " + this.getMaxPlasma(itemStack));
 
         if (Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.keyCode))
@@ -144,7 +147,6 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
         {
             NBTTagCompound batt = assembledTool.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
             battery = ItemStack.loadItemStackFromNBT(batt);
-            ((IEnergyItem) battery.getItem()).setEnergy(battery, this.getEnergy(assembledTool));
         }
         catch (Throwable e)
         {
@@ -216,11 +218,11 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     }
 
     @Override
-    public long getEnergy(ItemStack itemStack)
+    public long getEnergy(ItemStack theItem)
     {
         try
         {
-            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getLong("electricity");
+            return CompatibilityModule.getEnergyItem(this.getStorage(theItem));
         }
         catch (Exception e)
         {
@@ -231,15 +233,15 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     @Override
     public void setEnergy(ItemStack itemStack, long energy)
     {
-        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setLong("electricity", energy);
+        //itemStack.stackTagCompound.getCompoundTag("SimpleTools").setLong("electricity", energy);
+        // TODO Find a workaround for TE and IC2 Items
     }
 
-    @Override
-    public long getEnergyCapacity(ItemStack itemStack)
+    public long getEnergyCapacity(ItemStack theItem)
     {
         try
         {
-            return itemStack.stackTagCompound.getCompoundTag("SimpleTools").getLong("maxEnergy");
+            return CompatibilityModule.getMaxEnergyItem(this.getStorage(theItem));
         }
         catch (Exception e)
         {
@@ -248,40 +250,15 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     }
 
     @Override
-    public long getVoltage(ItemStack itemStack)
-    {
-        try
-        {
-            NBTTagCompound info = itemStack.stackTagCompound.getCompoundTag("SimpleTools").getCompoundTag("battery");
-            ItemStack batteryStack = ItemStack.loadItemStackFromNBT(info);
-            return ((IVoltageItem) batteryStack.getItem()).getVoltage(batteryStack);
-        }
-        catch (Exception e)
-        {
-            return 35L;
-        }
-    }
-
-    @Override
     public long recharge(ItemStack itemStack, long energy, boolean doRecharge)
     {
-        try
-        {
-            long rejectedElectricity = Math.max(this.getEnergy(itemStack) + energy - this.getEnergyCapacity(itemStack), 0);
-            long energyToStore = energy - rejectedElectricity;
-            this.setEnergy(itemStack, this.getEnergy(itemStack) + energyToStore);
-            return energyToStore;
-        }
-        catch (Exception e)
-        {
-            return energy;
-        }
+        return CompatibilityModule.chargeItem(this.getStorage(itemStack), energy, doRecharge);
     }
 
     @Override
     public long discharge(ItemStack itemStack, long energy, boolean doDischarge)
     {
-        return 0L;
+        return CompatibilityModule.dischargeItem(this.getStorage(itemStack), energy, doDischarge);
     }
 
     @Override
@@ -327,7 +304,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     {
         if (this.canDoWork(i))
         {
-            this.setEnergy(i, this.getEnergy(i) - JOULES_PER_USE);
+            this.discharge(i, JOULES_PER_USE, true);
             this.setPlasma(i, this.getPlasma(i) - PLASMA_PER_USE);
             return true;
         }
@@ -404,7 +381,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
         if (canUse && this.canDoWork(itemStack))
         {
             byte plasma = attach.onRightClick(this.getAttachment(itemStack), new Object[] { world, x, y, z, side, hitX, HitY, hitZ }, player);
-            this.setEnergy(itemStack, this.getEnergy(itemStack) - JOULES_PER_USE);
+            this.discharge(itemStack, JOULES_PER_USE, true);
             this.setPlasma(itemStack, this.getPlasma(itemStack) + (plasma * 200));
         }
         return canUse;
@@ -432,11 +409,11 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
         if (((IAttachment) this.getAttachment(par1ItemStack).getItem()).getToolType(this.getAttachment(par1ItemStack)).equals("shears"))
         {
             if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass) || block.equals(Block.deadBush) || block.equals(Block.vine) || block.equals(Block.tripWire)
-                || block instanceof IShearable)
+            || block instanceof IShearable)
                 return true;
         }
         if (blockHardness != 0D && this.canBreakBlock(par1ItemStack, par2World, id, metadata, par7EntityLiving)
-            && !block.canHarvestBlock((EntityPlayer) par7EntityLiving, par2World.getBlockMetadata(x, y, z)))
+        && !block.canHarvestBlock((EntityPlayer) par7EntityLiving, par2World.getBlockMetadata(x, y, z)))
         {
             if (this.onItemUse(par1ItemStack))
             {
