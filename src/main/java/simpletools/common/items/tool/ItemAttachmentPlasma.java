@@ -26,6 +26,7 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
         this.setCreativeTab(SimpleToolsCreativeTab.INSTANCE);
         this.setUnlocalizedName(name);
         this.setMaxStackSize(16);
+        this.setHasSubtypes(true);
     }
 
     @Override

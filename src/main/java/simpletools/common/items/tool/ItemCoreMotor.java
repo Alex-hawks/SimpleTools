@@ -24,6 +24,7 @@ public class ItemCoreMotor extends Item implements ICore
         this.setCreativeTab(SimpleToolsCreativeTab.INSTANCE);
         this.setUnlocalizedName(name);
         this.setMaxStackSize(16);
+        this.setHasSubtypes(true);
     }
     
     @Override
