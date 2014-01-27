@@ -45,7 +45,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 @UniversalClass
 public class ItemAssembledToolElectric extends ItemTool implements IAssembledElectricTool
 {
-    private final long energyPerUse = 100000; // in Joules
+    public static final long BASE_ENERGY_PER_USE = 2000000; // in Joules
+    public static final long MIN_ENERGY_PER_USE = (BASE_ENERGY_PER_USE / 40) * 39;
 
     public ItemAssembledToolElectric(int itemID, String name)
     {
@@ -203,7 +204,8 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     {
         if (this.canDoWork(i))
         {
-            return this.discharge(i, energyPerUse, true) >= energyPerUse;
+            long res = this.discharge(i, BASE_ENERGY_PER_USE, true);
+            return res >= MIN_ENERGY_PER_USE;
         }
         return false;
     }
@@ -211,7 +213,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     @Override
     public boolean canDoWork(ItemStack i)
     {
-        return this.getEnergy(i) >= this.energyPerUse;
+        return this.getEnergy(i) >= BASE_ENERGY_PER_USE;
     }
 
     @Override
