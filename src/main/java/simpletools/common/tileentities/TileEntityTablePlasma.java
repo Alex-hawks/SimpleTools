@@ -36,20 +36,20 @@ implements IInventory, IEnergyInterface, IEnergyContainer
     private int plasma = 0;
     private int rawFuel = 0;
 
-    public static final long MAX_ENERGY = 50000000;
+    public static final long MAX_ENERGY = 1000000000;
     /** In Milli-Buckets */
     public static final int MAX_RAW_FUEL = 10_000;
     /** In Milli-Buckets */
-    public static final int MAX_PLASMA = 50000;
+    public static final int MAX_PLASMA = 5000;
 
-    public static final int RAW_FUEL_PER_WATER = 500;
-    public static final int RAW_FUEL_PER_DEUTERIUM = 1500;
-    public static final int RAW_FUEL_PER_TRITIUM = 3000;
+    public static final int RAW_FUEL_PER_WATER = 100;
+    public static final int RAW_FUEL_PER_DEUTERIUM = 500;
+    public static final int RAW_FUEL_PER_TRITIUM = 1000;
     /** In Milli-Buckets */
-    public static final int RAW_FUEL_PER_OPERATION = 500;
-    public static final int ENERGY_PER_OPERATION = 90000;
-    public static final int PLASMA_PER_OPERATION = 200;
-    public static final int PLASMA_PER_FUELING = 200;
+    public static final int RAW_FUEL_PER_OPERATION = 1000;
+    public static final int ENERGY_PER_OPERATION = 100000000;
+    public static final int PLASMA_PER_OPERATION = 100;
+    public static final int PLASMA_PER_FUELING = 10;
     public static final int INVENTORY_SIZE = 4;
 
     public TileEntityTablePlasma()

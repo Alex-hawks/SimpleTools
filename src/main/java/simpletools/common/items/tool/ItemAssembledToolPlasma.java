@@ -35,7 +35,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 @UniversalClass
 public class ItemAssembledToolPlasma extends Item implements IAssembledElectricTool, IPlasmaStorage
 {
-    private static final long JOULES_PER_USE = 50000;
+    public static final long BASE_ENERGY_PER_USE = 1000000; // in Joules
+    public static final long MIN_ENERGY_PER_USE = (BASE_ENERGY_PER_USE / 20) * 19;
     private static final int PLASMA_PER_USE = 100;
 
     public ItemAssembledToolPlasma(int par1, String name)
@@ -175,7 +176,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     @Override
     public boolean canDoWork(ItemStack assembledTool)
     {
-        return this.getEnergy(assembledTool) >= JOULES_PER_USE && this.getPlasma(assembledTool) >= PLASMA_PER_USE;
+        return this.getEnergy(assembledTool) >= BASE_ENERGY_PER_USE && this.getPlasma(assembledTool) >= PLASMA_PER_USE;
     }
 
     @Override
@@ -294,7 +295,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     {
         if (this.canDoWork(i))
         {
-            this.discharge(i, JOULES_PER_USE, true);
+            this.discharge(i, BASE_ENERGY_PER_USE, true);
             this.setPlasma(i, this.getPlasma(i) - PLASMA_PER_USE);
             return true;
         }
@@ -371,7 +372,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
         if (canUse && this.canDoWork(itemStack))
         {
             byte plasma = attach.onRightClick(this.getAttachment(itemStack), new Object[] { world, x, y, z, side, hitX, HitY, hitZ }, player);
-            this.discharge(itemStack, JOULES_PER_USE, true);
+            this.discharge(itemStack, BASE_ENERGY_PER_USE, true);
             this.setPlasma(itemStack, this.getPlasma(itemStack) + (plasma * 200));
         }
         return canUse;

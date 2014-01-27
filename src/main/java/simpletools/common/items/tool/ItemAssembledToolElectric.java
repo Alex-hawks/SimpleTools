@@ -46,7 +46,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class ItemAssembledToolElectric extends ItemTool implements IAssembledElectricTool
 {
     public static final long BASE_ENERGY_PER_USE = 2000000; // in Joules
-    public static final long MIN_ENERGY_PER_USE = (BASE_ENERGY_PER_USE / 40) * 39;
+    public static final long MIN_ENERGY_PER_USE = (BASE_ENERGY_PER_USE / 20) * 19;
 
     public ItemAssembledToolElectric(int itemID, String name)
     {
