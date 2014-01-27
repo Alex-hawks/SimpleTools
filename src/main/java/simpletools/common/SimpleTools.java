@@ -56,7 +56,7 @@ public class SimpleTools
     public static final String MOD_ID = "UE-SimpleTools";
     public static final String MOD_NAME = "Simple Tools";
     public static final String VERSION = MAJOR_VERSION + "." + MINOR_VERSION + "." + REVIS_VERSION + "." + BUILD_VERSION;
-    public static final String DEPENDENCIES = "after:UniversalElectricity;after:AtomicScience";
+    public static final String DEPENDENCIES = "after:UniversalElectricity";
     public static final boolean USE_METADATA = true;
     
     // @NetworkMod
@@ -190,6 +190,7 @@ public class SimpleTools
     }
     
     @EventHandler
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void postInit(FMLPostInitializationEvent event)
     {
         SimpleToolsCreativeTab.INSTANCE.setItemStack(new ItemStack(SimpleToolsItems.blockTableAssembly));

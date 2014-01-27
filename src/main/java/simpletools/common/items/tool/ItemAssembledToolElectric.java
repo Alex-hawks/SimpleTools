@@ -45,7 +45,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 @UniversalClass
 public class ItemAssembledToolElectric extends ItemTool implements IAssembledElectricTool
 {
-    private final long energyPerUse = 50000; // in Joules
+    private final long energyPerUse = 100000; // in Joules
 
     public ItemAssembledToolElectric(int itemID, String name)
     {
@@ -235,7 +235,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
         if (((IAttachment) this.getAttachment(par1ItemStack).getItem()).getToolType(this.getAttachment(par1ItemStack)).equals("shears"))
         {
             if (block.equals(Block.leaves) || block.equals(Block.web) || block.equals(Block.tallGrass) || block.equals(Block.deadBush) || block.equals(Block.vine) || block.equals(Block.tripWire)
-            || block instanceof IShearable)
+            || block instanceof IShearable && this.onItemUse(par1ItemStack))
                 return true;
         }
         if (blockHardness != 0D && this.canBreakBlock(par1ItemStack, par2World, id, metadata, par7EntityLiving)

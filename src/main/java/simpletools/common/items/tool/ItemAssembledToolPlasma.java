@@ -35,7 +35,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 @UniversalClass
 public class ItemAssembledToolPlasma extends Item implements IAssembledElectricTool, IPlasmaStorage
 {
-    private static final long JOULES_PER_USE = 25000;
+    private static final long JOULES_PER_USE = 50000;
     private static final int PLASMA_PER_USE = 100;
 
     public ItemAssembledToolPlasma(int par1, String name)
@@ -76,7 +76,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
                     compound.setBoolean("useDamageVsEntityTag", true);
 
                     compound.getCompoundTag("SimpleTools").setInteger("plasma", 0);
-                    compound.getCompoundTag("SimpleTools").setInteger("maxPlasma", (coreTemp.getCoreTier(core) + 1) * 5000 + 5000);
+                    compound.getCompoundTag("SimpleTools").setInteger("maxPlasma", (coreTemp.getCoreTier(core) + 2) * 5000);
                     compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("battery", storage.writeToNBT(new NBTTagCompound()));
 
@@ -103,9 +103,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
             NBTBase attach = itemStack.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("attachment");
             attachment = ItemStack.loadItemStackFromNBT((NBTTagCompound) attach);
         }
-        catch (Exception e)
-        {
-        }
+        catch (Exception e) { }
 
         currentTips.add("Energy: " + UnitDisplay.getDisplayShort(this.getEnergy(itemStack), Unit.JOULES) + " / "
         + UnitDisplay.getDisplayShort(this.getEnergyCapacity(itemStack), Unit.JOULES));
@@ -220,14 +218,7 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     @Override
     public long getEnergy(ItemStack theItem)
     {
-        try
-        {
-            return CompatibilityModule.getEnergyItem(this.getStorage(theItem));
-        }
-        catch (Exception e)
-        {
-            return 0L;
-        }
+        return CompatibilityModule.getEnergyItem(this.getStorage(theItem));
     }
 
     @Override
@@ -239,26 +230,25 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
 
     public long getEnergyCapacity(ItemStack theItem)
     {
-        try
-        {
-            return CompatibilityModule.getMaxEnergyItem(this.getStorage(theItem));
-        }
-        catch (Exception e)
-        {
-            return 0L;
-        }
+        return CompatibilityModule.getMaxEnergyItem(this.getStorage(theItem));
     }
 
     @Override
     public long recharge(ItemStack itemStack, long energy, boolean doRecharge)
     {
-        return CompatibilityModule.chargeItem(this.getStorage(itemStack), energy, doRecharge);
+        ItemStack is = this.getStorage(itemStack);
+        long toReturn = CompatibilityModule.chargeItem(is, energy, doRecharge);
+        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setCompoundTag("battery", is.writeToNBT(new NBTTagCompound()));
+        return toReturn;
     }
 
     @Override
     public long discharge(ItemStack itemStack, long energy, boolean doDischarge)
     {
-        return CompatibilityModule.dischargeItem(this.getStorage(itemStack), energy, doDischarge);
+        ItemStack is = this.getStorage(itemStack);
+        long toReturn = CompatibilityModule.dischargeItem(is, energy, doDischarge);
+        itemStack.stackTagCompound.getCompoundTag("SimpleTools").setCompoundTag("battery", is.writeToNBT(new NBTTagCompound()));
+        return toReturn;
     }
 
     @Override
