@@ -9,15 +9,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumToolMaterial;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
@@ -35,10 +37,6 @@ import universalelectricity.api.CompatibilityModule;
 import universalelectricity.api.UniversalClass;
 import universalelectricity.api.energy.UnitDisplay;
 import universalelectricity.api.energy.UnitDisplay.Unit;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -127,16 +125,22 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
 
                     NBTTagCompound compound = new NBTTagCompound();
                     compound.setCompoundTag("SimpleTools", new NBTTagCompound());
-                    compound.setCompoundTag("damageVsEntity", new NBTTagCompound());
-                    compound.setBoolean("useDamageVsEntityTag", true);
+                    compound.setTag("AttributeModifiers", new NBTTagList());
 
                     returnStack.setTagCompound(compound);
 
                     compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("battery", battery.writeToNBT(new NBTTagCompound()));
 
-                    compound.getCompoundTag("damageVsEntity").setInteger("", attachmentTemp.getDamageVsEntities(attachment).get(null));
-
+                    NBTTagCompound damage = new NBTTagCompound();
+                    damage.setLong("UUIDMost", Item.field_111210_e.getMostSignificantBits());
+                    damage.setLong("UUIDLeast", Item.field_111210_e.getLeastSignificantBits());
+                    damage.setString("AttributeName", SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName());
+                    damage.setString("Name", "Weapon modifier");
+                    damage.setDouble("Amount", attachmentTemp.getDamageVsEntities(attachment));
+                    damage.setInteger("Operation", 0);
+                    
+                    compound.getTagList("AttributeModifiers").appendTag(damage);
                 }
             }
         }
@@ -147,7 +151,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     public float getStrVsBlock(ItemStack itemStack, Block block, int meta)
     {
         ItemStack attachment = this.getAttachment(itemStack);
-        String toolClass = ((IAttachment) attachment.getItem()).getToolType(attachment);
+        String toolClass = ((IAttachment) attachment.getItem()).getToolType(attachment).toLowerCase();
         int toolLevel = ((IAttachment) attachment.getItem()).getAttachmentTier(attachment);
         int blockLevel = MinecraftForge.getBlockHarvestLevel(block, meta, toolClass);
 
@@ -155,7 +159,6 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
             return (float) ((IAttachment) attachment.getItem()).getHarvestSpeed(attachment);
         else
             return 1f;
-
     }
 
     @Override
@@ -286,9 +289,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
             NBTTagCompound batt = assembledTool.getTagCompound().getCompoundTag("SimpleTools").getCompoundTag("battery");
             battery = ItemStack.loadItemStackFromNBT(batt);
         }
-        catch (Throwable e)
-        {
-        }
+        catch (Throwable e) { }
         return battery;
     }
 
@@ -306,9 +307,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
                 attachment.getTagCompound().setTag(assembledTool.getEnchantmentTagList().getName(), assembledTool.getEnchantmentTagList());
             }
         }
-        catch (Throwable e)
-        {
-        }
+        catch (Throwable e) { }
         return attachment;
     }
 
@@ -370,7 +369,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
      */
     public int getEnchantmentLvl(Enchantment enchant, ItemStack assembledTool)
     {
-        int level = -1;
+        int level = 0;
         if (assembledTool.getEnchantmentTagList() != null)
         {
             for (int i = 0; i < assembledTool.getEnchantmentTagList().tagCount(); i++)
@@ -402,30 +401,6 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     }
 
     @Override
-    public boolean hitEntity(ItemStack par1ItemStack, EntityLivingBase par2EntityLiving, EntityLivingBase par3EntityLiving)
-    {
-        if (par1ItemStack.getTagCompound().hasKey("damageVsEntity"))
-        {
-            if (!par1ItemStack.getTagCompound().getCompoundTag("damageVsEntity").hasKey(par2EntityLiving.getEntityName()))
-            {
-                ;
-            }
-            {
-                BiMap<Entity, Integer> damageMap = HashBiMap.create();
-                if (damageMap.containsKey(par2EntityLiving))
-                {
-                    int damage = damageMap.get(par2EntityLiving);
-                    par1ItemStack.getTagCompound().getCompoundTag("damageVsEntity").setInteger(par2EntityLiving.getEntityName(), damage);
-                }
-            }
-        }
-        if (this.onItemUse(par1ItemStack))
-            return true;
-        else
-            return false;
-    }
-
-    @Override
     public boolean itemInteractionForEntity(ItemStack itemstack, EntityPlayer par2EntityPlayer, EntityLivingBase entity)
     {
         IAttachment attach = (IAttachment) this.getAttachment(itemstack).getItem();
@@ -439,9 +414,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister par1IconRegister)
-    {
-    }
+    public void registerIcons(IconRegister par1IconRegister) { }
 
     @Override
     public boolean onBlockStartBreak(ItemStack itemstack, int x, int y, int z, EntityPlayer player)
@@ -504,13 +477,5 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     {
         IAttachment attach = (IAttachment) this.getAttachment(itemstack).getItem();
         return attach.canRightClick(this.getAttachment(itemstack), new Object[] { world, x, y, z, side, hitX, HitY, hitZ }, player) && this.canDoWork(itemstack);
-    }
-
-    @Override
-    public float getDamageVsEntity(Entity par1Entity, ItemStack itemStack)
-    {
-        NBTTagCompound damageTag = itemStack.getTagCompound().getCompoundTag("damageVsEntity");
-        float damage = damageTag.hasKey(par1Entity.getEntityName()) ? damageTag.getFloat(par1Entity.getEntityName()) : damageTag.hasKey("") ? damageTag.getFloat("") : 0;
-        return damage;
     }
 }

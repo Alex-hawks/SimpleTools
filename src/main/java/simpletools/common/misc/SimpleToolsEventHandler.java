@@ -12,7 +12,7 @@ import simpletools.api.IAssembledTool;
 
 public class SimpleToolsEventHandler
 {
-    @ForgeSubscribe
+    //@ForgeSubscribe
     public void playerBreakingBlock(BreakSpeed event)
     {
         ItemStack usedIS = event.entityPlayer.inventory.getCurrentItem();

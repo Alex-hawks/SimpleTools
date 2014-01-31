@@ -6,12 +6,14 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
@@ -73,15 +75,22 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
 
                     NBTTagCompound compound = new NBTTagCompound();
                     compound.setCompoundTag("SimpleTools", new NBTTagCompound());
-                    compound.setCompoundTag("damageVsEntity", new NBTTagCompound());
-                    compound.setBoolean("useDamageVsEntityTag", true);
+                    compound.setTag("AttributeModifiers", new NBTTagList());
 
                     compound.getCompoundTag("SimpleTools").setInteger("plasma", 0);
                     compound.getCompoundTag("SimpleTools").setInteger("maxPlasma", (coreTemp.getCoreTier(core) + 2) * 5000);
                     compound.getCompoundTag("SimpleTools").setCompoundTag("attachment", attachment.writeToNBT(new NBTTagCompound()));
                     compound.getCompoundTag("SimpleTools").setCompoundTag("battery", storage.writeToNBT(new NBTTagCompound()));
 
-                    compound.getCompoundTag("damageVsEntity").setInteger("", attachmentTemp.getDamageVsEntities(attachment).get(null));
+                    NBTTagCompound damage = new NBTTagCompound();
+                    damage.setLong("UUIDMost", Item.field_111210_e.getMostSignificantBits());
+                    damage.setLong("UUIDLeast", Item.field_111210_e.getLeastSignificantBits());
+                    damage.setString("AttributeName", SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName());
+                    damage.setString("Name", "Weapon modifier");
+                    damage.setDouble("Amount", attachmentTemp.getDamageVsEntities(attachment));
+                    damage.setInteger("Operation", 0);
+                    
+                    compound.getTagList("AttributeModifiers").appendTag(damage);
 
                     returnStack.setTagCompound(compound);
                 }

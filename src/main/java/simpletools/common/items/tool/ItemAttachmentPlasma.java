@@ -3,7 +3,6 @@ package simpletools.common.items.tool;
 import java.util.List;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -12,9 +11,6 @@ import net.minecraftforge.common.ForgeDirection;
 import simpletools.api.IAttachment;
 import simpletools.api.SimpleToolsItems;
 import simpletools.common.misc.SimpleToolsCreativeTab;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 
 public class ItemAttachmentPlasma extends Item implements IAttachment
 {
@@ -120,11 +116,9 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
     }
 
     @Override
-    public BiMap<Entity, Integer> getDamageVsEntities(ItemStack i)
+    public double getDamageVsEntities(ItemStack i)
     {
-        BiMap<Entity, Integer> toReturn = HashBiMap.create();
-        toReturn.put(null, 3);
-        return toReturn;
+        return 3;
     }
 
     @Override

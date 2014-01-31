@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,10 +18,6 @@ import net.minecraftforge.common.IShearable;
 import simpletools.api.IAttachment;
 import simpletools.common.SimpleTools;
 import simpletools.common.misc.SimpleToolsCreativeTab;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -132,34 +127,32 @@ public class ItemAttachmentToolMotor extends Item implements IAttachment
     }
     
     @Override
-    public BiMap<Entity, Integer> getDamageVsEntities(ItemStack i)
+    public double getDamageVsEntities(ItemStack i)
     {
-        BiMap<Entity, Integer> toReturn = HashBiMap.create();
-        
         String type = this.getToolType(i);
-        int toolBonus = 0;
+        int typeBonus = 0;
+        int tierBonus = 2 * this.getAttachmentTier(i);
         if (type.equals("pickaxe"))
         {
-            toolBonus = 2;
+            typeBonus = 2;
         }
         else if (type.equals("shovel"))
         {
-            toolBonus = 1;
+            typeBonus = 1;
         }
         else if (type.equals("axe"))
         {
-            toolBonus = 3;
+            typeBonus = 3;
         }
         else if (type.equals("sword"))
         {
-            toolBonus = 4;
+            typeBonus = 4;
         }
         else if (type.equals("shears"))
         {
-            toolBonus = -(this.getAttachmentTier(i) + 1); // shears will hit for 0
+            return 0; // shears will hit for 0
         }
-        toReturn.put(null, this.getAttachmentTier(i) + toolBonus + 1);
-        return toReturn;
+        return tierBonus + typeBonus + 1;
     }
     
     @Override

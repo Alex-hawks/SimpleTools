@@ -1,10 +1,7 @@
 package simpletools.api;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-
-import com.google.common.collect.BiMap;
 
 /**
  * @author Alex_hawks
@@ -64,22 +61,10 @@ public interface IAttachment
     /**
      * @param i
      *            The ItemStack, to provide the metadata to the method.
-     * @return A BiMap<Entity, Integer> of the Entity and the damage dealt.
-     *         </br> The Assembled tool will do the out of energy penalties.
-     *         </br> Also, DO NOT DAMAGE THE ENTITY IN THIS METHOD... The
-     *         Assembled tool does that too. </br> You do need to calculate
-     *         damage based on the attachment, and the entity. But NOT based on
-     *         enchantments. </br> Also, map a value to Entity as that value
-     *         will be used on anything not specifically listed. </br> If you
-     *         want all entities to take the same base damage from the tool,
-     *         just return the map with one entry. </br> THIS IS
-     *         META-SENSETIVE!!! </br> Shovels do 1 more damage than their
-     *         EnumToolMaterial says. </br> Pick-axes do 2 more damage than
-     *         their EnumToolMaterial says. </br> Axes do 3 more damage than
-     *         their EnumToolMaterial says. </br> Swords do 4 more damage than
-     *         their EnumToolMaterial says.
+     * @return 
+     *            The damage to be dealt
      */
-    public BiMap<Entity, Integer> getDamageVsEntities(ItemStack i);
+    public double getDamageVsEntities(ItemStack i);
     
     /**
      * Called to check if the attachment can interact with this object
