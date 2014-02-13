@@ -207,7 +207,7 @@ public class ItemAssembledToolElectric extends ItemTool implements IAssembledEle
     {
         if (this.canDoWork(i))
         {
-            long res = this.discharge(i, BASE_ENERGY_PER_USE, true);
+            long res = this.discharge(i, (long) (BASE_ENERGY_PER_USE - (BASE_ENERGY_PER_USE / 25.0 * this.getEnchantmentLvl(Enchantment.unbreaking, i)) + 0.5), true);
             return res >= MIN_ENERGY_PER_USE;
         }
         return false;

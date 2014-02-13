@@ -38,7 +38,7 @@ implements IInventory, IEnergyInterface, IEnergyContainer
 
     public static final long MAX_ENERGY = 1000000000;
     /** In Milli-Buckets */
-    public static final int MAX_RAW_FUEL = 10_000;
+    public static final int MAX_RAW_FUEL = 10000;
     /** In Milli-Buckets */
     public static final int MAX_PLASMA = 5000;
 

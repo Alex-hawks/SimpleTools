@@ -304,8 +304,8 @@ public class ItemAssembledToolPlasma extends Item implements IAssembledElectricT
     {
         if (this.canDoWork(i))
         {
-            this.discharge(i, BASE_ENERGY_PER_USE, true);
-            this.setPlasma(i, this.getPlasma(i) - PLASMA_PER_USE);
+            this.discharge(i, (long) (BASE_ENERGY_PER_USE - (BASE_ENERGY_PER_USE / 25.0 * this.getEnchantmentLvl(Enchantment.unbreaking, i)) + 0.5), true);
+            this.setPlasma(i, (int) (this.getPlasma(i) - (PLASMA_PER_USE - (PLASMA_PER_USE / 25.0 * this.getEnchantmentLvl(Enchantment.unbreaking, i))) + 0.5));
             return true;
         }
         return false;

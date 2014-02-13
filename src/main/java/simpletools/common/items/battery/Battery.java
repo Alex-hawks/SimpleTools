@@ -8,7 +8,7 @@ import universalelectricity.api.item.ItemElectric;
 @UniversalClass
 public class Battery extends ItemElectric
 {
-    public static final long[] CAPACITY = new long[] {10_000_000L, 50_000_000L, 100_000_000L, 500_000_000L};
+    public static final long[] CAPACITY = new long[] {10000000L, 50000000L, 100000000L, 500000000L};
     private final int tier;
     
     public Battery(int id, int tier)

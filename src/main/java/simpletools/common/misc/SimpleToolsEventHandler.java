@@ -12,7 +12,7 @@ import simpletools.api.IAssembledTool;
 
 public class SimpleToolsEventHandler
 {
-    //@ForgeSubscribe
+    @ForgeSubscribe
     public void playerBreakingBlock(BreakSpeed event)
     {
         ItemStack usedIS = event.entityPlayer.inventory.getCurrentItem();
@@ -39,7 +39,7 @@ public class SimpleToolsEventHandler
 
                 boolean canHarvest = tool.canBreakBlock(itemstack, player.worldObj, par1Block.blockID, meta, player);
 
-                System.out.println("canHarvest: " + canHarvest);
+                //System.out.println("canHarvest: " + canHarvest);
                 if (!canHarvest && f <= 1.0F)
                 {
                     f += f1 * 0.08F;

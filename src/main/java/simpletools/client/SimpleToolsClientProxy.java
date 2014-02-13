@@ -5,7 +5,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import simpletools.client.gui.GuiTableAssembly;
 import simpletools.client.gui.GuiTablePlasma;
-import simpletools.client.misc.STCapeHandler;
 import simpletools.client.misc.STRenderTickHandler;
 import simpletools.client.render.RenderHandler;
 import simpletools.common.SimpleToolsCommonProxy;
@@ -30,7 +29,6 @@ public class SimpleToolsClientProxy extends SimpleToolsCommonProxy implements IG
         
         RenderingRegistry.registerBlockHandler(plasmaTorch);
         
-        TickRegistry.registerTickHandler(STCapeHandler.INSTANCE, Side.CLIENT);
         TickRegistry.registerTickHandler(STRenderTickHandler.INSTANCE, Side.CLIENT);
     }
     
