@@ -2,19 +2,26 @@ package simpletools.common.items.tool;
 
 import java.util.List;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import simpletools.api.IAttachment;
 import simpletools.api.SimpleToolsItems;
+import simpletools.common.SimpleTools;
 import simpletools.common.misc.SimpleToolsCreativeTab;
 
 public class ItemAttachmentPlasma extends Item implements IAttachment
 {
     private final String[] names = { "tool.0", "tool.1", "tool.2", "tool.3", "plasmaTorch" };
+    private Icon[] icons;
 
     public ItemAttachmentPlasma(int itemID, String name)
     {
@@ -194,6 +201,27 @@ public class ItemAttachmentPlasma extends Item implements IAttachment
         {
             par3List.add(new ItemStack(par1, 1, i));
         }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IconRegister iconRegister)
+    {
+        ItemStack itemStack;
+        this.icons = new Icon[names.length];
+
+        for (int i = 0; i < names.length; i++)
+        {
+            itemStack = new ItemStack(this.itemID, 1, i);
+            this.icons[i] = iconRegister.registerIcon(this.getUnlocalizedName(itemStack).replace("item.", SimpleTools.DOMAIN));
+        }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getIconFromDamage(int par1)
+    {
+        return this.icons[par1];
     }
 
 }
